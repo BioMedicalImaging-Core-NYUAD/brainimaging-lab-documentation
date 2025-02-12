@@ -12,4 +12,6 @@ These are the policies and procedures for a working MRI lab.
     :caption: Lab Overview
 
     mri_lab_description
+    process_diagram
+
 
