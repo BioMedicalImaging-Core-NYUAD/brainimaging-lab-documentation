@@ -17,9 +17,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = "Basic Sphinx Example Project"
-copyright = "2022, Read the Docs core team"
-author = "Read the Docs core team"
+project = "NYUAD MRI Lab Documentation"
+copyright = "2022, Haidee Paterson, Osama Abdullah"
+author = "Haidee Paterson, Osama Abdullah"
 
 master_doc = "index"
 # -- General configuration ---------------------------------------------------
