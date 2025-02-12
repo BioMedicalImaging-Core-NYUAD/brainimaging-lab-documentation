@@ -50,6 +50,22 @@ html_css_files = [
     "custom.css",
 ]
 
+
+html_theme_options = {
+    "logo_only": False,
+    "display_version": True,
+    "prev_next_buttons_location": "bottom",
+    "style_external_links": False,
+    "vcs_pageview_mode": "",
+    "style_nav_header_background": "#561A70",
+    # Toc options
+    "collapse_navigation": True,
+    "sticky_navigation": True,
+    "navigation_depth": 4,
+    "includehidden": True,
+    "titles_only": False,
+}
+
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
