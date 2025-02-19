@@ -1,3 +1,7 @@
+MRI lab flowchart
+=================
+
+
 .. mermaid::
    :align: center
    :caption: "MEG Lab Flowchart"
