@@ -12,5 +12,5 @@ Instructions for creating new mermaid diagrams
 
 -Right click 'Refactor' allows you to change the name of a file
 
--The name of the .rst file does not need to be the same as the heading in the index
+-The name of the .rst file does not create the index file names on the webpage index but rather the underlined headings on top of the page
 
