@@ -1,4 +1,4 @@
-.. mermaid::
+. mermaid::
    :align: center
    :caption: "MEG Lab Flowchart"
 
