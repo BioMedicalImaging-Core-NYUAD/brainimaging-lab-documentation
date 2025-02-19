@@ -13,5 +13,7 @@ These are the policies and procedures for a working MRI lab.
 
     mri_lab_description
     process_diagram
+    processes
+    instructions
 
 
