@@ -5,8 +5,7 @@ Below is a flowchart describing a typical MRI data acquisition process:
 
 .. mermaid::
 
-
-graph TD
+flowchart TD
     A[Patient Registration & Scheduling]
     B((Screening for Contraindications))
     C{Patient Preparation & Consent}
