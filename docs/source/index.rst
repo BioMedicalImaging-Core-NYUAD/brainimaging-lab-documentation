@@ -16,13 +16,6 @@ These are the policies and procedures for a working MRI lab.
     3-processes
     4-instructions
 
-.. toctree::
-    :caption: Performance Dashboards
-
-    1-test
-    2-test2
-
-
 
 
 
