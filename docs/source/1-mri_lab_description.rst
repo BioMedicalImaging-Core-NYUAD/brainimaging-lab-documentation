@@ -3,8 +3,21 @@ MRI Lab Description
 
 .. image:: /_static/myimage.png
    :alt: MRI scanner image
-   :width: 300px
+   :width: 600px
    :align: center
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Magnetic Resonance Imaging (MRI) is a non-invasive technique that uses a powerful magnetic field and radio waves to produce detailed images of the inside of the body. Unlike X-rays or CT scans, it does not rely on radiation; instead, the strong magnetic field interacts with the body’s hydrogen atoms, and the scanner detects the signals they emit to create images. This approach allows researchers and medical professionals to see organs, tissues, and other structures with remarkable clarity, making MRI a crucial tool in diagnosing and studying a wide range of conditions.
 
