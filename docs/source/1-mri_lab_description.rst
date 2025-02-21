@@ -6,6 +6,10 @@ MRI Lab Description
    :width: 1200px
    :align: center
 
+.. raw:: html
+
+   <br><br>
+
 
 .. raw:: html
 
