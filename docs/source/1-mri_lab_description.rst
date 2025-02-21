@@ -6,7 +6,7 @@ MRI Lab Description
    :width: 1200px
    :align: center
 
-   Figure 1. This is the MRI scanner used in NYU Abu Dhabi’s lab.
+   Figure 1. MRI scanner at NYU Abu Dhabi
 
 .. raw:: html
 
