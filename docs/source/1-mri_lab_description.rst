@@ -3,7 +3,7 @@ MRI Lab Description
 
 .. image:: /_static/myimage.png
    :alt: MRI scanner image
-   :width: 600px
+   :width: 1200px
    :align: center
 
 
