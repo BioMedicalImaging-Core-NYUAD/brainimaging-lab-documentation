@@ -1,7 +1,7 @@
 MRI Lab Description
 ===================
 
-.. image:: /_static/Picture1.jpg
+.. image:: /_static/myimage.png
    :alt: MRI scanner image
    :width: 300px
    :align: center
