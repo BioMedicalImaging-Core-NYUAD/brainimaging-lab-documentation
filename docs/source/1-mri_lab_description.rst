@@ -10,7 +10,7 @@ MRI Lab Description
 
 .. raw:: html
 
-   <br><br>
+   <br>
 
 
 .. raw:: html
