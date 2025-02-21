@@ -1,4 +1,4 @@
 MRI Lab Description
 ===================
 
-Test
+This is a system that investigates brain function
