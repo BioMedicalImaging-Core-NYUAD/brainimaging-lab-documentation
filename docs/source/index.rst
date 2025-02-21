@@ -17,6 +17,9 @@ These are the policies and procedures for a working MRI lab.
     4-instructions
     5-setup
 
-
+.. image:: /_static/Picture1.jpg
+   :alt: A sample image
+   :width: 300px
+   :align: center
 
 
