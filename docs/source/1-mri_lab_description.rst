@@ -5,7 +5,7 @@ MRI Lab Description
    :alt: MRI scanner image
    :width: 1200px
    :align: center
-   :caption: MRI Lab Photograph
+
 
 .. raw:: html
 
