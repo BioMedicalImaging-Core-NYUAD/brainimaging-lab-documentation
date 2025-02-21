@@ -1,10 +1,15 @@
 MRI Lab Description
 ===================
 
-.. image:: /_static/myimage.png
+MRI Lab Description
+===================
+
+.. figure:: /_static/myimage.png
    :alt: MRI scanner image
    :width: 1200px
    :align: center
+
+   Figure 1. This is the MRI scanner used in NYU Abu Dhabi’s lab.
 
 .. raw:: html
 
