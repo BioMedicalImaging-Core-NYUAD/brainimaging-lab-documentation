@@ -7,7 +7,7 @@ Brain Imaging Lab Overview
    :width: 1200px
    :align: center
 
-   Figure 1. MRI scanner at NYU Abu Dhabi
+
 
 .. raw:: html
 
@@ -25,7 +25,7 @@ Brain Imaging Lab description
 3T Siemens Prisma MRI Scanner
 *****************************
 
-.. figure:: ../_static/mri_scanner_inside.png
+.. figure:: ../_static/mri_scanner_inside.jpg
    :alt: MRI scanner image
    :width: 800px
    :align: center
