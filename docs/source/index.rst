@@ -2,7 +2,7 @@
 Brain Imaging: NYUAD documentation page
 #######################################
 
-.. figure:: /_static/myimage.png
+.. figure:: /_static/mri_scanner.png
    :alt: MRI scanner image
    :width: 1200px
    :align: center
@@ -31,9 +31,6 @@ These are the policies and procedures for a working MRI lab.
     4-instructions
     5-setup
 
-.. image:: /_static/Picture1.jpg
-   :alt: A sample image
-   :width: 300px
-   :align: center
+
 
 
