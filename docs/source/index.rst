@@ -17,7 +17,7 @@ Brain Imaging: NYUAD documentation page
 
 .. raw:: html
 
-   <br><br>
+   <br>
 
 
 ****
