@@ -2,7 +2,7 @@
 Brain Imaging Lab Overview
 **************************
 
-.. figure:: ../_static/mri_scanner.png
+.. image:: ../_static/mri_scanner.png
    :alt: MRI scanner image
    :width: 1200px
    :align: center
