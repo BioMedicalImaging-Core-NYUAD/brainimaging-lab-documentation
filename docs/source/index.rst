@@ -68,10 +68,6 @@ MRI data acquisition, MRI integrated with EEG, and MEG data acquisition.
    <div style="clear: both;"></div>
 
 
-.. raw:: html
-
-   <div style="clear: both;"></div>
-
 
 Lab Address
 -----------
