@@ -85,10 +85,11 @@ Documentation content
     :caption: Lab Overview
 
     1-lab_overview/1-mri_lab_description
-    1-lab_overview/2-process_diagram
-    1-lab_overview/3-processes
-    1-lab_overview/4-instructions
-    1-lab_overview/5-setup
+    1-lab_overview/2-mri_system
+    1-lab_overview/3-process_diagram
+    1-lab_overview/4-processes
+    1-lab_overview/5-instructions
+    1-lab_overview/6-setup
 
 
 .. toctree::
