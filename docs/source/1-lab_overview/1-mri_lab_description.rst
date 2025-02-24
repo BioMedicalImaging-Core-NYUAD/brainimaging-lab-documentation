@@ -26,7 +26,7 @@ Brain Imaging Lab description
 
 .. figure:: ../_static/mri_scanner_inside.jpg
    :alt: MRI scanner inside image
-   :width: 800px
+   :width: 1000px
    :align: center
 
    Figure 1. MRI scanner at NYU Abu Dhabi
