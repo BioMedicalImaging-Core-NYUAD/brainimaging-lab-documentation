@@ -48,20 +48,6 @@ MRI data acquisition, MRI integrated with EEG, and MEG data acquisition.
    <div style="clear: both;"></div>
 
 
-Hadi Zaatiti
-------------
-.. image:: graphic/team/hadi.jpg
-   :width: 250px
-   :align: left
-   :alt: Hadi Zaatiti
-
-**MEG Research Scientist I**
-
-Hadi is an MEG Research Scientist, specialized in MEG-EEG data processing,
-with a background in designing embedded systems, representation learning and electrical engineering.
-His main role is to support MEG-EEG projects by ensuring correct operation of the systems and processing of acquired data.
-
-`hadi.zaatiti@nyu.edu <mailto:hadi.zaatiti@nyu.edu>`_
 
 .. raw:: html
 
