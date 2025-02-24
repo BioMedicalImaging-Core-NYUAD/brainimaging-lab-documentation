@@ -25,7 +25,7 @@ Brain Imaging Lab description
 *****************************
 
 .. figure:: ../_static/mri_scanner_inside.jpg
-   :alt: MRI scanner image
+   :alt: MRI scanner inside image
    :width: 800px
    :align: center
 
