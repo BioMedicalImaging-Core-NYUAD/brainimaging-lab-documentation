@@ -35,3 +35,13 @@ NYU Abu Dhabi’s MRI lab features a 3T Siemens Prisma system, installed in 2017
 
 MRI Compatible EEG System Brain Products
 ****************************************
+
+.. figure:: ../_static/eeg.png
+   :alt: eeg
+   :width: 800px
+   :align: center
+
+   Figure 2. EEG System
+
+We have an EEG system that complements fMRI by measuring electrical changes in the brain, while fMRI measures hemodynamic changes. Because EEG and fMRI provide distinct spatial and temporal information, combining the two requires special considerations for data quality and participant safety. Our setup includes MR-conditional amplifiers certified by major scanner vendors, with the option to add sensors like accelerometers or GSR for broader physiological monitoring. We have online viewing software allowing for real-time processing to ensure data quality throughout each recording session.
+
