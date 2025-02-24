@@ -26,6 +26,31 @@ Team
 
 
 
+
+
+
+Osama Abdullah
+---------------
+.. image:: /_static/osama.jpg
+   :width: 250px
+   :align: left
+   :alt: Osama Abdullah
+
+**MRI Physicist II**
+
+Osama is a research scientist and physicist who manages the daily operations of the BioMedical Imaging Core
+at New York University Abu Dhabi, overseeing a research-dedicated 3-Tesla Siemens MRI scanner,
+the MEG lab, and the Small Animal Imaging lab on campus.
+In his role, he supports research activities and advances technical capabilities by
+supervising researchers and technical staff and providing scientific assistance.
+
+`osama.abdullah@nyu.edu <mailto:osama.abdullah@nyu.edu>`_
+
+.. raw:: html
+
+   <div style="clear: both;"></div>
+
+
 Haidee Paterson
 ---------------
 .. image:: /_static/haidee.jpg
@@ -47,28 +72,6 @@ MRI data acquisition, MRI integrated with EEG, and MEG data acquisition.
 
    <div style="clear: both;"></div>
 
-
-.. raw:: html
-
-   <div style="clear: both;"></div>
-
-
-Osama Abdullah
----------------
-.. image:: /_static/osama.jpg
-   :width: 250px
-   :align: left
-   :alt: Osama Abdullah
-
-**MRI Physicist II**
-
-Osama is a research scientist and physicist who manages the daily operations of the BioMedical Imaging Core
-at New York University Abu Dhabi, overseeing a research-dedicated 3-Tesla Siemens MRI scanner,
-the MEG lab, and the Small Animal Imaging lab on campus.
-In his role, he supports research activities and advances technical capabilities by
-supervising researchers and technical staff and providing scientific assistance.
-
-`osama.abdullah@nyu.edu <mailto:osama.abdullah@nyu.edu>`_
 
 .. raw:: html
 
