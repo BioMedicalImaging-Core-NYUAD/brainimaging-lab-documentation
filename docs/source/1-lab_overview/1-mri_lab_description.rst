@@ -50,7 +50,7 @@ Vpixx System
 VPixx systems provide MRI researchers with tools that deliver precise, reliable, and highly synchronized visual and often auditory stimuli inside the scanning environment. In particular, the PROPixx projector’s long-throw lens options and robust design allow the device to be placed safely outside the MRI room while projecting clear, stable images into the bore. These systems also integrate trigger inputs/outputs and analog I/O so that the presentation of stimuli can be tightly coordinated with scanner pulses, ensuring that changes in brain activity, captured by MRI, line up exactly with the onset of visual or auditory events.
 
 The system includes:
---------------------
+
     - a PROPixx projector
     - an in-bore screen
     - left and right-hand response boxes
