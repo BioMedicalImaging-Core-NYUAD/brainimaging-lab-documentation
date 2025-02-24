@@ -17,7 +17,6 @@ Brain Imaging Lab Overview
 
    <br>
 
-
 Brain Imaging Lab description
 #############################
 
