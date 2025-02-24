@@ -7,7 +7,7 @@ Brain Imaging: NYUAD documentation page
    :width: 1200px
    :align: center
 
-   Figure 1. MRI scanner at NYU Abu Dhabi
+   The Brain Imaging NYUAD lab, part of the BioMedical Imaging Core at NYU Abu Dhabi, provides a comprehensive documentation page covering the Magnetic Resonance Imaging (MRI) system and its associated ancillary equipment. This resource is aimed at all NYUAD users who need guidance on utilizing the lab’s imaging facilities.
 
 .. raw:: html
 
