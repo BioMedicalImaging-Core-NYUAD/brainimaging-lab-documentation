@@ -24,11 +24,6 @@ Brain Imaging: NYUAD documentation page
 Team
 ****
 
-
-
-
-
-
 Osama Abdullah
 ---------------
 .. image:: /_static/osama.jpg
