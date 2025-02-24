@@ -1,8 +1,22 @@
-MRI documentation page
-######################
+#######################################
+Brain Imaging: NYUAD documentation page
+#######################################
 
-Lab description
-===============
+.. figure:: /_static/myimage.png
+   :alt: MRI scanner image
+   :width: 1200px
+   :align: center
+
+   Figure 1. MRI scanner at NYU Abu Dhabi
+
+.. raw:: html
+
+   <br>
+
+
+.. raw:: html
+
+   <br>
 
 
 These are the policies and procedures for a working MRI lab.
