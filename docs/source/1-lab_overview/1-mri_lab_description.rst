@@ -56,7 +56,7 @@ The system includes:
     - left and right-hand response boxes
     - soundpixx
 
-.. figure:: ../_static/VPixx.png
+.. figure:: ../_static/vpixx.png
    :alt: vpixx
    :width: 800px
    :align: center
