@@ -8,7 +8,6 @@ Brain Imaging Lab Overview
    :align: center
 
 
-
 .. raw:: html
 
    <br>
