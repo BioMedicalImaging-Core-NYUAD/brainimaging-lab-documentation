@@ -25,7 +25,7 @@ Brain Imaging Lab description
 3T Siemens Prisma MRI Scanner
 *****************************
 
-.. figure:: ../_static/mri scanner_inside.png
+.. figure:: ../_static/mri_scanner_inside.png
    :alt: MRI scanner image
    :width: 800px
    :align: center
