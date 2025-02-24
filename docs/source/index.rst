@@ -28,7 +28,7 @@ Team
 
 Haidee Paterson
 ---------------
-.. image:: graphic/team/haidee.jpg
+.. image:: /_static/haidee.jpg
    :width: 250px
    :align: left
    :alt: Haidee Paterson
@@ -48,7 +48,6 @@ MRI data acquisition, MRI integrated with EEG, and MEG data acquisition.
    <div style="clear: both;"></div>
 
 
-
 .. raw:: html
 
    <div style="clear: both;"></div>
@@ -56,7 +55,7 @@ MRI data acquisition, MRI integrated with EEG, and MEG data acquisition.
 
 Osama Abdullah
 ---------------
-.. image:: graphic/team/osama.jpg
+.. image:: /_static/osama.jpg
    :width: 250px
    :align: left
    :alt: Osama Abdullah
@@ -76,21 +75,15 @@ supervising researchers and technical staff and providing scientific assistance.
    <div style="clear: both;"></div>
 
 
-
 Lab Address
 -----------
 
 .. admonition:: Lab Address
 
-   📍 **NeuroWaves Research Lab**
-   A2, 008, Ground Floor,
+   📍 **Brain Imaging Research Lab**
+   A2, 014-015, Ground Floor,
    New York University,
    Abu Dhabi, Saadiyat Island
-
-.. admonition:: Contact
-
-   📧 Email: nyuad.meg@nyu.edu
-   ☎ Phone: +971 02 556 8066
 
 
 .. toctree::
