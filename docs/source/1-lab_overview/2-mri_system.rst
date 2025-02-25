@@ -15,30 +15,55 @@ MRI system components
 
 NYU Abu Dhabi’s MRI lab features a 3T Siemens Prisma system.
 
-Specifications:
+Specifications
+-------------
 
-Field strength	3 Tesla
-Bore size	60 cm
-System length	213 cm
-System weight (in operation)	13 tons
-Gradient strength	XR Gradients (139 mT/m8 @ 346 T/m/s8)
-Max. amplitude	139 mT/m8
-Max. slew rate	346 T/m/s8
+- **Field strength**: 3 Tesla
+- **Bore size**: 60 cm
+- **System length**: 213 cm
+- **System weight (in operation)**: 13 tons
+- **Gradient strength**: XR Gradients (139 mT/m8 @ 346 T/m/s8)
+- **Max. amplitude**: 139 mT/m8
+- **Max. slew rate**: 346 T/m/s8
 
-Available coils:
+Available coils
+---------------
 
-- Head/Neck 64 Ultra-fast, high SNR, head and neck imaging
-- 32-Channel Head Coil iPAT-compatible coil for fast high-resolution and advanced neuro imaging.
-- Tx/Rx CP Head Coil CP Send/Receive head coil with integrated preamplifier.
-- Head/Neck 20 for examination of head and neck, for example of brain, neck blood vessels and the C-spine
-- Body 18 - Light-weight coil with SlideConnect® technology for easy coil set up and excellent patient comfort. The Body 18 is typically used in combination with the Spine 32 for examinations of the thorax, abdomen, pelvis or hip and is also well suited for cardiac or vascular applications.
-- Body 30 - This flexible and comfortable Body 30 coil enables full Field of View coverage and patient comfort. The Body 30 is typically used for examinations of the pelvis, particularly prostate examinations, hip, abdomen, or thorax and is also well suited for cardiac or vascular applications. It is used in combination with Spine coil or with other coils.
-- Tx/Rx Knee 15 Flare Coil 15 channel transmit/receive coil for high resolution knee imaging with a flared opening for better patient population fit.
-- 4-Channel Flex Coils Multipurpose coils for orthopedic imaging and other applications.
-- 4-Channel Special-Purpose Coil The 4-channel special purpose coil is a no-tune receiver coil designed for examination with small Field-of-Views.
-- Spine Matrix Coil 24-element design with 24 integrated preamplifiers, 8 clusters of 3 elements each. Smoothly integrated into the patient table and streamlined with Head Matrix coil and Neck Matrix coil
--
+- **Head/Neck 64**
+  Ultra-fast, high SNR, head and neck imaging.
 
+- **32-Channel Head Coil**
+  iPAT-compatible coil for fast high-resolution and advanced neuro imaging.
+
+- **Tx/Rx CP Head Coil**
+  CP Send/Receive head coil with integrated preamplifier.
+
+- **Head/Neck 20**
+  For examination of head and neck (brain, neck blood vessels, and C-spine).
+
+- **Body 18**
+  Light-weight coil with SlideConnect® technology for easy coil set up and
+  excellent patient comfort. Typically used with the Spine 32 for thorax,
+  abdomen, pelvis, or hip exams. Also well suited for cardiac or vascular applications.
+
+- **Body 30**
+  Flexible and comfortable coil for full Field of View coverage and patient comfort.
+  Typically used for pelvis (particularly prostate), hip, abdomen, or thorax exams.
+  Often combined with the Spine coil or other coils for cardiac/vascular applications.
+
+- **Tx/Rx Knee 15 Flare Coil**
+  15-channel transmit/receive coil for high-resolution knee imaging, featuring
+  a flared opening for better patient fit.
+
+- **4-Channel Flex Coils**
+  Multipurpose coils for orthopedic imaging and other specialized applications.
+
+- **4-Channel Special-Purpose Coil**
+  A no-tune receiver coil designed for small Field-of-View exams.
+
+- **Spine Matrix Coil**
+  24-element design with 24 integrated preamplifiers, 8 clusters of 3 elements each.
+  Integrated into the patient table, works with Head and Neck Matrix coils.
 
 MRI Compatible EEG System from Brain Products
 ****************************************
