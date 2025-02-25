@@ -26,6 +26,7 @@ Max. amplitude	139 mT/m8
 Max. slew rate	346 T/m/s8
 
 Available coils:
+
 - Head/Neck 64 Ultra-fast, high SNR, head and neck imaging
 - 32-Channel Head Coil iPAT-compatible coil for fast high-resolution and advanced neuro imaging.
 - Tx/Rx CP Head Coil CP Send/Receive head coil with integrated preamplifier.
