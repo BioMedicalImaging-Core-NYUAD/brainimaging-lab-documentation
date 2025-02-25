@@ -1,8 +1,8 @@
 MRI System
 ==========
 
-MRI system description
---------------------------
+MRI system components
+---------------------
 3T Siemens Prisma MRI Scanner
 *****************************
 
