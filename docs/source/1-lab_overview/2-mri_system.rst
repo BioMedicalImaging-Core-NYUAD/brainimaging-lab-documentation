@@ -2,9 +2,9 @@ MRI System
 ==========
 
 MRI system components
----------------------
+*********************
 3T Siemens Prisma MRI Scanner
-*****************************
+-----------------------------
 
 .. figure:: ../_static/mri_scanner_inside.png
    :alt: mri scanner inside image
