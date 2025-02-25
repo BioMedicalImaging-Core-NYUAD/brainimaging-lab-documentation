@@ -16,6 +16,7 @@ MRI system components
 NYU Abu Dhabi’s MRI lab features a 3T Siemens Prisma system.
 
 Specifications
+--------------
 
 - **Field strength**: 3 Tesla
 - **Bore size**: 60 cm
@@ -26,6 +27,7 @@ Specifications
 - **Max. slew rate**: 346 T/m/s8
 
 Available coils
+---------------
 
 - **Head/Neck 64**
   Ultra-fast, high SNR, head and neck imaging.
@@ -64,7 +66,7 @@ Available coils
   Integrated into the patient table, works with Head and Neck Matrix coils.
 
 MRI Compatible EEG System from Brain Products
-****************************************
+---------------------------------------------
 
 .. figure:: ../_static/eeg.png
    :alt: eeg
@@ -76,7 +78,8 @@ MRI Compatible EEG System from Brain Products
 We have an EEG system that complements fMRI by measuring electrical changes in the brain, while fMRI measures hemodynamic changes. Because EEG and fMRI provide distinct spatial and temporal information, combining the two requires special considerations for data quality and participant safety. Our setup includes MR-conditional amplifiers certified by major scanner vendors, with the option to add sensors like accelerometers or GSR for broader physiological monitoring. We have online viewing software allowing for real-time processing to ensure data quality throughout each recording session.
 
 Vpixx System
-************
+------------
+
 VPixx systems provide MRI researchers with tools that deliver precise, reliable, and highly synchronized visual and often auditory stimuli inside the scanning environment. In particular, the PROPixx projector’s long-throw lens options and robust design allow the device to be placed safely outside the MRI room while projecting clear, stable images into the bore. These systems also integrate trigger inputs/outputs and analog I/O so that the presentation of stimuli can be tightly coordinated with scanner pulses, ensuring that changes in brain activity, captured by MRI, line up exactly with the onset of visual or auditory events.
 
 The system includes:
