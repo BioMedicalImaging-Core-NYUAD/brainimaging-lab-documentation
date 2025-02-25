@@ -15,10 +15,10 @@ MRI system components
 
 NYU Abu Dhabi’s MRI lab features a 3T Siemens Prisma system.
 
-        Specifications
-        --------------
+Specifications
+--------------
 
-        - **Field strength**: 3 Tesla
+    - **Field strength**: 3 Tesla
     - **Bore size**: 60 cm
     - **System length**: 213 cm
     - **System weight (in operation)**: 13 tons
@@ -26,8 +26,8 @@ NYU Abu Dhabi’s MRI lab features a 3T Siemens Prisma system.
     - **Max. amplitude**: 139 mT/m8
     - **Max. slew rate**: 346 T/m/s8
 
-        Available coils
-        ---------------
+Available coils
+---------------
 
     - **Head/Neck 64**
       Ultra-fast, high SNR, head and neck imaging.
