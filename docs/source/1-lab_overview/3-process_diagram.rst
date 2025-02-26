@@ -14,10 +14,6 @@ Process for new MEG user
         C --> D[💻 <b>Submit Draft Code via Pull Request</b>];
         D --> E[✅ <b>Code Reviewed</b>];
         E --> F{⚖️ <b>Does Code Work?</b>};
-
-        F --❌ No --> G[🔄 <b>Iterate & Revise Code</b>];
-        G -->|📂 Resubmit| D;
-
         F --✅ Yes --> H[🔬 <b>Keep Testing Code</b>];
         H -->|🏆 Success| I[🎉 <b>Experiment Finalized</b>];
 
