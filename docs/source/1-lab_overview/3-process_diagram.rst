@@ -1,7 +1,3 @@
-MRI Data Acquisition Workflow
-=============================
-
-Below is a flowchart describing a typical MRI data acquisition process:
 
 Process for new MRI user
 ========================
