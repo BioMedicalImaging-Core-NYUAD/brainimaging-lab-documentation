@@ -16,7 +16,7 @@ Process for new MRI user
     F --> I[⏱️ <b>Time to test your code in the MRI lab</b>];
     G --> I;
     H --> I;
-    I --> J
+    I --> J[<b>Schedule testing time on both CTPSS calendar and NYUAD Prisma MRI Schedule</b>];
     J --> K{🧲️ <b>Does Code Work?</b>};
     K --✅ Yes --> L[🔬 <b>Keep Testing Code</b>];
     L -->|🏆 Success| M[🎉 <b>Experiment Finalized</b>];
