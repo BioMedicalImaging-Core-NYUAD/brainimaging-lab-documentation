@@ -3,22 +3,37 @@ MRI Data Acquisition Workflow
 
 Below is a flowchart describing a typical MRI data acquisition process:
 
+Process for new MEG user
+========================
+
 .. mermaid::
 
     graph TD;
-    A[🎓 <b>User arrives at MRI lab</b>] -->|Start| B[🧪 <b>Complete Experiment Request Form</b>];
-    B --> C[<b>Prepare code (Psychtoolbox)</b>];
-    C --> D[<b>Test Code on Stimulus computer in MRI lab</b>];
-    D --> E[<b>Test Experiment timing with MRI scanner</b>];
+        A[🎓 <b>User arrives at MEG lab</b>] -->|🚀 Start| B[🧪 <b>Design Experiment</b>];
+        B --> C[📝 <b>Present Research</b>];
+        C --> D[💻 <b>Submit Draft Code via Pull Request</b>];
+        D --> E[✅ <b>Code Reviewed</b>];
+        E --> F{⚖️ <b>Does Code Work?</b>};
 
-    %% Clickable Node for Google Drive file
-    click B "https://drive.google.com/file/d/10Py1KSAsktpCjU6c3lLuWLqVL2a5ofee/view?usp=drive_link"
+        F --❌ No --> G[🔄 <b>Iterate & Revise Code</b>];
+        G -->|📂 Resubmit| D;
 
-    %% Style Definitions
+        F --✅ Yes --> H[🔬 <b>Keep Testing Code</b>];
+        H -->|🏆 Success| I[🎉 <b>Experiment Finalized</b>];
 
-    classDef process fill:#2196F3,stroke:#1976D2,color:#fff;
+        %% Clickable Node for GitHub PR
+        click D "https://github.com/Hzaatiti/meg-pipeline/pulls" "Visit GitHub Repository"
 
-    class A,B,C,D,E process;
+        %% Style Definitions
+        classDef success fill:#4CAF50,stroke:#2E7D32,color:#fff;
+        classDef decision fill:#FFEB3B,stroke:#FBC02D,color:#000;
+        classDef process fill:#2196F3,stroke:#1976D2,color:#fff;
+        classDef warning fill:#FF5722,stroke:#E64A19,color:#fff;
+
+        class A,B,C,D,E,H process;
+        class F decision;
+        class G warning;
+        class I success;
 
 
 
