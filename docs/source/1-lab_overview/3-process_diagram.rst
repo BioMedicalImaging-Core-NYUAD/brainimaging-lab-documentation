@@ -5,7 +5,6 @@ Below is a flowchart describing a typical MRI data acquisition process:
 
 .. mermaid::
 
-    %%{init: {'themeCSS': '.triangle rect { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }'}}%%
 graph TD
     A[Patient Registration & Scheduling] --> B[Screening for Contraindications]
     B --> C[Patient Preparation & Consent]
