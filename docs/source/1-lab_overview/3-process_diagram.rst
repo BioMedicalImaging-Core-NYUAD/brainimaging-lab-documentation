@@ -24,6 +24,7 @@ Process for new MRI user
     click B "https://drive.google.com/file/d/10Py1KSAsktpCjU6c3lLuWLqVL2a5ofee/view?usp=drive_link"
     click D "https://app.imagingu.com/courses/personnel-group-ii-yearly"
     click E "mailto:haidee.paterson@nyu.edu" "Email haidee.paterson@nyu.edu"
+    click F "https://corelabs.abudhabi.nyu.edu/"
 
     %% Style Definitions
     classDef success fill:#4CAF50,stroke:#2E7D32,color:#fff;
