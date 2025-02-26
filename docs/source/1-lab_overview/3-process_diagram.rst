@@ -5,7 +5,7 @@ Process for new MRI user
 .. mermaid::
 
   graph TD;
-    A[🎓 <b>User arrives at MRI lab</b>] --> B[🧪 <b>Complete New MRI Project Request</b>];
+    B[🧪 <b>Complete New MRI Project Request</b>];
     B --> C[<b>User designs experimental code</b>];
     B --> D[<b>Complete MRI Safety Training Level 2</b>];
     C --> E[<b>Request access from <a href="mailto:haidee.paterson@nyu.edu">haidee.paterson@nyu.edu</a></b>];
@@ -32,6 +32,6 @@ Process for new MRI user
     classDef process fill:#2196F3,stroke:#1976D2,color:#fff;
     classDef warning fill:#FF5722,stroke:#E64A19,color:#fff;
 
-    class A,C,D,F,G,H,K,L process;
+    class C,D,F,G,H,K,L process;
     class I warning;
     class J decision;
