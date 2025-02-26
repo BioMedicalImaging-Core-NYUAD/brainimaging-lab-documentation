@@ -11,14 +11,9 @@ Below is a flowchart describing a typical MRI data acquisition process:
         A[🎓 <b>User arrives at MRI lab</b>] -->| Start| B[🧪 <b>Complete Experiment Request Form</b>];
         B --> C[<b>Prepare code (Psychtoolbox)</b>];
         C --> D[<b>Test Code on Stimulus computer in MRI lab</b>];
-        D --> E[<b>Test Experiment timing with MRI scanner</b>];
-        E -->|✅ If the code works| F[<b>Proceed to plan booking and preparation of participants</b>];
+        D --> E[<b>Test Experiment timing with MRI scanner</b>]
 
-        F --❌ No --> G[🔄 <b>Iterate & Revise Code</b>];
-        G -->|📂 Resubmit| D;
 
-        F --✅ Yes --> H[🔬 <b>Keep Testing Code</b>];
-        H -->|🏆 Success| I[🎉 <b>Experiment Finalized</b>];
 
         %% Clickable Node for GitHub PR
         click B "https://drive.google.com/file/d/10Py1KSAsktpCjU6c3lLuWLqVL2a5ofee/view?usp=drive_link"
