@@ -13,7 +13,7 @@ Process for new MRI user
     E --> F[<b>Access 1 - CTPSS calendar</b>];
     E --> G[<b>Access 2 - NYUAD Prisma MRI Schedule</b>];
     E --> H[<b>Access 3 - Card Access to Appropriate MRI Zones</b>];
-    F --> I[⏱️ <b>Time to test your code in MRI lab</b>];
+    F --> I[⏱️ <b>Time to test your code in the MRI lab</b>];
     G --> I;
     H --> I;
     I --> J{🧲️ <b>Does Code Work?</b>};
@@ -32,5 +32,6 @@ Process for new MRI user
     classDef process fill:#2196F3,stroke:#1976D2,color:#fff;
     classDef warning fill:#FF5722,stroke:#E64A19,color:#fff;
 
-    class A,C,D,F,G,H,I,K,L process;
+    class A,C,D,F,G,H,K,L process;
+    class I warning;
     class J decision;
