@@ -10,10 +10,15 @@ Process for new MRI user
     B --> D[<b>Complete MRI Safety Training Level 2</b>];
     C --> E[<b>Request access from <a href="mailto:haidee.paterson@nyu.edu">haidee.paterson@nyu.edu</a></b>];
     D --> E;
-    E --> F[✅ <b>Code Reviewed</b>];
-    F --> G{🧲️ <b>Does Code Work?</b>};
-    G --✅ Yes --> H[🔬 <b>Keep Testing Code</b>];
-    H -->|🏆 Success| I[🎉 <b>Experiment Finalized</b>];
+    E --> F[<b>Access 1 - CTPSS calendar</b>];
+    E --> G[<b>Access 2 - NYUAD Prisma MRI Schedule</b>];
+    E --> H[<b>Access 3 - Card Access to Appropriate MRI Zones</b>];
+    F --> G;
+    G --> H;
+    H --> I[✅ <b>Code Reviewed</b>];
+    I --> J{🧲️ <b>Does Code Work?</b>};
+    J --✅ Yes --> K[🔬 <b>Keep Testing Code</b>];
+    K -->|🏆 Success| L[🎉 <b>Experiment Finalized</b>];
 
     %% Clickable Nodes
     click B "https://drive.google.com/file/d/10Py1KSAsktpCjU6c3lLuWLqVL2a5ofee/view?usp=drive_link"
@@ -26,8 +31,8 @@ Process for new MRI user
     classDef process fill:#2196F3,stroke:#1976D2,color:#fff;
     classDef warning fill:#FF5722,stroke:#E64A19,color:#fff;
 
-    class A,C,D,F,H,I process;
-    class G decision;
+    class A,C,D,F,G,H,I process;
+    class J decision;
 
 
 
