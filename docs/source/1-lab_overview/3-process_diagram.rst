@@ -31,5 +31,5 @@ Process for new MRI user
     classDef process fill:#2196F3,stroke:#1976D2,color:#fff;
     classDef warning fill:#FF5722,stroke:#E64A19,color:#fff;
 
-    class A,B,C,D,E,F,G,H,I,K,L process;
+    class A,C,D,F,G,H,I,K,L process;
     class J decision;
