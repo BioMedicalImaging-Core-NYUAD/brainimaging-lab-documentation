@@ -12,7 +12,7 @@ Process for new MRI user
         A[🎓 <b>User arrives at MRI lab</b>] -->|🚀 Start| B[🧪 <b>Complete New MRI Project Request</b>];
         B --> C[<b>User designs experimental code</b>];
         C --> D[<b>Complete MRI Safety Training Level 2</b>];
-        D --> E[<b>Submit Draft Code via Pull Request</b>];
+        D --> E[<b>Request access from hp42@nyu.edu</b>];
         E --> F[✅ <b>Code Reviewed</b>];
         F --> G{🧲️ <b>Does Code Work?</b>};
         G --✅ Yes --> H[🔬 <b>Keep Testing Code</b>];
