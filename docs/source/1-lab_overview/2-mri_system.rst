@@ -1,8 +1,5 @@
-MRI System
-==========
-
 MRI system components
-*********************
+=====================
 
 3T Siemens Prisma MRI Scanner
 *****************************
@@ -69,7 +66,7 @@ Available coils
       Integrated into the patient table, works with Head and Neck Matrix coils.
 
 MRI Compatible EEG System from Brain Products
----------------------------------------------
+*********************************************
 
 .. figure:: ../_static/eeg.png
    :alt: eeg
