@@ -5,8 +5,6 @@ Below is a flowchart describing a typical MRI data acquisition process:
 
 .. mermaid::
 
-.. mermaid::
-
     graph TD;
     A[🎓 <b>User arrives at MRI lab</b>] -->|Start| B[🧪 <b>Complete Experiment Request Form</b>];
     B --> C[<b>Prepare code (Psychtoolbox)</b>];
