@@ -21,8 +21,7 @@ Below is a flowchart describing a typical MRI data acquisition process:
         H -->|🏆 Success| I[🎉 <b>Experiment Finalized</b>];
 
         %% Clickable Node for GitHub PR
-        click B "https://drive.google.com/drive/folders/1s2pE1BAYCHVMi1RfnJD2i7T2XkJIsj1r?usp=drive_link"
-
+        click B "https://drive.google.com/file/d/1Gyl7DlsGBLzpBWYaXMwsTUY9zokBo6ia/view?usp=drive_link"
         %% Style Definitions
         classDef success fill:#4CAF50,stroke:#2E7D32,color:#fff;
         classDef decision fill:#FFEB3B,stroke:#FBC02D,color:#000;
