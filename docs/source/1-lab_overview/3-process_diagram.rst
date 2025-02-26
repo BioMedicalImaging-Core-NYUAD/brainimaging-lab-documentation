@@ -8,7 +8,7 @@ Below is a flowchart describing a typical MRI data acquisition process:
 .. mermaid::
 
     graph TD;
-        A[🎓 <b>User arrives at MEG lab</b>] -->|🚀 Start| B[🧪 <b>Design Experiment</b>];
+        A[🎓 <b>User arrives at MRI lab</b>] -->| Start| B[🧪 <b>Design Experiment</b>];
         B -->|📢 Present| C[📝 <b>Present Research</b>];
         C -->|📂 Submit| D[💻 <b>Submit Draft Code via Pull Request</b>];
         D -->|🔍 Review| E[✅ <b>Code Reviewed</b>];
@@ -21,7 +21,7 @@ Below is a flowchart describing a typical MRI data acquisition process:
         H -->|🏆 Success| I[🎉 <b>Experiment Finalized</b>];
 
         %% Clickable Node for GitHub PR
-        click D "https://github.com/Hzaatiti/meg-pipeline/pulls" "Visit GitHub Repository"
+        click B "https://drive.google.com/drive/folders/1s2pE1BAYCHVMi1RfnJD2i7T2XkJIsj1r?usp=drive_link"
 
         %% Style Definitions
         classDef success fill:#4CAF50,stroke:#2E7D32,color:#fff;
