@@ -13,7 +13,7 @@ Process for new MRI user
     E --> F[<b>Access 1 - CTPSS calendar</b>];
     E --> G[<b>Access 2 - NYUAD Prisma MRI Schedule</b>];
     E --> H[<b>Access 3 - Card Access to Appropriate MRI Zones</b>];
-    F --> I[✅ <b>Code Reviewed</b>];
+    F --> I[⏱️ <b>Time to test your code in MRI lab</b>];
     G --> I;
     H --> I;
     I --> J{🧲️ <b>Does Code Work?</b>};
