@@ -5,7 +5,7 @@ Process for new MRI user
 .. mermaid::
 
   graph TD;
-    A[🎓 <b>User arrives at MRI lab</b>] -->|🚀 Start| B[🧪 <b>Complete New MRI Project Request</b>];
+    A[🎓 <b>User arrives at MRI lab</b>] --> B[🧪 <b>Complete New MRI Project Request</b>];
     B --> C[<b>User designs experimental code</b>];
     B --> D[<b>Complete MRI Safety Training Level 2</b>];
     C --> E[<b>Request access from <a href="mailto:haidee.paterson@nyu.edu">haidee.paterson@nyu.edu</a></b>];
