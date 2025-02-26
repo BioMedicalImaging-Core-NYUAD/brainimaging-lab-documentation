@@ -19,7 +19,7 @@ Process for new MRI user
     I --> J[<b>Schedule testing time on both CTPSS calendar and NYUAD Prisma MRI Schedule</b>];
     J --> K{🧲️ <b>Does Code Work?</b>};
     K --✅ Yes --> L[<b>Finalize experimental design and participant booking with radiographers</b>];
-    L --> M[✅ <b>Ready to begin recruiting</b>];
+    L --> M[🏆 <b>Ready to begin recruiting</b>];
 
 
     %% Clickable Nodes
