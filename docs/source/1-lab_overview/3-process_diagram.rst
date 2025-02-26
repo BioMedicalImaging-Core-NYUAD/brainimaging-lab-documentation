@@ -18,9 +18,9 @@ Process for new MRI user
     H --> I;
     I --> J[<b>Schedule testing time on both CTPSS calendar and NYUAD Prisma MRI Schedule</b>];
     J --> K{🧲️ <b>Does Code Work?</b>};
-    K --✅ Yes --> L[🔬 <b> 🏆Success</b>];
+    K --✅ Yes --> L[<b> 🏆 Success</b>];
     L --> M[<b>Finalize experimental design and participant booking with radiographers</b>];
-    M --> N[✅<b>Ready to begin recruiting</b>]
+    M --> N[✅ <b>Ready to begin recruiting</b>]
 
     %% Clickable Nodes
     click B "https://drive.google.com/file/d/10Py1KSAsktpCjU6c3lLuWLqVL2a5ofee/view?usp=drive_link"
@@ -34,6 +34,6 @@ Process for new MRI user
     classDef process fill:#2196F3,stroke:#1976D2,color:#fff;
     classDef warning fill:#FF5722,stroke:#E64A19,color:#fff;
 
-    class B,C,D,F,G,H,J,L process;
+    class B,C,D,F,G,H,J,L,M,N process;
     class I warning;
     class K decision;
