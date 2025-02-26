@@ -13,9 +13,9 @@ Process for new MRI user
         B --> C[<b>User designs experimental code</b>];
         C --> D[<b>Complete MRI Safety Training Level 2</b>];
         D --> E[<b>Submit Draft Code via Pull Request</b>];
-        D --> E[✅ <b>Code Reviewed</b>];
-        E --> F{🧲️ <b>Does Code Work?</b>};
-        F --✅ Yes --> H[🔬 <b>Keep Testing Code</b>];
+        E --> F[✅ <b>Code Reviewed</b>];
+        F --> G{🧲️ <b>Does Code Work?</b>};
+        G --✅ Yes --> H[🔬 <b>Keep Testing Code</b>];
         H -->|🏆 Success| I[🎉 <b>Experiment Finalized</b>];
 
         %% Clickable Node for GitHub PR
