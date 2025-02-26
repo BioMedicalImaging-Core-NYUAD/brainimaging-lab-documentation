@@ -5,22 +5,35 @@ Below is a flowchart describing a typical MRI data acquisition process:
 
 .. mermaid::
 
-graph TD
-    A[Patient Registration & Scheduling] --> B[Screening for Contraindications]
-    B --> C[Patient Preparation & Consent]
-    C --> D[Patient Positioning]
-    D --> E[Localizer/Scout Scans]
-    E --> F[Pulse Sequence Selection]
-    F --> G[MRI Data Acquisition]
-    G --> H[Quality Control & Post-Processing]
-    H --> I[Diagnostic Interpretation]
-    I --> J[Archiving]
-    J --> K[Send images for reporting]
+.. mermaid::
 
-classDef rectangle fill:#FFB6C1,stroke:#000,stroke-width:1px;
-classDef triangle fill:#B0E0E6,stroke:#000,stroke-width:1px;
+    graph TD;
+        A[🎓 <b>User arrives at MEG lab</b>] -->|🚀 Start| B[🧪 <b>Design Experiment</b>];
+        B -->|📢 Present| C[📝 <b>Present Research</b>];
+        C -->|📂 Submit| D[💻 <b>Submit Draft Code via Pull Request</b>];
+        D -->|🔍 Review| E[✅ <b>Code Reviewed</b>];
+        E -->|🤔 Decision| F{⚖️ <b>Does Code Work?</b>};
 
-class A,C,E,G,I,K rectangle;
-class B,D,F,H,J triangle;
+        F --❌ No --> G[🔄 <b>Iterate & Revise Code</b>];
+        G -->|📂 Resubmit| D;
+
+        F --✅ Yes --> H[🔬 <b>Keep Testing Code</b>];
+        H -->|🏆 Success| I[🎉 <b>Experiment Finalized</b>];
+
+        %% Clickable Node for GitHub PR
+        click D "https://github.com/Hzaatiti/meg-pipeline/pulls" "Visit GitHub Repository"
+
+        %% Style Definitions
+        classDef success fill:#4CAF50,stroke:#2E7D32,color:#fff;
+        classDef decision fill:#FFEB3B,stroke:#FBC02D,color:#000;
+        classDef process fill:#2196F3,stroke:#1976D2,color:#fff;
+        classDef warning fill:#FF5722,stroke:#E64A19,color:#fff;
+
+        class A,B,C,D,E,H process;
+        class F decision;
+        class G warning;
+        class I success;
+
+
 
 
