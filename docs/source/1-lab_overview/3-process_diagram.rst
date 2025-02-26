@@ -9,10 +9,10 @@ Below is a flowchart describing a typical MRI data acquisition process:
 
     graph TD;
         A[🎓 <b>User arrives at MRI lab</b>] -->| Start| B[🧪 <b>Complete Experiment Request Form</b>];
-        B --> C[<b>Present Research</b>];
-        C -->|📂 Submit| D[💻 <b>Submit Draft Code via Pull Request</b>];
-        D -->|🔍 Review| E[✅ <b>Code Reviewed</b>];
-        E -->|🤔 Decision| F{⚖️ <b>Does Code Work?</b>};
+        B --> C[<b>Prepare code (Psychtoolbox)</b>];
+        C --> D[<b>Test Code on Stimulus computer in MRI lab</b>];
+        D --> E[<b>Test Experiment timing with MRI scanner</b>];
+        E -->|✅ If the code works| F[<b>Proceed to plan booking and preparation of participants</b>];
 
         F --❌ No --> G[🔄 <b>Iterate & Revise Code</b>];
         G -->|📂 Resubmit| D;
