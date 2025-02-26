@@ -16,9 +16,10 @@ Process for new MRI user
     F --> I[⏱️ <b>Time to test your code in the MRI lab</b>];
     G --> I;
     H --> I;
-    I --> J{🧲️ <b>Does Code Work?</b>};
-    J --✅ Yes --> K[🔬 <b>Keep Testing Code</b>];
-    K -->|🏆 Success| L[🎉 <b>Experiment Finalized</b>];
+    I --> J
+    J --> K{🧲️ <b>Does Code Work?</b>};
+    K --✅ Yes --> L[🔬 <b>Keep Testing Code</b>];
+    L -->|🏆 Success| M[🎉 <b>Experiment Finalized</b>];
 
     %% Clickable Nodes
     click B "https://drive.google.com/file/d/10Py1KSAsktpCjU6c3lLuWLqVL2a5ofee/view?usp=drive_link"
@@ -32,6 +33,6 @@ Process for new MRI user
     classDef process fill:#2196F3,stroke:#1976D2,color:#fff;
     classDef warning fill:#FF5722,stroke:#E64A19,color:#fff;
 
-    class C,D,F,G,H,K,L process;
+    class C,D,F,G,H,J,L process;
     class I warning;
-    class J decision;
+    class K decision;
