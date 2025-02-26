@@ -83,6 +83,7 @@ Documentation content
 
 .. toctree::
     :caption: Lab Overview
+    :maxdepth: 2
 
     1-lab_overview/1-mri_lab_description
     1-lab_overview/2-mri_system
@@ -94,6 +95,7 @@ Documentation content
 
 .. toctree::
     :caption: Booking and usage
+    :maxdepth: 2
 
     2-booking_usage/booking_lab
 

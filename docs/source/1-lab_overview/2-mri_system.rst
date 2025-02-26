@@ -3,6 +3,7 @@ MRI System
 
 MRI system components
 *********************
+
 3T Siemens Prisma MRI Scanner
 -----------------------------
 
@@ -16,7 +17,7 @@ MRI system components
 NYU Abu Dhabi’s MRI lab features a 3T Siemens Prisma system.
 
 Specifications
---------------
+^^^^^^^^^^^^^^
 
     - **Field strength**: 3 Tesla
     - **Bore size**: 60 cm
@@ -27,7 +28,7 @@ Specifications
     - **Max. slew rate**: 346 T/m/s8
 
 Available coils
----------------
+^^^^^^^^^^^^^^^
 
     - **Head/Neck 64**
       Ultra-fast, high SNR, head and neck imaging.
