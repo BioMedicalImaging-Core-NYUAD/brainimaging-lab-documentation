@@ -41,3 +41,5 @@ media_dir/
 *.tmp
 *.temp
 .DS_Store 
+
+Makefile

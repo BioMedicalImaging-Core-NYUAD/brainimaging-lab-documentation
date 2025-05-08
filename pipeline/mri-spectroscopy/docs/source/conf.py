@@ -17,19 +17,23 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'MRI Spectroscopy Documentation'
-copyright = '2024, Your Institution'
-author = 'Your Name'
+project = "NYUAD MRI Lab Documentation"
+copyright = "2022, Haidee Paterson, Osama Abdullah"
+author = "Haidee Paterson, Osama Abdullah"
 
 master_doc = "index"
 # -- General configuration ---------------------------------------------------
 # -- General configuration
 
 extensions = [
+    "sphinx.ext.autosummary",
+    "sphinx.ext.intersphinx",
+    "sphinxcontrib.mermaid",
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.mathjax',
     'sphinx_rtd_theme',
+    
 ]
 
 intersphinx_mapping = {
@@ -50,9 +54,10 @@ html_css_files = [
 
 
 html_theme_options = {
-    'navigation_depth': 4,
-    'titles_only': False,
-    'logo_only': False,
+     "style_external_links": False,
+    "vcs_pageview_mode": "",
+    "style_nav_header_background": "#561A70",
+    # Toc options
 }
 
 # List of patterns, relative to source directory, that match files and
