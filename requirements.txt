@@ -1,0 +1,6 @@
+pangocairo
+streamlit
+manim
+numpy
+matplotlib
+pillow

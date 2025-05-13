@@ -11,7 +11,7 @@ Brain Imaging: NYUAD documentation page
 
  <br><br>
 
-   The Brain Imaging NYUAD lab, part of the BioMedical Imaging Core at NYU Abu Dhabi, provides a comprehensive documentation page covering the Magnetic Resonance Imaging (MRI) system and its associated ancillary equipment. This resource is aimed at all NYUAD users who need guidance on utilizing the lab’s imaging facilities.
+   The Brain Imaging NYUAD lab, part of the BioMedical Imaging Core at NYU Abu Dhabi, provides a comprehensive documentation page covering the Magnetic Resonance Imaging (MRI) system and its associated ancillary equipment. This resource is aimed at all NYUAD users who need guidance on utilizing the lab's imaging facilities.
 
 
 .. raw:: html
@@ -98,4 +98,18 @@ Documentation content
     :maxdepth: 2
 
     2-booking_usage/booking_lab
+
+.. toctree::
+   :caption: MR spectroscopy
+   :maxdepth: 2
+
+   3-spectroscopy/introduction
+   3-spectroscopy/pipeline/1-pipeline_overview
+   3-spectroscopy/pipeline/data_acquisition
+   3-spectroscopy/pipeline/basis_file
+   3-spectroscopy/pipeline/organization
+   3-spectroscopy/pipeline/lcmodel_control
+   3-spectroscopy/pipeline/notes
+   3-spectroscopy/index.rst
+   3-spectroscopy/lcmodel_manual.rst
 

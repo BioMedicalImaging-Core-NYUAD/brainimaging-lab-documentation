@@ -31,7 +31,11 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
-    "sphinxcontrib.mermaid"
+    "sphinxcontrib.mermaid",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.mathjax",
+    "sphinx_rtd_theme",
+    
 ]
 
 intersphinx_mapping = {
@@ -46,6 +50,8 @@ templates_path = ["_templates"]
 # -- Options for EPUB output
 epub_show_urls = "footnote"
 
+html_static_path = ['_static']
+
 html_css_files = [
     "custom.css",
 ]
@@ -58,7 +64,6 @@ html_theme_options = {
     "style_external_links": False,
     "vcs_pageview_mode": "",
     "style_nav_header_background": "#561A70",
-    # Toc options
     "collapse_navigation": True,
     "sticky_navigation": True,
     "navigation_depth": 4,
@@ -83,4 +88,9 @@ html_logo = "graphic/NYU_Logo.png"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+
+
+
+
+# -- Math options ---------------------------------------------------------
+mathjax_path = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
