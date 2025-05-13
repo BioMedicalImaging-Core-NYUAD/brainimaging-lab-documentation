@@ -1,3 +1,55 @@
 body {
     background-color: #ADFF2F; /* Replace with your desired color */
 }
+
+
+
+/* Main content area width */
+.wy-nav-content {
+    max-width: 1000px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+}
+
+
+.wy-grid-for-nav {
+    display: flex !important;
+    justify-content: center !important;
+}
+
+
+/* ========================
+   Heading Styling
+=========================== */
+.rst-content h1 {
+    font-size: 2em !important;
+    color: #57068c !important;         /* NYU Purple */
+    text-align: center !important;
+    font-weight: bold !important;
+    margin-top: 0 !important;          /* Remove space above */
+    margin-bottom: 1em !important;   /* Keep tight below */
+}
+
+.rst-content h2 {
+    font-size: 1.75em !important;
+    color: #57068c !important;         /* Deep Purple */
+    font-weight: bold !important;
+    margin-top: 1em !important;
+    margin-bottom: 0.3em !important;
+}
+
+.rst-content h3 {
+    font-size: 1.5em !important;
+    color: #8a51af !important;
+    font-weight: bold !important;
+    margin-top: 1em !important;
+    margin-bottom: 0.3em !important;
+}
+
+.rst-content h4 {
+   font-size: 1.25em !important;
+    color: #7f7f7c !important;
+    font-weight: bold !important;
+    margin-top: 1em !important;
+    margin-bottom: 0.3em !important;
+}
