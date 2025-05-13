@@ -62,7 +62,6 @@ html_theme_options = {
     "display_version": True,
     "prev_next_buttons_location": "bottom",
     "style_external_links": False,
-     "style_external_links": False,
     "vcs_pageview_mode": "",
     "style_nav_header_background": "#561A70",
     "collapse_navigation": True,
@@ -70,7 +69,6 @@ html_theme_options = {
     "navigation_depth": 4,
     "includehidden": True,
     "titles_only": False,
-    # Toc options
 }
 
 # List of patterns, relative to source directory, that match files and
