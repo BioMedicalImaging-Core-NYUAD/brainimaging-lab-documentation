@@ -99,34 +99,17 @@ Documentation content
 
     2-booking_usage/booking_lab
 
-#######################################################
-MR Spectroscopy Pipeline Documentation
-#######################################################
-
-Welcome to the MR Spectroscopy Pipeline Documentation
-=================================================
-
-This documentation provides a comprehensive guide for MR Spectroscopy analysis using LCModel.
-
-MR spectroscopy
---------------
-
 .. toctree::
+   :caption: MR spectroscopy
    :maxdepth: 2
-   :caption: MR spectroscopy:
 
-   basics/introduction
-   pipeline/data_acquisition
-   pipeline/basis_file
-   pipeline/organization
-   pipeline/lcmodel_control
-   pipeline/notes
-   files/index
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   3-spectroscopy/introduction
+   3-spectroscopy/pipeline/1-pipeline_overview
+   3-spectroscopy/pipeline/data_acquisition
+   3-spectroscopy/pipeline/basis_file
+   3-spectroscopy/pipeline/organization
+   3-spectroscopy/pipeline/lcmodel_control
+   3-spectroscopy/pipeline/notes
+   3-spectroscopy/index.rst
+   3-spectroscopy/lcmodel_manual.rst
 

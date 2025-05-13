@@ -2,4 +2,4 @@ streamlit==1.31.1
 manim==0.18.0
 numpy==1.26.4
 matplotlib==3.8.3
-pillow==10.2.0 
+pillow==10.2.0
