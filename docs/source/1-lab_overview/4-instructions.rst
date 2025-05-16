@@ -1,3 +1,5 @@
+:orphan:
+
 Instructions for creating new mermaid diagrams
 ----------------------------------------------
 

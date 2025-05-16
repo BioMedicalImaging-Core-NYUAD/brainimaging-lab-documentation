@@ -1,10 +1,10 @@
 Manuals and Documentation
-========================
+=========================
 
 This section contains various manuals and documentation files related to MR Spectroscopy analysis.
 
 LCModel Manual
--------------
+--------------
 
 .. toctree::
    :maxdepth: 1
@@ -13,13 +13,9 @@ LCModel Manual
    lcmodel_manual
 
 MRSCloud Manual
---------------
+---------------
 
-.. toctree::
-   :maxdepth: 1
-   :caption: MRSCloud Documentation
 
-   mrscloud_manual
 
 Note: To add PDF files to this section:
 1. Place your PDF files in the `docs/source/files/manuals/` directory

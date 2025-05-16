@@ -88,8 +88,8 @@ Documentation content
     1-lab_overview/1-mri_lab_description
     1-lab_overview/2-mri_system
     1-lab_overview/3-process_diagram
-    1-lab_overview/4-processes
-    1-lab_overview/5-instructions
+..     1-lab_overview/4-processes
+..    1-lab_overview/5-instructions
     1-lab_overview/6-setup
 
 
@@ -110,6 +110,6 @@ Documentation content
    3-spectroscopy/pipeline/organization
    3-spectroscopy/pipeline/lcmodel_control
    3-spectroscopy/pipeline/notes
-   3-spectroscopy/index.rst
-   3-spectroscopy/lcmodel_manual.rst
+   3-spectroscopy/manuals/index.rst
+   3-spectroscopy/manuals/lcmodel_manual.rst
 

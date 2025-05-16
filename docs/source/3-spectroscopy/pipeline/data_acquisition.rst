@@ -1,12 +1,12 @@
 Data Acquisition and Conversion
-=============================
+===============================
 
 Overview
 --------
 
 MR spectroscopy data is initially exported from the scanner as `.rda` files. However, LCModel requires data in `.RAW` format. Converting from `.rda` to `.RAW` involves more than simply renaming the file—it requires reading the data and writing it out in a compatible format.
 
-.. image:: ../_static/conversion_flowchart.png
+.. image:: ../graphic/conversion_flowchart.png
    :alt: Flowchart showing the conversion process from .rda to .RAW format
    :align: center
 
@@ -36,7 +36,7 @@ Procedure
       io_writelcm(in_unsuppressed, '/Users/SH7437/Desktop/unsuppressed.raw', TE);
 
 Key Points
----------
+----------
 
 * The function ``io_loadspec_rda`` reads the RDA file
 * The function ``io_writelcm`` writes the data into the `.RAW` format needed by LCModel
