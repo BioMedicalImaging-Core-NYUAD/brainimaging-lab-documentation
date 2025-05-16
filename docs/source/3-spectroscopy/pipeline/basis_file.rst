@@ -42,7 +42,7 @@ Simulation Using MRSCloud
 
 |
 
-.. image:: ../graphic/mrscloud4.png
+.. image:: ../graphic/mrscloud5.png
    :alt: MRSCloud configuration interface
    :align: center
 
