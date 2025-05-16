@@ -17,14 +17,14 @@ Simulation Using MRSCloud
    Visit `MRSCloud <https://braingps.mricloud.org/>`_ and sign in with your credentials.
 
 2. **Configuration for Simulation**
-   * **Module:** Select "MRSCloud"
-   * **Phantom Case:** Choose the phantom case that matches your experimental setup
-   * **Metabolites:** Select the corresponding metabolites (e.g., the seven metabolites present in your phantom)
-   * **Simulation Settings:**
-     * **Localization:** PRESS
-     * **Vendor:** Siemens
-     * **Editing:** unEdited
-     * **TE:** 30 ms
+    * **Module:** Select "MRSCloud"
+    * **Phantom Case:** Choose the phantom case that matches your experimental setup
+    * **Metabolites:** Select the corresponding metabolites (e.g., the seven metabolites present in your phantom)
+    * **Simulation Settings:**
+        * **Localization:** PRESS
+        * **Vendor:** Siemens
+        * **Editing:** unEdited
+        * **TE:** 30 ms
 
 .. image:: ../graphic/mrscloud1.png
    :alt: MRSCloud configuration interface
