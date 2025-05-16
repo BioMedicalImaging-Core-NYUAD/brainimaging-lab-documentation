@@ -60,14 +60,8 @@ Raw Phantom Data
    :caption: Manuals
 
    manuals/lcmodel_manual
-   manuals/mrscloud_manual
 
 Scripts and Templates
 ---------------------
 
-.. toctree::
-   :maxdepth: 1
-   :caption: Scripts and Templates
-
-   scripts/control_file_template
-   scripts/analysis_scripts
+NA
