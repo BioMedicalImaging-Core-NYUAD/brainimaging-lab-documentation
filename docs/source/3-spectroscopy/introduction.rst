@@ -7,7 +7,7 @@ What is MRI Spectroscopy?
 Magnetic Resonance Spectroscopy (MRS) is a non-invasive diagnostic test for measuring biochemical changes in the brain, especially the presence of certain metabolites. Unlike conventional MRI that produces anatomical images, MRS produces a spectrum of resonances that correspond to different chemical compounds.
 
 Key Concepts
------------
+------------
 
 1. **Basic Principles**
    - MRS uses the same basic principles as MRI
@@ -44,13 +44,7 @@ External Files and Manuals
 
 This section contains external files, manuals, and additional resources related to MR Spectroscopy analysis.
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
 
-   manuals
-   scripts
-   templates
 
 Manuals and Documentation
 -------------------------
