@@ -10,11 +10,8 @@ EEG-fMRI Manual
     :caption: EEG-fMRI Manual
     :glob:
 
-    1-systems/4-eeg-fmri
-    2-operationprotocol/eeg-fmri-protocol
-    3-experimentdesign/experimentdesign-eeg-fmri
-    3-experimentdesign/experiments-eeg-fmri/*
-    5-pipeline/4-eeg-fmri-pipelines
-    5-pipeline/notebooks/eeg-fmri/*
+    3-eeg-fmri-system/*
+    5-mriexperiments-gallery/experiments/eeg-fmri/*
+    7-mri-pipeline-gallery/notebooks/eeg-fmri/*
 
 
