@@ -34,6 +34,6 @@ Example Experiments EEG-FMRI
     :name: rst-gallery
     :glob:
 
-    experiments-eeg-fmri/*
+    ../5-mri-experiments-gallery/experiments/eeg-fmri/*
 
 
