@@ -1,3 +1,5 @@
+:orphan:
+
 MRI lab flowchart
 =================
 

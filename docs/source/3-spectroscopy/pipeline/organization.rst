@@ -1,8 +1,8 @@
 Organizing the Main Folder
-========================
+==========================
 
 Folder Structure
---------------
+----------------
 
 Create a main folder (e.g., ``/Users/SH7437/Desktop/LC``) to host all files required by LCModel. This folder should include:
 
@@ -14,6 +14,6 @@ Create a main folder (e.g., ``/Users/SH7437/Desktop/LC``) to host all files requ
 
 Keeping these files organized in one location simplifies batch processing and minimizes errors during execution.
 
-.. image:: ../_static/main.png
+.. image:: ../graphic/main.png
    :alt: LCModel folder structure
    :align: center 
