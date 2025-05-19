@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = "NYUAD MRI Lab Documentation"
-copyright = "2022, Haidee Paterson, Osama Abdullah"
-author = "Haidee Paterson, Osama Abdullah"
+copyright = "2022, Haidee Paterson, Hadi Zaatiti, Osama Abdullah"
+author = "Haidee Paterson, Hadi Zaatiti, Osama Abdullah"
 
 master_doc = "index"
 # -- General configuration ---------------------------------------------------
@@ -31,6 +31,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
+    "nbsphinx",
     "sphinxcontrib.mermaid",
     "sphinx.ext.napoleon",
     "sphinx.ext.mathjax",
