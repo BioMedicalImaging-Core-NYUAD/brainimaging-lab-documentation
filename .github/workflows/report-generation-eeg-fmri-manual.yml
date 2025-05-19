@@ -1,0 +1,75 @@
+name: Report Generation EEG-fMRI Lab Manual
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write  # Required for managing releases
+    env:
+      BOX_CLIENT_ID: ${{ secrets.BOX_CLIENT_ID }}
+      BOX_CLIENT_SECRET: ${{ secrets.BOX_CLIENT_SECRET }}
+      BOX_ENTERPRISE_ID: ${{ secrets.BOX_ENTERPRISE_ID }}
+      BOX_PUBLIC_KEY_ID: ${{ secrets.BOX_PUBLIC_KEY_ID }}
+      BOX_PRIVATE_KEY: ${{ secrets.BOX_PRIVATE_KEY }}
+      BOX_PASSPHRASE: ${{ secrets.BOX_PASSPHRASE }}
+      PDF_GENERATION_INDEX: "EEG_FMRI_MANUAL"
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for all branches
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade --no-cache-dir pip setuptools
+          python -m pip install --upgrade --no-cache-dir sphinx
+          python -m pip install --exists-action=w --no-cache-dir -r docs/requirements.txt
+          python -m pip install --upgrade --upgrade-strategy only-if-needed --no-cache-dir .
+
+      - name: Install pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+
+      - name: Build HTML documentation
+        working-directory: docs/source
+        run: |
+          python -m sphinx -T --keep-going -b html -d ../../rtd-build-output/_build/doctrees -D language=en -D exclude_patterns="index.rst" . ../../rtd-build-output/html
+
+      - name: Build LaTeX documentation
+        working-directory: docs/source
+        run: |
+          python -m sphinx -T -b latex -d ../../rtd-build-output/_build/doctrees -D language=en . ../../rtd-build-output/pdf
+
+      - name: Install TeX Live for LaTeX PDF generation
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-xetex latexmk
+
+      - name: Build PDF from LaTeX
+        working-directory: rtd-build-output/pdf
+        run: |
+          latexmk -r latexmkrc -pdf -f -dvi- -ps- -jobname=meg-pipeline -interaction=nonstopmode || true
+
+      - name: Rename PDF for Release
+        run: |
+          mv rtd-build-output/pdf/meg-pipeline.pdf rtd-build-output/pdf/eeg-fmri-lab-manual.pdf
+
+      - name: Create or Update GitHub Release and Upload PDF
+        if: ${{ success() && (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) }}
+        uses: softprops/action-gh-release@v1
+        with:
+          files: rtd-build-output/pdf/eeg-fmri-lab-manual.pdf
+          tag_name: v-report-docs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
