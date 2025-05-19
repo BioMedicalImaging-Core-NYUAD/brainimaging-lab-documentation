@@ -32,6 +32,8 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
     "nbsphinx",
+    "sphinx_togglebutton",
+    "sphinx_panels",
     "sphinxcontrib.mermaid",
     "sphinx.ext.napoleon",
     "sphinx.ext.mathjax",
