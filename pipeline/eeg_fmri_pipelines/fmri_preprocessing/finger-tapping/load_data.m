@@ -11,7 +11,13 @@ fileType = '.mgh';
 TR = 1.0; % in seconds Repetition Time
 hemi = {'L';'R'};
 
-bidsDir = '\\rcsfileshare.abudhabi.nyu.edu\mri\projects\MS_osama\hadiBIDS\fmriprep_output_from_HPC';
+if ispc
+    bidsDir = '\\rcsfileshare.abudhabi.nyu.edu\mri\projects\MS_osama\hadiBIDS\fmriprep_output_from_HPC';
+elseif isunix
+    bidsDir = '\mnt\rcs_mri';
+end
+    
+    
 setenv('FS_LICENSE', '/Applications/freesurfer/7.4.1/license.txt');
 
 
