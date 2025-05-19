@@ -134,24 +134,24 @@ Documentation content
    :caption: Experiments Gallery
    :maxdepth: 2
 
-    5-mri-experiments-gallery/1-mri-experiments
+   5-mri-experiments-gallery/1-mri-experiments
 
 .. toctree::
    :caption: Data Gallery
    :maxdepth: 2
 
-    6-mri-data-gallery/1-data-use-cases.rst
+   6-mri-data-gallery/1-data-use-cases.rst
 
 .. toctree::
    :caption: Pipeline Gallery
    :maxdepth: 2
 
-    7-mri-pipeline-gallery/1-mri-pipeline-overview
-    7-mri-pipeline-gallery/2-mri-pipeline-gallery
+   7-mri-pipeline-gallery/1-mri-pipeline-overview
+   7-mri-pipeline-gallery/2-mri-pipeline-gallery
 
 
 .. toctree::
    :caption: Talks and demos
    :maxdepth: 2
 
-    8-mri-talks-demos/1-talks-demos
+   8-mri-talks-demos/1-talks-demos
