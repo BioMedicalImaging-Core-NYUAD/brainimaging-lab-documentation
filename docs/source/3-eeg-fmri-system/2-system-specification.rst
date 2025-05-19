@@ -28,7 +28,7 @@ Example Experiments EEG-FMRI
     :name: rst-gallery
     :glob:
 
-    ../3-experimentdesign/experiments-eeg-fmri/*
+    ../5-mri-experiments-gallery/experiments/eeg-fmri/*
 
 
 Pipelines Processing EEG-FMRI data
@@ -37,6 +37,6 @@ Pipelines Processing EEG-FMRI data
 .. nbgallery::
     :glob:
 
-    ../5-pipeline/notebooks/eeg-fmri/*
+    ../7-mri-pipeline-gallery/notebooks/eeg-fmri/*
 
 

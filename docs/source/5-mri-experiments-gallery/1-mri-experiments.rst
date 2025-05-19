@@ -6,12 +6,7 @@ Example Experiments
 General demo scripts
 ^^^^^^^^^^^^^^^^^^^^
 
-.. nbgallery::
-   :glob:
-
-   experiments/general/*
-   experiments/psychtoolbox/trigger-psychtoolbox
-   experiments/psychopy/trigger-psychopy
+NA
 
 
 
@@ -19,11 +14,7 @@ fMRI
 ^^^^
 
 
-.. nbgallery::
-   :glob:
-
-   experiments/psychopy/*
-
+NA
 
 
 EEG-fMRI
@@ -33,4 +24,4 @@ EEG-fMRI
 .. nbgallery::
     :glob:
 
-    experiments-eeg-fmri/*
+    experiments/eeg-fmri/*
