@@ -11,7 +11,7 @@ EEG-fMRI Manual
     :glob:
 
     3-eeg-fmri-system/*
-    5-mriexperiments-gallery/experiments/eeg-fmri/*
+    5-mri-experiments-gallery/experiments/eeg-fmri/*
     7-mri-pipeline-gallery/notebooks/eeg-fmri/*
 
 
