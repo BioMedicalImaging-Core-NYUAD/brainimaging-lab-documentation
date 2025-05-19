@@ -1,3 +1,5 @@
 sphinx
+nbsphinx
+sphinx-gallery
 sphinx-rtd-theme
 sphinxcontrib-mermaid
