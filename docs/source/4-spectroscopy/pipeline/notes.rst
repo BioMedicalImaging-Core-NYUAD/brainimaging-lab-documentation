@@ -1,8 +1,8 @@
 Additional Notes and Recommendations
-=================================
+====================================
 
 Best Practices
--------------
+--------------
 
 1. **Data Organization**
    * Keep all related files in a single directory
