@@ -16,7 +16,7 @@ This is repeated as blocks for 25 times.
 
 .. dropdown:: Alpha blocking task code
 
-    .. literalinclude:: ../../../../experiments/EEG-FMRI/resting-eye-closed-eye-open/main.m
+    .. literalinclude:: ../../../../../experiments/EEG-FMRI/resting-eye-closed-eye-open/main.m
       :language: matlab
 
 

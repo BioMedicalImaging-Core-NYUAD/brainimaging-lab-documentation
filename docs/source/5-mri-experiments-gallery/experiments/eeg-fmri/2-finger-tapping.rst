@@ -8,5 +8,5 @@ This is repeated 5 times. The block duration is 12 seconds.
 
 .. dropdown:: Finger Tapping task code
 
-    .. literalinclude:: ../../../../experiments/EEG-FMRI/finger-tapping/main.m
+    .. literalinclude:: ../../../../../experiments/EEG-FMRI/finger-tapping/main.m
       :language: matlab

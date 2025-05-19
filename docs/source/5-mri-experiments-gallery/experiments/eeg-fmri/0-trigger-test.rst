@@ -26,10 +26,10 @@ Purpose of script
 
 .. dropdown:: Trigger test
 
-    .. literalinclude:: ../../../../experiments/EEG-FMRI/general/trigger_test.m
+    .. literalinclude:: ../../../../../experiments/EEG-FMRI/general/trigger_test.m
       :language: matlab
 
-You can also :download:`Download the file here <../../../../experiments/EEG-FMRI/general/trigger_test.m>`
+You can also :download:`Download the file here <../../../../../experiments/EEG-FMRI/general/trigger_test.m>`
 
 
 
