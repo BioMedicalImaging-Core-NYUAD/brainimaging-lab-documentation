@@ -1,0 +1,2 @@
+- check how to remove the Acquisition Duration automatically using either python or a config file
+- check why the repetition time of the resting state is 1 second
