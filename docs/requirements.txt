@@ -3,3 +3,5 @@ nbsphinx
 sphinx-gallery
 sphinx-rtd-theme
 sphinxcontrib-mermaid
+sphinx-togglebutton
+sphinx-panels

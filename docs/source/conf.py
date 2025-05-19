@@ -36,6 +36,8 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.mathjax",
     "sphinx_rtd_theme",
+    "sphinx_togglebutton",
+    "sphinx_panels",
 ]
 
 intersphinx_mapping = {
