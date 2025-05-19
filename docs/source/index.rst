@@ -85,19 +85,35 @@ Documentation content
     :caption: Lab Overview
     :maxdepth: 2
 
-    1-lab_overview/1-mri_lab_description
-    1-lab_overview/2-mri_system
-    1-lab_overview/3-process_diagram
-..     1-lab_overview/4-processes
-..    1-lab_overview/5-instructions
-    1-lab_overview/6-setup
+    1-lab-overview/0-brainimaging-lab-description.rst
+    1-lab-overview/1-brainimaging-policies.rst
+    1-lab-overview/2-brainimaging-processes.rst
+    1-lab-overview/3-brainimaging-publications.rst
+    1-lab-overview/4-brainimaging-collaborations.rst
+    1-lab-overview/5-brainimaging-useful-links.rst
+    1-lab-overview/6-brainimaging-contribution.rst
 
 
 .. toctree::
-    :caption: Booking and usage
+    :caption: MRI System
     :maxdepth: 2
 
-    2-booking_usage/booking_lab
+    2-mri-scanner-system/1-technology-overview.rst
+    2-mri-scanner-system/2-system-specification.rst
+    2-mri-scanner-system/3-main-applications.rst
+    2-mri-scanner-system/4-experiment-design.rst
+
+
+.. toctree::
+    :caption: EEG-fMRI System
+    :maxdepth: 2
+
+    3-eeg-fmri-system/1-technology-overview.rst
+    3-eeg-fmri-system/2-system-specification.rst
+    3-eeg-fmri-system/3-main-applications.rst
+    3-eeg-fmri-system/4-operational-protocol.rst
+    3-eeg-fmri-system/5-experiment-design.rst
+
 
 .. toctree::
    :caption: MR spectroscopy
