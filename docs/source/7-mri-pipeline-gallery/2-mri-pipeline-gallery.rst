@@ -1,5 +1,16 @@
-EEG-fMRI Pipelines
-##################
+-----------------
+Pipelines Gallery
+-----------------
+
+
+fMRI pipelines
+^^^^^^^^^^^^^^
+
+NA
+
+EEG-fMRI pipelines
+^^^^^^^^^^^^^^^^^^
+
 
 Analysis pipelines for EEG-fMRI data.
 
@@ -10,3 +21,8 @@ Analysis pipelines for EEG-fMRI data.
    :glob:
 
    notebooks/eeg-fmri/*
+
+
+
+
+

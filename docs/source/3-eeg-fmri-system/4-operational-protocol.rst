@@ -1,8 +1,8 @@
 .. _brainamp_mr_plus_sop:
 
-
+-----------------------------
 Operational Protocol EEG-fMRI
-=============================
+-----------------------------
 
 
 .. contents:: Table of Contents
@@ -10,8 +10,16 @@ Operational Protocol EEG-fMRI
    :local:
 
 
+EEG/fMRI
+^^^^^^^^
+
+.. csv-table:: Primary contact EEG/fMRI
+   :header-rows: 1
+   :file: contact_eeg_fmri.csv
+
+
 Standard Operating Procedure (SOP) for BrainAmp MR Plus EEG System
-------------------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 :Document ID: CTP_MRI_001
 :Issue: 0.1
