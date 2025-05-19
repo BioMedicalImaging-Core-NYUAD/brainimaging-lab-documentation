@@ -119,13 +119,13 @@ Documentation content
    :caption: MR spectroscopy
    :maxdepth: 2
 
-   3-spectroscopy/introduction
-   3-spectroscopy/pipeline/1-pipeline_overview
-   3-spectroscopy/pipeline/data_acquisition
-   3-spectroscopy/pipeline/basis_file
-   3-spectroscopy/pipeline/organization
-   3-spectroscopy/pipeline/lcmodel_control
-   3-spectroscopy/pipeline/notes
-   3-spectroscopy/manuals/index.rst
-   3-spectroscopy/manuals/lcmodel_manual.rst
+   4-spectroscopy/introduction
+   4-spectroscopy/pipeline/1-pipeline_overview
+   4-spectroscopy/pipeline/data_acquisition
+   4-spectroscopy/pipeline/basis_file
+   4-spectroscopy/pipeline/organization
+   4-spectroscopy/pipeline/lcmodel_control
+   4-spectroscopy/pipeline/notes
+   4-spectroscopy/manuals/index.rst
+   4-spectroscopy/manuals/lcmodel_manual.rst
 
