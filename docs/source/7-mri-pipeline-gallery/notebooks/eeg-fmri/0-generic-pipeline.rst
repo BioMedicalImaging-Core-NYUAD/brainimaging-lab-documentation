@@ -369,6 +369,21 @@ The following explains how to learn a GLM from the fMRIprep output, the provided
 - You will need to install `freesurfer` and have the license file pointed out correctly in the script
     - On windows computer we cloned the vistasoft MRI repository https://github.com/vistalab/vistasoft and then added the external/freesurfer folder to MATLAB path
     - On linux/mac you can instal freesurfer normally this will give you the mri_convert and other commands to get the .mgh files
+        - add to MATLAB path, the following directories
+            .. code-block:: none
+
+                /usr/local/freesurfer/8.0.0/bin
+                /usr/local/freesurfer/8.0.0/matlab
+                /usr/local/freesurfer/8.0.0/matlab/Survival
+                /usr/local/freesurfer/8.0.0/matlab/Survival/ex_data
+                /usr/local/freesurfer/8.0.0/matlab/Survival/mass_univariate
+                /usr/local/freesurfer/8.0.0/matlab/Survival/univariate
+                /usr/local/freesurfer/8.0.0/matlab/lme
+                /usr/local/freesurfer/8.0.0/matlab/lme/Qdec
+                /usr/local/freesurfer/8.0.0/matlab/lme/geodesic
+                /usr/local/freesurfer/8.0.0/matlab/lme/mass_univariate
+                /usr/local/freesurfer/8.0.0/matlab/lme/univariate
+
 - Load data in MATLAB using script in `load_data.m` in `pipeline/eeg_fmri_pipelines/finger-tapping` directory, make sure to open MATLAB from the script itself
     - the script will perform the following:
         - load the fmriprep output data into MATLAB

@@ -5,6 +5,7 @@ clear all; close all; clc;
 subject = 'sub-0665';
 nRuns = 3;
 
+
 task = 'fingertapping';
 space = 'fsnative';
 fileType = '.mgh';
