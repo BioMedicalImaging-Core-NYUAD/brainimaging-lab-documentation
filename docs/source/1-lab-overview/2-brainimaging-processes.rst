@@ -1,6 +1,11 @@
+---------
+Processes
+---------
+
+
 
 Process for new MRI user
-========================
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. mermaid::
 
@@ -40,7 +45,7 @@ Process for new MRI user
 
 
 MRI lab flowchart
-=================
+^^^^^^^^^^^^^^^^^
 
 
 .. mermaid::

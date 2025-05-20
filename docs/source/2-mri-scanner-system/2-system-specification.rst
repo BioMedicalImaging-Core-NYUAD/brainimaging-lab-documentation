@@ -1,5 +1,7 @@
-MRI system components
-=====================
+--------------------
+System specification
+--------------------
+
 
 3T Siemens Prisma MRI Scanner
 *****************************
@@ -65,17 +67,6 @@ Available coils
       24-element design with 24 integrated preamplifiers, 8 clusters of 3 elements each.
       Integrated into the patient table, works with Head and Neck Matrix coils.
 
-MRI Compatible EEG System from Brain Products
-*********************************************
-
-.. figure:: ../_static/eeg.png
-   :alt: eeg
-   :width: 800px
-   :align: center
-
-   Figure 2. EEG System
-
-We have an EEG system that complements fMRI by measuring electrical changes in the brain, while fMRI measures hemodynamic changes. Because EEG and fMRI provide distinct spatial and temporal information, combining the two requires special considerations for data quality and participant safety. Our setup includes MR-conditional amplifiers certified by major scanner vendors, with the option to add sensors like accelerometers or GSR for broader physiological monitoring. We have online viewing software allowing for real-time processing to ensure data quality throughout each recording session.
 
 Vpixx System
 ************

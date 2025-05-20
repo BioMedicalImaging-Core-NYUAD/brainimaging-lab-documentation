@@ -7,25 +7,24 @@ The contribution will be submitted for review through github. If you already hav
 
 - Fork the current repository to your account
 - On the created fork, create a new branch named with the feature you are developping or change you are making
-- Add the directory containing the files of your experiment under the `experiments/psychopy` or `experiments/psychtoolbox` according to which framework you are using.
-- Create a pull request from your branch to the main branch of the source repository (Not your fork, but the original repo)
+- Add the directory containing the files of your experiment under the `experiments`.
+- Create a pull request from your branch from your forked repository into the main branch of the source repository (origin)
 - Add any comments you want the reviewer to know of
 - A reviewer will review your code and either approve or ask for changes
 - If changes are needed, make the changes and push your new code to the same branch, your PR (Pull Request) will then get automatically updated
-- Consider adding a page describing your experiment to the `docs\source\3-experimentdesign\experiments`
+- Consider adding a page describing your experiment to the `docs\source\5-mri-experiments-galleryh\experiments`
 - Once your branch is merged to the main branch (meaning your experiment is approved), your code will be available in the MEG lab Stimulus computer
 
 Building your processing pipeline
-=================================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Do the same steps as before to fork the repository and create a new branch named as `experiment_name-analysis`
-Submit an initial notebook under `docs/source/5-pipeline/notebooks` or simply code file for your pipeline under `pipeline\experiment_name`
-The file
+Submit an initial notebook under `docs/source/7-mri-pipeline-gallery/notebooks` or simply code file for your pipeline under `pipeline\experiment_name`
 
 
 
-Contributing to this repository
-===============================
+Contributing to the documentation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Your contribution, mistake correction, code contributions are very welcome.
 Contributions are made through pull reqests, please do the following steps:
@@ -60,9 +59,6 @@ If you'd like to contribute to this documentation, please follow the heading-ado
 +---------------------+------------------------+----------------+------------+
 | Fifth-level         | N/A                    | ``++++++++``   | ``+``      |
 +---------------------+------------------------+----------------+------------+
-
-
-
 
 Thank you for your contribution!
 
