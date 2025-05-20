@@ -10,7 +10,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
+import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
@@ -18,10 +18,24 @@
 # -- Project information -----------------------------------------------------
 
 project = "NYUAD MRI Lab Documentation"
-copyright = "2022, Haidee Paterson, Osama Abdullah"
-author = "Haidee Paterson, Osama Abdullah"
+copyright = "2022, Haidee Paterson, Hadi Zaatiti, Osama Abdullah"
+author = "Haidee Paterson, Hadi Zaatiti, Osama Abdullah"
 
-master_doc = "index"
+
+
+
+PDF_GENERATION_INDEX = os.getenv('PDF_GENERATION_INDEX', 'ALL_WEBSITE')
+
+master_doc = 'index'
+
+print('Global variable', PDF_GENERATION_INDEX)
+
+if PDF_GENERATION_INDEX == 'ALL_WEBSITE':
+    master_doc = 'index'
+elif PDF_GENERATION_INDEX == 'EEG_FMRI_MANUAL':
+    master_doc = 'index_eeg_fmri'
+
+
 # -- General configuration ---------------------------------------------------
 # -- General configuration
 
@@ -31,11 +45,13 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
-    "sphinxcontrib.mermaid",
     "sphinx.ext.napoleon",
     "sphinx.ext.mathjax",
+    "nbsphinx",
+    "sphinxcontrib.mermaid",
     "sphinx_rtd_theme",
-    
+    "sphinx_togglebutton",
+    "sphinx_panels",
 ]
 
 intersphinx_mapping = {

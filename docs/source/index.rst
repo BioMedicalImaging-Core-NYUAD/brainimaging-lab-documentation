@@ -85,31 +85,73 @@ Documentation content
     :caption: Lab Overview
     :maxdepth: 2
 
-    1-lab_overview/1-mri_lab_description
-    1-lab_overview/2-mri_system
-    1-lab_overview/3-process_diagram
-..     1-lab_overview/4-processes
-..    1-lab_overview/5-instructions
-    1-lab_overview/6-setup
+    1-lab-overview/0-brainimaging-lab-description.rst
+    1-lab-overview/1-brainimaging-policies.rst
+    1-lab-overview/2-brainimaging-processes.rst
+    1-lab-overview/3-brainimaging-publications.rst
+    1-lab-overview/4-brainimaging-collaborations.rst
+    1-lab-overview/5-brainimaging-useful-links.rst
+    1-lab-overview/6-brainimaging-contribution.rst
 
 
 .. toctree::
-    :caption: Booking and usage
+    :caption: MRI System
     :maxdepth: 2
 
-    2-booking_usage/booking_lab
+    2-mri-scanner-system/1-technology-overview.rst
+    2-mri-scanner-system/2-system-specification.rst
+    2-mri-scanner-system/3-main-applications.rst
+    2-mri-scanner-system/4-experiment-design.rst
+
+
+.. toctree::
+    :caption: EEG-fMRI System
+    :maxdepth: 2
+
+    3-eeg-fmri-system/1-technology-overview.rst
+    3-eeg-fmri-system/2-system-specification.rst
+    3-eeg-fmri-system/3-main-applications.rst
+    3-eeg-fmri-system/4-operational-protocol.rst
+    3-eeg-fmri-system/5-experiment-design.rst
+
 
 .. toctree::
    :caption: MR spectroscopy
    :maxdepth: 2
 
-   3-spectroscopy/introduction
-   3-spectroscopy/pipeline/1-pipeline_overview
-   3-spectroscopy/pipeline/data_acquisition
-   3-spectroscopy/pipeline/basis_file
-   3-spectroscopy/pipeline/organization
-   3-spectroscopy/pipeline/lcmodel_control
-   3-spectroscopy/pipeline/notes
-   3-spectroscopy/manuals/index.rst
-   3-spectroscopy/manuals/lcmodel_manual.rst
+   4-spectroscopy/introduction
+   4-spectroscopy/pipeline/1-pipeline_overview
+   4-spectroscopy/pipeline/data_acquisition
+   4-spectroscopy/pipeline/basis_file
+   4-spectroscopy/pipeline/organization
+   4-spectroscopy/pipeline/lcmodel_control
+   4-spectroscopy/pipeline/notes
+   4-spectroscopy/manuals/index.rst
+   4-spectroscopy/manuals/lcmodel_manual.rst
 
+
+.. toctree::
+   :caption: Experiments Gallery
+   :maxdepth: 2
+
+   5-mri-experiments-gallery/1-mri-experiments
+
+.. toctree::
+   :caption: Data Gallery
+   :maxdepth: 2
+
+   6-mri-data-gallery/1-data-use-cases.rst
+
+.. toctree::
+   :caption: Pipeline Gallery
+   :maxdepth: 2
+
+   7-mri-pipeline-gallery/1-mri-pipeline-overview
+   7-mri-pipeline-gallery/2-mri-pipeline-gallery
+
+
+.. toctree::
+   :caption: Talks and demos
+   :maxdepth: 2
+
+   8-mri-talks-demos/1-talks-demos

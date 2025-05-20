@@ -1,0 +1,263 @@
+{
+  "dcm2niixOptions": "-d 9 -b y -ba y -z y -f '%3s_%f_%p_%t'",
+  "case_sensitive": true,
+  "search_method": "fnmatch",
+  "dup_method": "run",
+  "compKeys": ["SeriesNumber", "AcquisitionTime", "SidecarFilename"],
+  "post_op": [{"cmd": "pydeface --outfile dst_file src_file --verbose --debug --force",
+              "datatype": "anat",
+              "suffix": ["T1w", "FLAIR", "T2w"]}],
+
+  "extractors": {
+    "SeriesDescription": [
+      "run-(?P<run>[A-Za-z0-9]+)",
+      "task-(?P<task>[A-Za-z0-9]+)"
+    ],
+    "PhaseEncodedDirection": [
+      "dir-(?P<dir>-?j|i)"
+    ],
+    "EchoNumber": [
+      "echo-(?P<echo>[0-9])"
+    ]
+  },
+
+
+  "descriptions": [
+    {
+      "datatype": "anat",
+      "suffix": "T1w",
+      "criteria": {
+        "SeriesDescription": "anat-T1[wW]*",
+        "ImageTypeText": ["ORIGINAL", "PRIMARY", "M", "NORM", "DIS3D", "DIS2D"]
+      }
+    },
+    {
+      "datatype": "anat",
+      "suffix": "T1w",
+      "criteria": {
+        "SeriesDescription": "anat-T1[wW]*",
+        "ImageTypeText": ["ORIGINAL", "PRIMARY", "M", "NORM", "DIS2D"]
+      }
+    },
+    {
+      "datatype": "anat",
+      "suffix": "T1w",
+      "criteria": {
+        "SeriesDescription": "T1[wW]*_MPR",
+        "ImageType": ["ORIGINAL", "PRIMARY", "M", "ND", "NORM"]
+      }
+    },
+    {
+      "datatype": "anat",
+      "suffix": "T2w",
+      "criteria": {
+        "ProtocolName": "anat-T2[wW]*",
+        "ImageTypeText": ["ORIGINAL", "PRIMARY", "M", "NORM", "DIS2D"]
+      }
+    },
+    {
+      "datatype": "anat",
+      "suffix": "T2w",
+      "criteria": {
+        "SeriesDescription": "T2[wW]*_SPC",
+        "ImageType": ["ORIGINAL", "PRIMARY", "M", "ND", "NORM"]
+      }
+    },
+    {
+      "datatype": "anat",
+      "suffix": "FLAIR",
+      "criteria": {
+        "ProtocolName": "anat-FLAIR[wW]*",
+        "ImageTypeText": ["ORIGINAL", "PRIMARY", "M", "NORM", "DIS2D"]
+      }
+    },
+
+    {
+      "datatype": "anat",
+      "suffix": "inv-1_MP2RAGE",
+      "criteria": {
+        "SeriesDescription": "t1_mp2rage_sag_p3_iso_INV1",
+        "ImageType": ["ORIGINAL", "PRIMARY", "T1", "NONE"],
+        "ImageTypeText": ["ORIGINAL", "PRIMARY", "M", "NORM", "DIS2D"]
+      }
+    },
+    {
+      "datatype": "anat",
+      "suffix": "inv-2_MP2RAGE",
+      "criteria": {
+        "SeriesDescription": "t1_mp2rage_sag_p3_iso_INV2",
+        "ImageType": ["ORIGINAL", "PRIMARY"],
+        "ImageTypeText": ["ORIGINAL", "PRIMARY", "M", "NORM", "DIS2D"]
+      }
+    },
+    {
+      "datatype": "anat",
+      "suffix": "UNIT1",
+      "criteria": {
+        "SeriesDescription": "t1_mp2rage_sag_p3_iso_UNI_Images",
+        "ImageType": ["DERIVED", "PRIMARY", "T1", "UNIFORM"],
+        "ImageTypeText": ["DERIVED", "PRIMARY", "M", "UNI", "DIS2D"]
+      }
+    },
+
+
+    {
+      "datatype": "dwi",
+      "suffix": "dwi",
+      "criteria": {
+        "SidecarFilename": "*dwi*",
+        "ProtocolName": "dwi_acq-*_dir-AP",
+        "ImageType": ["ORIGINAL", "PRIMARY", "DIFFUSION", "NONE"]
+     }
+    },
+
+
+
+    {
+      "datatype": "dwi",
+      "suffix": "sbref",
+      "criteria": {
+        "SidecarFilename": "*dwi*",
+        "ProtocolName": "dwi_acq-*_dir-PA",
+        "ImageType": ["ORIGINAL", "PRIMARY", "DIFFUSION", "NONE"]
+      }
+    },
+
+
+
+
+
+
+   {
+     "id": "id_perf_asl",
+     "datatype": "perf",
+     "suffix": "asl",
+     "criteria": {
+       "ProtocolName": "asl_3d_tra_p2*",
+       "ImageType": ["ORIGINAL", "PRIMARY", "ASL", "NONE"]
+     },
+     "sidecar_changes": {
+        "RepetitionTimePreparation": 7.4,
+        "M0Type": "Separate",
+        "LabelingDuration": 1.800,
+        "PostLabelingDelay": [1.500, 1.500, 1.600, 1.600, 1.700, 1.700, 1.800, 1.800, 2.000,  2.000],
+        "TotalAcquiredPairs": 1,
+        "AcquisitionVoxelSize": [1.6, 1.6, 3.0],
+        "BackgroundSuppression": true
+     }
+   },
+   {
+     "id": "id_perf_m0scan_asl",
+     "datatype": "perf",
+     "suffix": "m0scan",
+     "criteria": {
+       "ProtocolName": "asl_m0*",
+       "ImageType": ["ORIGINAL", "PRIMARY", "ASL", "NONE"]
+     },
+      "sidecar_changes": {
+         "RepetitionTimePreparation": 7.4,
+         "AcquisitionVoxelSize": [1.6, 1.6, 3.0]
+     }
+   },
+
+   {
+     "id": "id_perf_m0scan_M",
+     "datatype": "perf",
+     "suffix": "m0scan",
+     "criteria": {
+       "ProtocolName": "M0_*",
+       "ImageType": ["ORIGINAL", "PRIMARY", "M", "NONE"]
+     },
+      "sidecar_changes": {
+         "RepetitionTimePreparation": 7.4,
+         "AcquisitionVoxelSize": [1.6, 1.6, 3.0]
+     }
+   },
+
+
+
+
+
+   {
+     "id": "id_task_sbref_AP",
+     "datatype": "func",
+     "suffix": "sbref",
+     "custom_entities": "dir-AP",
+     "criteria": {
+       "SidecarFilename": "*task-SBref*",
+       "PhaseEncodingDirection": "j-"
+     }
+   },
+   {
+     "id": "id_task_sbref_PA",
+     "datatype": "func",
+     "suffix": "sbref",
+     "custom_entities": "dir-PA",
+     "criteria": {
+       "SidecarFilename": "*task-SBref*",
+       "PhaseEncodingDirection": "j"
+     }
+   },
+
+
+    {
+      "id": "id_task_bold_PA",
+      "datatype": "func",
+      "suffix": "bold",
+      "custom_entities": ["task",
+        "dir-PA"
+      ],
+      "criteria": {
+        "SidecarFilename": "*func-bold_task-*",
+        "PhaseEncodingDirection": "j",
+        "MultibandAccelerationFactor": {
+         "gt": 0
+       }
+      }
+    },
+    {
+      "id": "id_task_bold_AP",
+      "datatype": "func",
+      "suffix": "bold",
+      "custom_entities": ["task",
+        "dir-AP"
+      ],
+      "criteria": {
+        "SidecarFilename": "*func-bold_task-*",
+        "PhaseEncodingDirection": "j-",
+        "MultibandAccelerationFactor": {
+         "gt": 0
+       }
+      }
+    },
+
+
+
+   {
+     "datatype": "fmap",
+     "suffix": "epi",
+     "custom_entities": "dir-AP",
+     "criteria": {
+       "SidecarFilename": "*fmap_*",
+       "PhaseEncodingDirection": "j-",
+       "ScanningSequence": "EP"
+     },
+     "sidecar_changes": {
+       "IntendedFor": ["id_task_bold_AP", "id_task_sbref_AP"]
+     }
+   },
+   {
+     "datatype": "fmap",
+     "suffix": "epi",
+     "custom_entities": "dir-PA",
+     "criteria": {
+       "SidecarFilename": "*fmap_*",
+       "PhaseEncodingDirection": "j",
+       "ScanningSequence": "EP"
+     },
+     "sidecar_changes": {
+       "IntendedFor": ["id_perf_m0scan_asl", "id_perf_m0scan_M", "id_perf_asl", "id_task_sbref_PA", "id_task_bold_PA"]
+     }
+   }
+  ]
+}

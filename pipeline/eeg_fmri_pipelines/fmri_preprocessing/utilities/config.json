@@ -1,0 +1,167 @@
+{
+  "dcm2niixOptions": "-d 9 -b y -ba y -z y -f '%3s_%f_%p_%t'",
+  "case_sensitive": true,
+  "search_method": "fnmatch",
+  "dup_method": "run",
+  "compKeys": ["SeriesNumber", "AcquisitionTime", "SidecarFilename"],
+  "post_op": [{"cmd": "pydeface --outfile dst_file src_file --verbose --debug --force",
+				"datatype": "anat",
+				"suffix": ["T1w", "FLAIR"]}],
+
+  "extractors": {
+    "SeriesDescription": [
+      "run-(?P<run>[0-9]+)",
+      "task-(?P<task>[0-9]+)"
+    ],
+    "PhaseEncodedDirection": [
+      "dir-(?P<dir>-?j|i)"
+    ],
+    "EchoNumber": [
+      "echo-(?P<echo>[0-9])"
+    ],
+    "BodyPartExamined": [
+      "(?P<bodypart>[a-zA-Z]+)"
+    ]
+  },
+
+
+  "descriptions": [
+    {
+      "datatype": "anat",
+      "suffix": "T1w",
+      "criteria": {
+        "SeriesDescription": "anat-T1w"
+      }
+    },
+    {
+      "datatype": "anat",
+      "suffix": "FLAIR",
+      "criteria": {
+        "SeriesDescription": "anat-FLAIRw"
+      }
+    },
+
+    {
+      "id": "rest_run-01",
+      "datatype": "func",
+      "suffix": "bold",
+      "custom_entities": "task-restingstate_run-01",
+      "criteria": {
+        "ProtocolName": "*bold_task-restingstate_run-01*",
+        "MultibandAccelerationFactor": "[1-9]"
+      },
+      "sidecar_changes": {
+        "TaskName": "rest",
+        "RepetitionTime": 1.0
+      }
+    },
+
+     {
+     "id": "finger_tapping_run-03",
+     "datatype": "func",
+     "suffix": "bold",
+     "custom_entities": "task-fingertapping_run-03",
+     "criteria": {
+       "ProtocolName": "*bold_task-fingertapping_run-03"
+     },
+     "sidecar_changes": {
+       "TaskName": "fingertapping",
+       "RepetitionTime": 1.0
+     }
+   },
+
+
+
+   
+  {
+    "id": "finger_tapping_run-02",
+    "datatype": "func",
+    "suffix": "bold",
+    "custom_entities": "task-fingertapping_run-02",
+    "criteria": {
+    "ProtocolName": "*bold_task-fingertapping_run-02"
+  },
+  "sidecar_changes": {
+    "TaskName": "fingertapping",
+    "RepetitionTime": 1.0
+  }
+  },
+   
+    {
+     "id": "finger_tapping_run-01",
+     "datatype": "func",
+     "suffix": "bold",
+     "custom_entities": "task-fingertapping_run-01",
+     "criteria": {
+       "ProtocolName": "*bold_task-fingertapping_run-01"
+     },
+     "sidecar_changes": {
+       "TaskName": "fingertapping",
+       "RepetitionTime": 1.0
+     }
+   },
+
+
+
+   {
+     "id": "AP_SBRef",
+     "datatype": "func",
+     "suffix": "sbref",
+     "custom_entities": "dir-AP",
+     "criteria": {
+       "SeriesDescription": "*SBref*dir-AP"
+     },
+     "sidecar_changes": {
+       "TaskName": "fingertapping"
+     }
+   },
+   {
+     "id": "PA_SBRef",
+     "datatype": "func",
+     "suffix": "sbref",
+     "custom_entities": "dir-PA",
+     "criteria": {
+       "SeriesDescription": "*SBref*dir-PA"
+     },
+     "sidecar_changes": {
+       "TaskName": "fingertapping"
+     }
+   },
+
+
+
+    {
+     "datatype": "fmap",
+     "suffix": "epi",
+     "custom_entities": "dir-PA",
+     "criteria": {
+       "SeriesDescription": "*fmap*dir-PA*"
+     },
+     "sidecar_changes": {
+       "IntendedFor": [
+         "rest_run-01",
+         "finger_tapping_run-01",
+         "finger_tapping_run-02",
+         "finger_tapping_run-03",
+         "PA_SBRef"]
+     }
+   },
+
+       {
+     "datatype": "fmap",
+     "suffix": "epi",
+     "custom_entities": "dir-AP",
+     "criteria": {
+       "SeriesDescription": "*fmap*dir-AP*"
+     },
+     "sidecar_changes": {
+       "IntendedFor": [
+         "rest_run-01",
+         "finger_tapping_run-01",
+         "finger_tapping_run-02",
+         "finger_tapping_run-03",
+         "PA_SBRef"]
+     }
+   }
+  ]
+}
