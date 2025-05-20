@@ -1,5 +1,12 @@
 .. _eeg-fmri-experiment:
 
+
+-----------------
+Experiment design
+-----------------
+
+
+
 Designing your EEG-fMRI experiment
 ==================================
 

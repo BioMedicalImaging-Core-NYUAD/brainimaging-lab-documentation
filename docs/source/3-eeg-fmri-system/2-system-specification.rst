@@ -1,6 +1,9 @@
---------------------------------
+--------------------
+System specification
+--------------------
+
 EEG compatible fMRI System setup
---------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The MRI lab is equipped with an fMRI compatible EEG system from BrainProducts installed on the 24th of september 2024.
 
