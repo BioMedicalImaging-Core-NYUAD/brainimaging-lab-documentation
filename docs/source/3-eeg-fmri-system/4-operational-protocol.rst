@@ -122,19 +122,18 @@ Inside the MRI Scanner Room
         :align: center
         :alt: BrainCap MR Connector Box
 
-    - **Multritrodes for MR**:
+    1. **Multritrodes for MR**:
         - Sintered Ag/AgCl sensors.
-    - Cable tree bundled tightly.
+    2. Cable tree bundled tightly.
         - All lead wires are bundled tight together as they leave the cap.
-    - ECG electrode with sheath protection.
+    3. ECG electrode with sheath protection.
         - Covered with a plastic sheath to prevent the cable touching the skin.
-    - Connector box
+    4. Connector box
         - with current-limiting resistors.
-    - Name labels on every electrode for easy recognition
-    - Electrode cables are routed on the outside of the cap and secured to avoid loops and cable movement
-    - Additional components:
-        - Chin strap.
-        - Loop for chest belt (belt not included).
+    5. Name labels on every electrode for easy recognition
+    6. Electrode cables are routed on the outside of the cap and secured to avoid loops and cable movement
+    7. Chin strap.
+    8. Loop for chest belt (belt not included).
 
 
 Outside the MRI Scanner Room
@@ -247,6 +246,10 @@ Filling Electrodes
 
 Positioning the ECG Electrode
 -----------------------------
+
+It is important to place and gel the ECG electrode correctly on the back of the participant.
+The measurements from EEG electrodes will have ballistocardiogram (BCG) artifacts, the ECG electrode data is used to remove those artifacts in pre-processing steps.
+
 
 1. Degrease the skin and attach the ECG holder using adhesive washers.
 2. Place the ECG lead along the **paravertebral line**.
