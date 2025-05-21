@@ -2,7 +2,6 @@
 EEG-fMRI - Finger-tapping experiment
 ------------------------------------
 
-
 Context
 ^^^^^^^
 
@@ -12,12 +11,12 @@ As an EEG-fMRI experiment, it is important that the action is not repeated conti
 If we are doing frequency analysis of the EEG data, then it is possible to repeat continuously the action throughout the block duration.
 This is repeated 3 times per finger, so a total of 15 blocks.
 
-
 Code
 ^^^^
 
 The experiment is coded in PsychToolBox.
 The experiment folder found in the `experiments` folder on the github repository, contains:
+
 - `main.m` main file to run for experiment
 - `loadParameters.m` defines the parameters for the experiment
     - your radiographer needs to be aware of this duration
@@ -29,7 +28,6 @@ The experiment folder found in the `experiments` folder on the github repository
 - one run is therefore 15 blocks * 20 seconds = 300 seconds
 - each finger is represented by 3 blocks per run
 - The acquired data for this experiment is 3 runs, therefore each finger was acquired for 9 blocks
-
 
 
 .. dropdown:: Finger Tapping task code
