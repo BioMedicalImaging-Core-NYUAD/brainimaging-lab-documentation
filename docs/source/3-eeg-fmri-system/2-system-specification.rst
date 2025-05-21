@@ -13,10 +13,9 @@ and the high temporal resolution of EEG.
 However, noise is induced from the MRI onto the EEG data due to the gradient artifacts, those must be removed to make the EEG data usable.
 Therefore, special analysis pipelines are needed. Additionally, designing an EEG/fMRI experiment demands taking into consideration specific requirements.
 
-EEG/fMRI documentation PDF `download from here <https://github.com/BioMedicalImaging-Core-NYUAD/brainimaging-lab-documentation/releases/download/v-report-docs/>`_
+EEG/fMRI documentation PDF `download from here <https://github.com/BioMedicalImaging-Core-NYUAD/brainimaging-lab-documentation/releases/tag/v-report-docs>`_
 
-MRI Compatible EEG System from Brain Products
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
 .. figure:: ../_static/eeg.png
    :alt: eeg
@@ -33,7 +32,7 @@ Operational protocol and SOP
 ============================
 
 - Operational Protocol :ref:`brainamp_mr_plus_sop`
-- SOP `download from here <https://github.com/BioMedicalImaging-Core-NYUAD/brainimaging-lab-documentation/releases/download/v-report-docs/>`_
+- SOP `download from here <https://github.com/BioMedicalImaging-Core-NYUAD/brainimaging-lab-documentation/releases/tag/v-report-docs>`_
 - Data storage information and currently available data :ref:`eeg-fmri-data`
 - Important guideline for designing your EEG-fMRI experiment can be found here :ref:`eeg-fmri-experiment`
 

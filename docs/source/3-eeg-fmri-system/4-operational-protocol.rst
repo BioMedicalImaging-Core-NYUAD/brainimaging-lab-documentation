@@ -76,10 +76,14 @@ Inside the MRI Scanner Room
         :alt: BrainAmp MR Plus Amplifiers (Front View)
         :width: 400px
 
+        Front view of the BrainAmp MR Plus Amplifiers
+
     .. figure:: figures/eeg-fmri-operationprotocol/SOP_eeg2.jpg
         :align: center
         :alt: BrainAmp MR Plus Amplifiers (Rear View)
         :width: 400px
+
+        Rear view of the BrainAmp MR Plus Amplifiers
 
 2. **PowerPack**
    - Portable and secure power source for amplifiers.
