@@ -15,7 +15,7 @@ hemi = {'L';'R'};
 if ispc
     bidsDir = '\\rcsfileshare.abudhabi.nyu.edu\mri\projects\MS_osama\hadiBIDS\fmriprep_output_from_HPC';
 elseif isunix
-    bidsDir = '\mnt\rcs_mri';
+    bidsDir = fullfile('mnt', 'rcs_mri');
 end
     
     
@@ -28,14 +28,17 @@ idx_hemi = cell(numel(hemi),nRuns);  % Left first then right
 for iRun = 1:nRuns
 
     % file path
-    subDir = sprintf('%s/derivatives/fmriprep/%s/func',bidsDir,subject);
-
+    %subDir = sprintf('%s/derivatives/fmriprep/%s/func',bidsDir,subject);
+    subDir = fullfile(bidsDir, 'derivatives', 'fmriprep', subject, 'func');
     func = cell(2,1); % initialize for 2 hemi
     
     for iH = 1:numel(hemi)
 
-        fileName = sprintf('%s/%s_task-%s_run-%s_hemi-%s_space-%s_bold.func',subDir,subject,task,sprintf('%02d',iRun),hemi{iH},space);
-
+        %fileName = sprintf('%s/%s_task-%s_run-%s_hemi-%s_space-%s_bold.func',subDir,subject,task,sprintf('%02d',iRun),hemi{iH},space);
+        
+        fileNamepart = sprintf('%s_task-%s_run-%02d_hemi-%s_space-%s_bold.func', ...
+    subject, task, iRun, hemi{iH}, space);
+        fileName = fullfile(subDir, fileNamepart);
         input = [fileName '.gii'];
         output = [fileName fileType]; % the file type that we want to load
         disp(['Filename ', input])
