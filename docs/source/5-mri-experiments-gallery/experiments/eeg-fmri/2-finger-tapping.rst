@@ -30,6 +30,12 @@ The experiment folder found in the `experiments` folder on the github repository
 - The acquired data for this experiment is 3 runs, therefore each finger was acquired for 9 blocks
 
 
+.. figure:: figures/2-finger-tapping/finger-tapping-diagram.png
+    :align: center
+    :alt: Finger tapping experiment diagram
+
+    Finger tapping experiment diagram
+
 .. dropdown:: Finger Tapping task code
 
     .. literalinclude:: ../../../../../experiments/EEG-FMRI/finger-tapping/main.m
