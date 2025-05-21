@@ -27,7 +27,7 @@ Ensure that:
         - as a matter of fact, the length of an experiment using EEG-fMRI will have less trials than using EEG alone
         - therefore, frequency analysis of the EEG data in an EEG-fMRI experiment is more useful than time-lock analysis
 - You know the total duration of your experiment
-    - The maximum duration for your experiment should not exceed X value
+    - It is recommended that the maximum duration for your experiment should not exceed 90 minutes
 
 .. important::
 
