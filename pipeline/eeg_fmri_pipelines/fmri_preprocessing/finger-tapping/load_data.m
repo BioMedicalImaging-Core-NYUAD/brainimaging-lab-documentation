@@ -15,7 +15,7 @@ hemi = {'L';'R'};
 if ispc
     bidsDir = '\\rcsfileshare.abudhabi.nyu.edu\mri\projects\MS_osama\hadiBIDS\fmriprep_output_from_HPC';
 elseif isunix
-    bidsDir = fullfile('mnt', 'rcs_mri');
+    bidsDir = fullfile('mnt', 'rcs_mri','projects', 'MS_osama', 'hadiBIDS', 'fmriprep_output_from_HPC');
 end
     
     
@@ -34,16 +34,18 @@ for iRun = 1:nRuns
     
     for iH = 1:numel(hemi)
 
-        %fileName = sprintf('%s/%s_task-%s_run-%s_hemi-%s_space-%s_bold.func',subDir,subject,task,sprintf('%02d',iRun),hemi{iH},space);
+        fileName2 = sprintf('%s/%s_task-%s_run-%s_hemi-%s_space-%s_bold.func',subDir,subject,task,sprintf('%02d',iRun),hemi{iH},space);
         
         fileNamepart = sprintf('%s_task-%s_run-%02d_hemi-%s_space-%s_bold.func', ...
     subject, task, iRun, hemi{iH}, space);
+        
         fileName = fullfile(subDir, fileNamepart);
-        input = [fileName '.gii'];
+
+        input = [fileName, '.gii'];
         output = [fileName fileType]; % the file type that we want to load
         disp(['Filename ', input])
         % check to see if data exists in the desired fileType, if not,
-        % mir_convert file from gii
+        % mri_convert file from gii
         if ~exist(output)
             disp(['File does not exist in ' fileType ' format, converting from .gii ...'])
             system(['mri_convert ' input ' ' output]);
