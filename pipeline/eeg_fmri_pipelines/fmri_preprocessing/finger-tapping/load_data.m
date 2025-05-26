@@ -107,51 +107,70 @@ plot_fft(runIdx, voxelIdx, datafiles, TR);
 %% Filtering
 
 
-APPLY_FILTER = 0;
+APPLY_FILTER = 1;
+SIGNAL_TOOLBOX_AVAILABLE = 0;
 
 if APPLY_FILTER
-    % For each voxel filter all frequencies below 1/40Hz = 0.25 Hz
-              % <- your TR (s)
-    f_hp   = 1/40;         % 0.025 Hz cut-off
-    order  = 2;            % 2-pole Butterworth (→ 12 dB/oct per pass)
-    fs   = 1/TR;                               % sampling rate (Hz)
-    [b,a] = butter(order, f_hp/(fs/2), 'high');% design once
-    
-    nRuns        = numel(datafiles);
-    datafiles_hp = cell(size(datafiles));
-    
-    for r = 1:nRuns
-        X = datafiles{r};
-    
-        mu = mean(X,1);
-        % First dimension of X in filtfilt must be time
-        % TODO: check that X has time in first dimension before launching this
-        X_filt = filtfilt(b, a, X);            % zero-phase
-        X_rest = X_filt+mu;         % Added the mean after filtering, because if not the percentage_change next would become very big (since the mean is 0)
-        datafiles_hp{r} = X_rest;
-    
+
+    if SIGNAL_TOOLBOX_AVAILABLE
+        % For each voxel filter all frequencies below 1/40Hz = 0.25 Hz
+                  % <- your TR (s)
+        f_hp   = 1/40;         % 0.025 Hz cut-off
+        order  = 2;            % 2-pole Butterworth (→ 12 dB/oct per pass)
+        fs   = 1/TR;                               % sampling rate (Hz)
+        [b,a] = butter(order, f_hp/(fs/2), 'high');% design once
+        
+        nRuns        = numel(datafiles);
+        datafiles_hp = cell(size(datafiles));
+        
+        for r = 1:nRuns
+            X = datafiles{r};
+        
+            mu = mean(X,1);
+            % First dimension of X in filtfilt must be time
+            % TODO: check that X has time in first dimension before launching this
+            X_filt = filtfilt(b, a, X);            % zero-phase
+            X_rest = X_filt+mu;         % Added the mean after filtering, because if not the percentage_change next would become very big (since the mean is 0)
+            datafiles_hp{r} = X_rest;
+        
+        end
+    else
+            f_hp = 1/40;                 % 0.025 Hz
+            fs   = 1/TR;                 % sampling rate
+            
+            nRuns        = numel(datafiles);
+            datafiles_hp = cell(size(datafiles));
+            
+            for r = 1:nRuns
+                X  = datafiles{r};               % [time × vox]
+                mu = mean(X, 1);                 % store mean
+                Xc = X - mu;                     % centre first (optional)
+            
+                X_hp = highpass_fft(Xc, f_hp, fs);
+                datafiles_hp{r} = X_hp + mu;     % add mean back
+            end
+
     end
+    
 
 
-
-
-%% Visualise the data after filtering
-
-
-figure('Color','w');
-tl = tiledlayout(1,2,'TileSpacing','compact');  % 1 row × 2 columns
-
-% ----- USER CHOICES ---------------------------------------------------
-runIdx   = 2;        % which run?  1 … numel(datafiles)
-voxelIdx = 100000;     % which voxel/vertex index?
-
-plot_voxel(runIdx, voxelIdx, datafiles_hp, TR);
-
-% Compute FFT for the chosen voxel, chosen run
-
-plot_fft(runIdx, voxelIdx, datafiles_hp, TR);
-
-data = datafiles_hp;
+    % Visualise the data after filtering
+    
+    
+    figure('Color','w');
+    tl = tiledlayout(1,2,'TileSpacing','compact');  % 1 row × 2 columns
+    
+    % ----- USER CHOICES ---------------------------------------------------
+    runIdx   = 2;        % which run?  1 … numel(datafiles)
+    voxelIdx = 100000;     % which voxel/vertex index?
+    
+    plot_voxel(runIdx, voxelIdx, datafiles_hp, TR);
+    
+    % Compute FFT for the chosen voxel, chosen run
+    
+    plot_fft(runIdx, voxelIdx, datafiles_hp, TR);
+    
+    data = datafiles_hp;
 
 else
 

@@ -127,6 +127,15 @@ betas = pinv(designMatrix_concatenated) * percent_change_signals_concatenated; %
 % Save results in surface space
 
 save betas betas
+
+
+%% Save fingers separately
+
+for iCond = 1:number_conditions
+    betas_finger = betas(iCond)
+end
+
+
 %%
 load betas betas
 % Get betas for the index finger

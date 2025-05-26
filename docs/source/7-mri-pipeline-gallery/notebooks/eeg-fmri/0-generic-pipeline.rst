@@ -447,7 +447,7 @@ The following explains how to learn a GLM from the fMRIprep output, the provided
 
                Loading an overlay of the maximum betas for the index finger on inflated left hemisphere.
 
-
+    - press Configure, and adjust the heatmap to show the highest values
 
 
 Other possible processing steps
