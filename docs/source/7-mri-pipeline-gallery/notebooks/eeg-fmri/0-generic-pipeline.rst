@@ -370,6 +370,7 @@ The following explains how to learn a GLM from the fMRIprep output, the provided
     - On windows computer we cloned the vistasoft MRI repository https://github.com/vistalab/vistasoft and then added the external/freesurfer folder to MATLAB path
     - On linux/mac you can instal freesurfer normally this will give you the mri_convert and other commands to get the .mgh files
         - add to MATLAB path, the following directories
+        - 
             .. code-block:: none
 
                 /usr/local/freesurfer/8.0.0/bin
@@ -430,13 +431,21 @@ The following explains how to learn a GLM from the fMRIprep output, the provided
             - n_voxels = 320721
                 - the number of voxels 324k for our case
 
+
 - Run the GLM
 - Save the GLM outputs
 - Visually inspect GLM outputs in freeview
 - Visualise `Betas`, use the `visualise_betas.sh` commands under `pipeline/eeg_fmri_pipelines/fmri_preprocessing/finger-tapping`
+    - the index finger betas are saved as two files in the current directory as `lh.betas_index.mgz` and 'rh.betas_index.mgz`
+    - to inspect them, run the second command in `visualise_betas.sh`, you should see the left hemisphere
+        - within freeview, load the `lh.betas_index.mgz` by going to Overlay, Load generic and load the file
 
+            .. figure:: 0-generic-pipeline-figures/freeview_screenshot.png
+               :alt:
+               :align: center
+               :figclass: align-center
 
-
+               Loading an overlay of the maximum betas for the index finger on inflated left hemisphere.
 
 
 

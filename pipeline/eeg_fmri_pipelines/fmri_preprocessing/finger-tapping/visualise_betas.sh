@@ -1,7 +1,7 @@
 # Requires freesurfer
 #Check file info
-mri_info /home/hz3752/PycharmProjects/neurowaves-lab-documentation/pipeline/eeg_fmri_pipelines/fmri_preprocessing/finger-tapping/sub-0665/surf/lh.inflated
+mris_info /mnt/rcs_mri/projects/MS_osama/hadiBIDS/fmriprep_output_from_HPC/derivatives/freesurfer/sub-0665/surf/lh.inflated
 
 # Visualise
 
-freeview -f /home/hz3752/PycharmProjects/neurowaves-lab-documentation/pipeline/eeg_fmri_pipelines/fmri_preprocessing/finger-tapping/sub-0665/surf/lh.inflated
+freeview -f /mnt/rcs_mri/projects/MS_osama/hadiBIDS/fmriprep_output_from_HPC/derivatives/freesurfer/sub-0665/surf/lh.inflated

@@ -151,11 +151,6 @@ betas_index = betas(2,:);
 % Find the voxels for which the betas are maximal
 
 
-
-
-
-%  
-
 % isolated+extended
 % TR's
 
@@ -174,15 +169,18 @@ valName = 'betas_index';
 
 %fspth = '\\rcsfileshare.abudhabi.nyu.edu\mri\projects\MS_osama\hadiBIDS\fmriprep_output_from_HPC/derivatives/fmriprep/sub-0665/func';
 
-fspth_linux = 'sub-0665';
+mgz_header_template_path = fullfile(bidsDir, 'derivatives', 'freesurfer', subject, 'mri', 'orig.mgz' );
+
 resultsdir = '.';
-mgz = MRIread(fullfile(fspth_linux, 'mri', 'orig.mgz'));
+addpath( genpath( fullfile( getenv('FREESURFER_HOME'), 'fsfast', 'toolbox' ) ) );
+
+
+mgz = MRIread(mgz_header_template_path);
+
 mgz.vol = [];
 
 leftidx = idx_hemi{1,1};
 rightidx = idx_hemi{2,1};
-leftidx = 159450;
-rightidx = 161271;
 
 mgz.vol = val(1:leftidx);
 
@@ -190,6 +188,14 @@ mgz.vol = val(1:leftidx);
 MRIwrite(mgz, fullfile(resultsdir, ['lh.' valName '.mgz']));
 mgz.vol = val((leftidx+1):end);
 MRIwrite(mgz, fullfile(resultsdir, ['rh.' valName '.mgz']));
+
+
+
+%% To visualise in freeview
+
+
+
+
 
 
 
