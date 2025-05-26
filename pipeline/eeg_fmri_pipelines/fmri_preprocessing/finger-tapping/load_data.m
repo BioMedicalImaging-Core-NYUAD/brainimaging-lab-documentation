@@ -106,27 +106,33 @@ plot_fft(runIdx, voxelIdx, datafiles, TR);
 
 %% Filtering
 
-% For each voxel filter all frequencies below 1/40Hz = 0.25 Hz
-          % <- your TR (s)
-f_hp   = 1/40;         % 0.025 Hz cut-off
-order  = 2;            % 2-pole Butterworth (→ 12 dB/oct per pass)
-fs   = 1/TR;                               % sampling rate (Hz)
-[b,a] = butter(order, f_hp/(fs/2), 'high');% design once
 
-nRuns        = numel(datafiles);
-datafiles_hp = cell(size(datafiles));
+APPLY_FILTER = 0;
 
-for r = 1:nRuns
-    X = datafiles{r};
+if APPLY_FILTER
+    % For each voxel filter all frequencies below 1/40Hz = 0.25 Hz
+              % <- your TR (s)
+    f_hp   = 1/40;         % 0.025 Hz cut-off
+    order  = 2;            % 2-pole Butterworth (→ 12 dB/oct per pass)
+    fs   = 1/TR;                               % sampling rate (Hz)
+    [b,a] = butter(order, f_hp/(fs/2), 'high');% design once
+    
+    nRuns        = numel(datafiles);
+    datafiles_hp = cell(size(datafiles));
+    
+    for r = 1:nRuns
+        X = datafiles{r};
+    
+        mu = mean(X,1);
+        % First dimension of X in filtfilt must be time
+        % TODO: check that X has time in first dimension before launching this
+        X_filt = filtfilt(b, a, X);            % zero-phase
+        X_rest = X_filt+mu;         % Added the mean after filtering, because if not the percentage_change next would become very big (since the mean is 0)
+        datafiles_hp{r} = X_rest;
+    
+    end
 
-    mu = mean(X,1);
-    % First dimension of X in filtfilt must be time
-    % TODO: check that X has time in first dimension before launching this
-    X_filt = filtfilt(b, a, X);            % zero-phase
-    X_rest = X_filt+mu;         % Added the mean after filtering, because if not the percentage_change next would become very big (since the mean is 0)
-    datafiles_hp{r} = X_rest;
 
-end
 
 
 %% Visualise the data after filtering
@@ -145,14 +151,20 @@ plot_voxel(runIdx, voxelIdx, datafiles_hp, TR);
 
 plot_fft(runIdx, voxelIdx, datafiles_hp, TR);
 
+data = datafiles_hp;
 
+else
+
+    data = datafiles;
+
+end
 %% Convert to signal change percentage
 
 % converting to % signal change
 
 %Compute the average value
 
-data = datafiles_hp;
+
 
 % Prepare cell arrays to store outputs
 average_signals = cell(1, nRuns);

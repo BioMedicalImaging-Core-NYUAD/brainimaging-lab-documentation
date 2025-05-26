@@ -7,7 +7,8 @@
 
 EEG_FMRI_DATA_PATH = getenv('EEG_FMRI_DATA');
 
-datapath = sprintf('%s\\%s\\%s\\matlab', EEG_FMRI_DATA_PATH, task, subject);
+%datapath = sprintf('%s\\%s\\%s\\matlab', EEG_FMRI_DATA_PATH, task, subject);
+datapath = fullfile(EEG_FMRI_DATA_PATH, task, subject, 'matlab');
 number_conditions = 5;  % Five fingers
 number_regressors_motion = 6;  % translation x,y,z and rotation x,y,z 
 number_regressors_extra = 2;   % constant regressor and drift
