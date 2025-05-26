@@ -383,7 +383,8 @@ The following explains how to learn a GLM from the fMRIprep output, the provided
                 /usr/local/freesurfer/8.0.0/matlab/lme/geodesic
                 /usr/local/freesurfer/8.0.0/matlab/lme/mass_univariate
                 /usr/local/freesurfer/8.0.0/matlab/lme/univariate
-
+- For the high-pass filter, we need to install the signal processing toolbox
+    - if you are facing issues with the add-on manager, please use the MATLAB installer (the one you used to install matlab) to install the addon
 - Load data in MATLAB using script in `load_data.m` in `pipeline/eeg_fmri_pipelines/finger-tapping` directory, make sure to open MATLAB from the script itself
     - the script will perform the following:
         - load the fmriprep output data into MATLAB

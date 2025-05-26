@@ -15,7 +15,8 @@ hemi = {'L';'R'};
 if ispc
     bidsDir = '\\rcsfileshare.abudhabi.nyu.edu\mri\projects\MS_osama\hadiBIDS\fmriprep_output_from_HPC';
 elseif isunix
-    bidsDir = fullfile('mnt', 'rcs_mri','projects', 'MS_osama', 'hadiBIDS', 'fmriprep_output_from_HPC');
+    % Unix requires the first slash to be put for fullfile to work...
+    bidsDir = fullfile('/mnt', 'rcs_mri','projects', 'MS_osama', 'hadiBIDS', 'fmriprep_output_from_HPC');
 end
     
     
@@ -24,6 +25,7 @@ setenv('FS_LICENSE', '/Applications/freesurfer/7.4.1/license.txt');
 
 datafiles = cell(1,nRuns); % initialize for all the runs
 idx_hemi = cell(numel(hemi),nRuns);  % Left first then right 
+
 
 for iRun = 1:nRuns
 
@@ -34,7 +36,7 @@ for iRun = 1:nRuns
     
     for iH = 1:numel(hemi)
 
-        fileName2 = sprintf('%s/%s_task-%s_run-%s_hemi-%s_space-%s_bold.func',subDir,subject,task,sprintf('%02d',iRun),hemi{iH},space);
+        %fileName2 = sprintf('%s/%s_task-%s_run-%s_hemi-%s_space-%s_bold.func',subDir,subject,task,sprintf('%02d',iRun),hemi{iH},space);
         
         fileNamepart = sprintf('%s_task-%s_run-%02d_hemi-%s_space-%s_bold.func', ...
     subject, task, iRun, hemi{iH}, space);
