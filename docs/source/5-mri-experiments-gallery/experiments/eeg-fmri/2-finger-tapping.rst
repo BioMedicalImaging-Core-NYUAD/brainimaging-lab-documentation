@@ -28,7 +28,12 @@ The experiment folder found in the `experiments` folder on the github repository
 - one run is therefore 15 blocks * 20 seconds = 300 seconds
 - each finger is represented by 3 blocks per run
 - The acquired data for this experiment is 3 runs, therefore each finger was acquired for 9 blocks
-
+- the condition for the fingers are numbered as
+    - 1 Thumb
+    - 2 Index
+    - 3 Middle
+    - 4 Ring
+    - 5 Pinkie
 
 .. figure:: figures/2-finger-tapping/finger-tapping-diagram.png
     :align: center
