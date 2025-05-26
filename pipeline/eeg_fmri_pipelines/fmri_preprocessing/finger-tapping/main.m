@@ -5,6 +5,12 @@
 % create design matrix  n by m 
 
 
+fingerNames = containers.Map( ...
+    [1 2 3 4 5], ...
+    {'thumb', 'index', 'middle', 'ring', 'pinkie'} ...
+);
+
+
 EEG_FMRI_DATA_PATH = getenv('EEG_FMRI_DATA');
 
 %datapath = sprintf('%s\\%s\\%s\\matlab', EEG_FMRI_DATA_PATH, task, subject);
@@ -131,13 +137,44 @@ save betas betas
 
 %% Save fingers separately
 
+load betas betas
+
 for iCond = 1:number_conditions
-    betas_finger = betas(iCond)
+
+    betas_finger = betas(iCond,:);
+    name = fingerNames(iCond);
+
+
+    val = betas_finger;
+    valName = sprintf('betas_%s',name);
+    
+    %fspth = '\\rcsfileshare.abudhabi.nyu.edu\mri\projects\MS_osama\hadiBIDS\fmriprep_output_from_HPC/derivatives/fmriprep/sub-0665/func';
+    
+    mgz_header_template_path = fullfile(bidsDir, 'derivatives', 'freesurfer', subject, 'mri', 'orig.mgz' );
+    
+    resultsdir = '.';
+    addpath( genpath( fullfile( getenv('FREESURFER_HOME'), 'fsfast', 'toolbox' ) ) );
+    
+    
+    mgz = MRIread(mgz_header_template_path);
+    
+    mgz.vol = [];
+    
+    leftidx = idx_hemi{1,1};
+    rightidx = idx_hemi{2,1};
+    
+    mgz.vol = val(1:leftidx);
+    
+    
+    MRIwrite(mgz, fullfile(resultsdir, ['lh.' valName '.mgz']));
+    mgz.vol = val((leftidx+1):end);
+    MRIwrite(mgz, fullfile(resultsdir, ['rh.' valName '.mgz']));
+
+
 end
 
-
 %%
-load betas betas
+
 % Get betas for the index finger
 % The index finger was numbered as block_type = 2, corresponding to the
 % second column of our designMatrix

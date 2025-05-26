@@ -448,6 +448,45 @@ The following explains how to learn a GLM from the fMRIprep output, the provided
                Loading an overlay of the maximum betas for the index finger on inflated left hemisphere.
 
     - press Configure, and adjust the heatmap to show the highest values
+    - below are the maximum betas per finger
+
+        .. figure:: 0-generic-pipeline-figures/prefix.lh.betas_thumb.png
+           :alt:
+           :align: center
+           :figclass: align-center
+
+           Thumb finger.
+
+        .. figure:: 0-generic-pipeline-figures/prefix.lh.betas_index.png
+           :alt:
+           :align: center
+           :figclass: align-center
+
+           Index finger.
+
+        .. figure:: 0-generic-pipeline-figures/prefix.lh.betas_middle.png
+           :alt:
+           :align: center
+           :figclass: align-center
+
+           Middle finger.
+
+
+        .. figure:: 0-generic-pipeline-figures/prefix.lh.betas_ring.png
+           :alt:
+           :align: center
+           :figclass: align-center
+
+           Ring finger.
+
+
+        .. figure:: 0-generic-pipeline-figures/prefix.lh.betas_pinkie.png
+           :alt:
+           :align: center
+           :figclass: align-center
+
+           Pinkie finger.
+
 
 
 Other possible processing steps
