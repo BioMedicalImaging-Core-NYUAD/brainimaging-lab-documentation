@@ -342,7 +342,7 @@ Learning Generalized Linear Models (GLM) from fMRI data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-- Define the following environment variable in your .bashrc and .profile,
+- Define the following environment variable in your .bashrc (to be seen by the terminal) and .profile (to be seen by MATLAB) by adding the following lines at the end of the files
 
         ..code-block::bash
 
