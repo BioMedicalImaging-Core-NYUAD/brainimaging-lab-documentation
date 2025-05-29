@@ -5,9 +5,16 @@
 % create design matrix  n by m 
 
 
+fingerNames = containers.Map( ...
+    [1 2 3 4 5], ...
+    {'thumb', 'index', 'middle', 'ring', 'pinkie'} ...
+);
+
+
 EEG_FMRI_DATA_PATH = getenv('EEG_FMRI_DATA');
 
-datapath = sprintf('%s\\%s\\%s\\matlab', EEG_FMRI_DATA_PATH, task, subject);
+%datapath = sprintf('%s\\%s\\%s\\matlab', EEG_FMRI_DATA_PATH, task, subject);
+datapath = fullfile(EEG_FMRI_DATA_PATH, task, subject, 'matlab');
 number_conditions = 5;  % Five fingers
 number_regressors_motion = 6;  % translation x,y,z and rotation x,y,z 
 number_regressors_extra = 2;   % constant regressor and drift
@@ -126,8 +133,48 @@ betas = pinv(designMatrix_concatenated) * percent_change_signals_concatenated; %
 % Save results in surface space
 
 save betas betas
-%%
+
+
+%% Save fingers separately
+
 load betas betas
+
+for iCond = 1:number_conditions
+
+    betas_finger = betas(iCond,:);
+    name = fingerNames(iCond);
+
+
+    val = betas_finger;
+    valName = sprintf('betas_%s',name);
+    
+    %fspth = '\\rcsfileshare.abudhabi.nyu.edu\mri\projects\MS_osama\hadiBIDS\fmriprep_output_from_HPC/derivatives/fmriprep/sub-0665/func';
+    
+    mgz_header_template_path = fullfile(bidsDir, 'derivatives', 'freesurfer', subject, 'mri', 'orig.mgz' );
+    
+    resultsdir = '.';
+    addpath( genpath( fullfile( getenv('FREESURFER_HOME'), 'fsfast', 'toolbox' ) ) );
+    
+    
+    mgz = MRIread(mgz_header_template_path);
+    
+    mgz.vol = [];
+    
+    leftidx = idx_hemi{1,1};
+    rightidx = idx_hemi{2,1};
+    
+    mgz.vol = val(1:leftidx);
+    
+    
+    MRIwrite(mgz, fullfile(resultsdir, ['lh.' valName '.mgz']));
+    mgz.vol = val((leftidx+1):end);
+    MRIwrite(mgz, fullfile(resultsdir, ['rh.' valName '.mgz']));
+
+
+end
+
+%%
+
 % Get betas for the index finger
 % The index finger was numbered as block_type = 2, corresponding to the
 % second column of our designMatrix
@@ -150,11 +197,6 @@ betas_index = betas(2,:);
 % Find the voxels for which the betas are maximal
 
 
-
-
-
-%  
-
 % isolated+extended
 % TR's
 
@@ -173,15 +215,18 @@ valName = 'betas_index';
 
 %fspth = '\\rcsfileshare.abudhabi.nyu.edu\mri\projects\MS_osama\hadiBIDS\fmriprep_output_from_HPC/derivatives/fmriprep/sub-0665/func';
 
-fspth_linux = 'sub-0665';
+mgz_header_template_path = fullfile(bidsDir, 'derivatives', 'freesurfer', subject, 'mri', 'orig.mgz' );
+
 resultsdir = '.';
-mgz = MRIread(fullfile(fspth_linux, 'mri', 'orig.mgz'));
+addpath( genpath( fullfile( getenv('FREESURFER_HOME'), 'fsfast', 'toolbox' ) ) );
+
+
+mgz = MRIread(mgz_header_template_path);
+
 mgz.vol = [];
 
 leftidx = idx_hemi{1,1};
 rightidx = idx_hemi{2,1};
-leftidx = 159450;
-rightidx = 161271;
 
 mgz.vol = val(1:leftidx);
 
@@ -189,6 +234,14 @@ mgz.vol = val(1:leftidx);
 MRIwrite(mgz, fullfile(resultsdir, ['lh.' valName '.mgz']));
 mgz.vol = val((leftidx+1):end);
 MRIwrite(mgz, fullfile(resultsdir, ['rh.' valName '.mgz']));
+
+
+
+%% To visualise in freeview
+
+
+
+
 
 
 

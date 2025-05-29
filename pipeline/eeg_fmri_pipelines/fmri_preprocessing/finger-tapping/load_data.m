@@ -5,6 +5,7 @@ clear all; close all; clc;
 subject = 'sub-0665';
 nRuns = 3;
 
+
 task = 'fingertapping';
 space = 'fsnative';
 fileType = '.mgh';
@@ -14,7 +15,8 @@ hemi = {'L';'R'};
 if ispc
     bidsDir = '\\rcsfileshare.abudhabi.nyu.edu\mri\projects\MS_osama\hadiBIDS\fmriprep_output_from_HPC';
 elseif isunix
-    bidsDir = '\mnt\rcs_mri';
+    % Unix requires the first slash to be put for fullfile to work...
+    bidsDir = fullfile('/mnt', 'rcs_mri','projects', 'MS_osama', 'hadiBIDS', 'fmriprep_output_from_HPC');
 end
     
     
@@ -24,22 +26,28 @@ setenv('FS_LICENSE', '/Applications/freesurfer/7.4.1/license.txt');
 datafiles = cell(1,nRuns); % initialize for all the runs
 idx_hemi = cell(numel(hemi),nRuns);  % Left first then right 
 
+
 for iRun = 1:nRuns
 
     % file path
-    subDir = sprintf('%s/derivatives/fmriprep/%s/func',bidsDir,subject);
-
+    %subDir = sprintf('%s/derivatives/fmriprep/%s/func',bidsDir,subject);
+    subDir = fullfile(bidsDir, 'derivatives', 'fmriprep', subject, 'func');
     func = cell(2,1); % initialize for 2 hemi
     
     for iH = 1:numel(hemi)
 
-        fileName = sprintf('%s/%s_task-%s_run-%s_hemi-%s_space-%s_bold.func',subDir,subject,task,sprintf('%02d',iRun),hemi{iH},space);
+        %fileName2 = sprintf('%s/%s_task-%s_run-%s_hemi-%s_space-%s_bold.func',subDir,subject,task,sprintf('%02d',iRun),hemi{iH},space);
+        
+        fileNamepart = sprintf('%s_task-%s_run-%02d_hemi-%s_space-%s_bold.func', ...
+    subject, task, iRun, hemi{iH}, space);
+        
+        fileName = fullfile(subDir, fileNamepart);
 
-        input = [fileName '.gii'];
+        input = [fileName, '.gii'];
         output = [fileName fileType]; % the file type that we want to load
         disp(['Filename ', input])
         % check to see if data exists in the desired fileType, if not,
-        % mir_convert file from gii
+        % mri_convert file from gii
         if ~exist(output)
             disp(['File does not exist in ' fileType ' format, converting from .gii ...'])
             system(['mri_convert ' input ' ' output]);
@@ -98,53 +106,84 @@ plot_fft(runIdx, voxelIdx, datafiles, TR);
 
 %% Filtering
 
-% For each voxel filter all frequencies below 1/40Hz = 0.25 Hz
-          % <- your TR (s)
-f_hp   = 1/40;         % 0.025 Hz cut-off
-order  = 2;            % 2-pole Butterworth (→ 12 dB/oct per pass)
-fs   = 1/TR;                               % sampling rate (Hz)
-[b,a] = butter(order, f_hp/(fs/2), 'high');% design once
 
-nRuns        = numel(datafiles);
-datafiles_hp = cell(size(datafiles));
+APPLY_FILTER = 1;
+SIGNAL_TOOLBOX_AVAILABLE = 0;
 
-for r = 1:nRuns
-    X = datafiles{r};
+if APPLY_FILTER
 
-    mu = mean(X,1);
-    % First dimension of X in filtfilt must be time
-    % TODO: check that X has time in first dimension before launching this
-    X_filt = filtfilt(b, a, X);            % zero-phase
-    X_rest = X_filt+mu;         % Added the mean after filtering, because if not the percentage_change next would become very big (since the mean is 0)
-    datafiles_hp{r} = X_rest;
+    if SIGNAL_TOOLBOX_AVAILABLE
+        % For each voxel filter all frequencies below 1/40Hz = 0.25 Hz
+                  % <- your TR (s)
+        f_hp   = 1/40;         % 0.025 Hz cut-off
+        order  = 2;            % 2-pole Butterworth (→ 12 dB/oct per pass)
+        fs   = 1/TR;                               % sampling rate (Hz)
+        [b,a] = butter(order, f_hp/(fs/2), 'high');% design once
+        
+        nRuns        = numel(datafiles);
+        datafiles_hp = cell(size(datafiles));
+        
+        for r = 1:nRuns
+            X = datafiles{r};
+        
+            mu = mean(X,1);
+            % First dimension of X in filtfilt must be time
+            % TODO: check that X has time in first dimension before launching this
+            X_filt = filtfilt(b, a, X);            % zero-phase
+            X_rest = X_filt+mu;         % Added the mean after filtering, because if not the percentage_change next would become very big (since the mean is 0)
+            datafiles_hp{r} = X_rest;
+        
+        end
+    else
+            f_hp = 1/40;                 % 0.025 Hz
+            fs   = 1/TR;                 % sampling rate
+            
+            nRuns        = numel(datafiles);
+            datafiles_hp = cell(size(datafiles));
+            
+            for r = 1:nRuns
+                X  = datafiles{r};               % [time × vox]
+                mu = mean(X, 1);                 % store mean
+                Xc = X - mu;                     % centre first (optional)
+            
+                X_hp = highpass_fft(Xc, f_hp, fs);
+                datafiles_hp{r} = X_hp + mu;     % add mean back
+            end
+
+    end
+    
+
+
+    % Visualise the data after filtering
+    
+    
+    figure('Color','w');
+    tl = tiledlayout(1,2,'TileSpacing','compact');  % 1 row × 2 columns
+    
+    % ----- USER CHOICES ---------------------------------------------------
+    runIdx   = 2;        % which run?  1 … numel(datafiles)
+    voxelIdx = 100000;     % which voxel/vertex index?
+    
+    plot_voxel(runIdx, voxelIdx, datafiles_hp, TR);
+    
+    % Compute FFT for the chosen voxel, chosen run
+    
+    plot_fft(runIdx, voxelIdx, datafiles_hp, TR);
+    
+    data = datafiles_hp;
+
+else
+
+    data = datafiles;
 
 end
-
-
-%% Visualise the data after filtering
-
-
-figure('Color','w');
-tl = tiledlayout(1,2,'TileSpacing','compact');  % 1 row × 2 columns
-
-% ----- USER CHOICES ---------------------------------------------------
-runIdx   = 2;        % which run?  1 … numel(datafiles)
-voxelIdx = 100000;     % which voxel/vertex index?
-
-plot_voxel(runIdx, voxelIdx, datafiles_hp, TR);
-
-% Compute FFT for the chosen voxel, chosen run
-
-plot_fft(runIdx, voxelIdx, datafiles_hp, TR);
-
-
 %% Convert to signal change percentage
 
 % converting to % signal change
 
 %Compute the average value
 
-data = datafiles_hp;
+
 
 % Prepare cell arrays to store outputs
 average_signals = cell(1, nRuns);
