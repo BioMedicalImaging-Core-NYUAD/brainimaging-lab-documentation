@@ -5,3 +5,8 @@ mris_info /mnt/rcs_mri/projects/MS_osama/hadiBIDS/fmriprep_output_from_HPC/deriv
 # Visualise
 
 freeview -f /mnt/rcs_mri/projects/MS_osama/hadiBIDS/fmriprep_output_from_HPC/derivatives/freesurfer/sub-0665/surf/lh.inflated
+
+
+#Load all five fingers
+
+freeview -f $BIDS_DIR/freesurfer/sub-0665/surf/lh.inflated

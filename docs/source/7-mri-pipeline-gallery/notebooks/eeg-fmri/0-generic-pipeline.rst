@@ -341,6 +341,15 @@ For further details on available spaces and how they are handled, see the `fMRIP
 Learning Generalized Linear Models (GLM) from fMRI data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+- Define the following environment variable in your .bashrc and .profile,
+
+        ..code-block::bash
+
+            export BIDS_DIR=/mnt/rcs_mri/projects/MS_osama/hadiBIDS/fmriprep_output_from_HPC/derivatives
+            export EEG_FMRI_DATA=/home/${USER}/Documents/EEG-FMRI
+            export FREESURFER_HOME=/usr/local/freesurfer/8.0.0
+
 - in the `fmriprepoutput\sub-0665\func` output directory you will find:
     - files ending in `func.gii`
     - files ending in `func.mgh`
@@ -384,6 +393,7 @@ The following explains how to learn a GLM from the fMRIprep output, the provided
                 /usr/local/freesurfer/8.0.0/matlab/lme/geodesic
                 /usr/local/freesurfer/8.0.0/matlab/lme/mass_univariate
                 /usr/local/freesurfer/8.0.0/matlab/lme/univariate
+
 - For the high-pass filter, we need to install the signal processing toolbox
     - if you are facing issues with the add-on manager, please use the MATLAB installer (the one you used to install matlab) to install the addon
 - Load data in MATLAB using script in `load_data.m` in `pipeline/eeg_fmri_pipelines/finger-tapping` directory, make sure to open MATLAB from the script itself
@@ -439,6 +449,7 @@ The following explains how to learn a GLM from the fMRIprep output, the provided
     - the index finger betas are saved as two files in the current directory as `lh.betas_index.mgz` and 'rh.betas_index.mgz`
     - to inspect them, run the second command in `visualise_betas.sh`, you should see the left hemisphere
         - within freeview, load the `lh.betas_index.mgz` by going to Overlay, Load generic and load the file
+            - Do not press the `Apply Registration` when loading the overlay, as we have not changed the space from the brain surface and the overlay, they are both fsnative
 
             .. figure:: 0-generic-pipeline-figures/freeview_screenshot.png
                :alt:
@@ -446,9 +457,20 @@ The following explains how to learn a GLM from the fMRIprep output, the provided
                :figclass: align-center
 
                Loading an overlay of the maximum betas for the index finger on inflated left hemisphere.
+    - for the right hemisphere run similar commands on the rh.inflated file
+        .. code-block:: bash
+
+            freeview -f $BIDS_DIR/derivatives/freesurfer/sub-0665/surf/rh.inflated
+
 
     - press Configure, and adjust the heatmap to show the highest values
-    - below are the maximum betas per finger
+        - start with the following parameters for the heatmap configuration and then adjust
+            - Use percentile 75 to 90%
+            - Enable smooth to 20 steps
+            - Color wheel
+            - Enable Inverse
+
+    - below are the maximum betas per finger for respectively left and right hemisphere
 
         .. figure:: 0-generic-pipeline-figures/prefix.lh.betas_thumb.png
            :alt:
