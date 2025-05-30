@@ -108,7 +108,7 @@ plot_fft(runIdx, voxelIdx, datafiles, TR);
 
 
 APPLY_FILTER = 1;
-SIGNAL_TOOLBOX_AVAILABLE = 0;
+SIGNAL_TOOLBOX_AVAILABLE = 1;
 
 if APPLY_FILTER
 
