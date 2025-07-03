@@ -510,6 +510,10 @@ The following explains how to learn a GLM from the fMRIprep output, the provided
            Pinkie finger.
 
 
+    - We can visualise the pial (non-inflated) brain surface instead, find the scripts under rh_visualise_betas_fingers.pial/inflated.sh
+    - Load an ATLAS by going, in freeview, to Annotation, then choose lh.aparc.annot to load the Desikan-Killiany Atlas
+
+
 
 Other possible processing steps
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -95,6 +95,100 @@ for iRun=1:nRuns
    
 end
 
+
+%% Without convolution
+
+fingerNames = containers.Map( ...
+    [1 2 3 4 5], ...
+    {'thumb', 'index', 'middle', 'ring', 'pinkie'} ...
+);
+
+
+EEG_FMRI_DATA_PATH = getenv('EEG_FMRI_DATA');
+
+%datapath = sprintf('%s\\%s\\%s\\matlab', EEG_FMRI_DATA_PATH, task, subject);
+datapath = fullfile(EEG_FMRI_DATA_PATH, task, subject, 'matlab');
+number_conditions = 5;  % Five fingers
+number_regressors_motion = 6;  % translation x,y,z and rotation x,y,z 
+number_regressors_extra = 2;   % constant regressor and drift
+n_cols_total = number_conditions+number_regressors_motion+number_regressors_extra
+run_length = 300; %In seconds (the TR was 1 seconds)
+nRuns = 3;
+block_size = 20;
+
+designMatrixNoConv = zeros(run_length, n_cols_total,  nRuns);
+
+const_regress_vector = repelem(1, run_length)';
+
+drift_regress_vector = 1:300;
+drift_regress_vector = drift_regress_vector';
+
+gam_x_values = linspace(1,block_size, block_size);
+
+hrf = gampdf(gam_x_values,2,3);
+
+% Plot hrf
+% What do we need to ensure?
+
+plot(gam_x_values,hrf);
+
+for iRun=1:nRuns
+
+    file_array_name = ['fingertap_0', num2str(iRun), '.csv'];
+    fullpath = fullfile(datapath, file_array_name);
+    data_output = readtable(fullpath);
+    
+
+    % the designmatrix is filled from data_output
+    % the first column is for finger number 1 and so on, the last columns are
+    % for the noise regressors
+    % in data_output we look at the blocktype column, each block is 20 seconds,
+    % so we need to create a repetition of 20 times the values
+
+    condition_vector = repelem(data_output.blocktype, 20);
+    
+    % Determine the number of rows (same as number of elements in vector)
+    num_rows = length(condition_vector);
+    
+    % Determine the number of columns (max value in vector)
+    num_cols = max(condition_vector);
+    
+    % Preallocate binary matrix
+    binary_matrix = zeros(num_rows, num_cols);
+    
+    % Fill matrix using subscript indexing
+    row_indices = (1:num_rows)';
+    col_indices = condition_vector(:);  % Ensure it's a column vector
+    
+    % Linear indexing to set the appropriate entries to 1
+    binary_matrix(sub2ind(size(binary_matrix), row_indices, col_indices)) = 1;
+
+    designMatrixNoConv(:,1:number_conditions,iRun) = binary_matrix;
+    
+    % The noise regressors have already been loaded in load_data.m
+
+    % PUTI - add constant 1s as a regressor, add linear drift 1:300 as
+    % another regressor DONE D
+
+    designMatrixNoConv(:,number_conditions+1:number_regressors_motion+number_conditions,iRun ) = table2array(noise_regressors_data{iRun});
+    
+    designMatrixNoConv(:, number_conditions+number_regressors_motion+1:n_cols_total, iRun) = [const_regress_vector, drift_regress_vector] ;
+     
+    
+    % PUTI - - remember to chop the left overs
+
+    % for col = 1:number_conditions
+    %     convolved_signal = conv(designMatrix(:,col,iRun),hrf);
+    %     convolved_signal = convolved_signal(1:run_length);  % Chop the leftovers
+    %     designMatrix(:,col,iRun) = convolved_signal;
+    %         % Chop off the left overs
+    %     %plot(1:run_length, convolved_signal);
+    % end
+    
+   
+end
+
+
 %% Learn GLM
 
 % Y = X.B + Epsilon, with Epsilon = 0
