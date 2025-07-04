@@ -1,5 +1,5 @@
 
-Experiment Description:
+## Experiment Description:
 This repository contains MATLAB Psychtoolbox code for running the Stroop Color-Word Task (SCWT) with auditory and visual feedback and trial timing control.
 
 - Visual Stimuli: Each trial presents a color word (e.g., "RED", "BLUE") displayed in a specific font color at the top-center of the screen. 
@@ -14,7 +14,7 @@ This repository contains MATLAB Psychtoolbox code for running the Stroop Color-W
    - The experiment runs for 10 blocks in total.
    - Duration: The total experiment duration is 10 minutes.
 
-Files:
+### Files:
 
 - StroopTask.m – main experiment script
 - GenerateSCWTTrials.m – a function that generates the Stroop trials
