@@ -70,6 +70,7 @@ html_static_path = ['_static']
 
 html_css_files = [
     "custom.css",
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css",
 ]
 
 
@@ -109,3 +110,43 @@ html_logo = "graphic/NYU_Logo.png"
 
 # -- Math options ---------------------------------------------------------
 mathjax_path = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
+
+
+
+
+from docutils import nodes
+from docutils.parsers.rst import roles
+
+# -- tweak these to match your repo/branch docs layout --
+GITHUB_USER   = "BioMedicalImaging-Core-NYUAD"
+GITHUB_REPO   = "brainimaging-lab-documentation"
+GITHUB_BRANCH = "main"
+DOCS_DIR      = "docs"      # if your docs live in repo/docs/, else ""
+
+
+def github_file_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
+    """
+    :github-file:`path/to/file.ext`
+    turns into a link <https://github.com/.../blob/.../path/to/file.ext>
+    with an inline GitHub icon.
+    """
+    # compute URL to blob
+    relpath = text.lstrip("/")
+    parts = [GITHUB_USER, GITHUB_REPO, "blob", GITHUB_BRANCH]
+    if DOCS_DIR:
+        parts.append(DOCS_DIR)
+    parts.extend(relpath.split("/"))
+    url = "https://github.com/" + "/".join(parts)
+
+    # inline FontAwesome icon + filename
+    html = (
+        f'<a class="github-link" href="{url}" target="_blank">'
+        '<i class="fab fa-github"></i> '
+        f'{relpath}</a>'
+    )
+    return [nodes.raw("", html, format="html")], []
+
+# register the new role
+roles.register_local_role("github-file", github_file_role)
+
+
