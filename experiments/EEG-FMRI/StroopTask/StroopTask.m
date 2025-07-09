@@ -9,6 +9,19 @@ function StroopTask(trialDuration, trialBlockDuration, restDuration, numBlocks)
     % numBlocks: number of blocks 
 
     %setting default values if inputs not provided.
+    
+    USE_VPIXX_RESPONSE = False;  % If set to True, we use the Vpixx response boxes in the NYUAD MRI LAB, if set to False we use the keyboard
+    USE_VPIXX_TRIGGERS = False;  
+    
+    if USE_VPIXX_TRIGGERS
+
+        % datapixx init               
+        AssertOpenGL;   % We use PTB-3;
+        isReady =  Datapixx('Open');
+        Datapixx('StopAllSchedules');
+        Datapixx('RegWrRd');    % Synchronize DATAPixx registers to local register cache
+    end
+    
 
     if nargin < 1 || isempty(trialDuration)
         trialDuration = 3;
@@ -235,4 +248,12 @@ function StroopTask(trialDuration, trialBlockDuration, restDuration, numBlocks)
     sca;
     PsychPortAudio('Close', pahandle);
     save('stroop_results_keyboard_feedback.mat', 'trials');
+
+
+    if USE_VPIXX_TRIGGERS
+        Datapixx('RegWrRd');
+        Datapixx('StopAllSchedules');
+        Datapixx('Close');
+    end
+
 end
