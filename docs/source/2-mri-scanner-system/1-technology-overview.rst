@@ -2,8 +2,6 @@
 Technology Overview
 -------------------
 
-
-```rst
 Overview of Magnetic Resonance Imaging (MRI)
 ********************************************
 
@@ -12,7 +10,9 @@ Overview of Magnetic Resonance Imaging (MRI)
    :width: 800px
    :align: center
 
-Magnetic Resonance Imaging (MRI) is a sophisticated medical imaging technology that allows physicians to visualize internal structures of the body with exceptional clarity and detail. Unlike X-rays and CT scans, MRI does not use ionizing radiation. Instead, it uses powerful magnetic fields and radiofrequency (RF) pulses to generate detailed images of soft tissues, organs, bones, and blood vessels.
+Magnetic Resonance Imaging (MRI) is a sophisticated medical imaging technology that allows physicians to visualize
+internal structures of the body with exceptional clarity and detail. Unlike X-rays and CT scans, MRI does not use
+ionizing radiation. Instead, it uses powerful magnetic fields and radiofrequency (RF) pulses to generate detailed images of soft tissues, organs, bones, and blood vessels.
 
 Basic Principles
 ----------------
@@ -100,4 +100,4 @@ Future Developments in MRI
    :align: center
 
 Advancements continue to improve MRI technology, including faster imaging techniques, higher field strength magnets, AI integration, and portable MRI systems.
-```
+
