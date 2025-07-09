@@ -27,7 +27,7 @@ MRI technology is rooted in the principle of nuclear magnetic resonance (NMR). T
 Components of an MRI Scanner
 ----------------------------
 
-.. image:: ../_static/mri_scanner_components.png
+.. image:: ../_static/mri_components.png
    :alt: MRI scanner components
    :width: 800px
    :align: center
@@ -54,9 +54,7 @@ Types of MRI Sequences
 Clinical Applications of MRI
 ----------------------------
 
-   :alt: Clinical MRI applications
-   :width: 800px
-   :align: center
+
 
 - **Neurology**: Diagnosis and monitoring of brain tumors, stroke, multiple sclerosis, dementia, and epilepsy.
 - **Orthopedics**: Assessment of joints, ligaments, cartilage, and bones to diagnose injuries and degenerative diseases.
@@ -83,18 +81,14 @@ Advantages and Limitations
 MRI Safety and Precautions
 --------------------------
 
-   :alt: MRI safety checklist
-   :width: 800px
-   :align: center
+
 
 MRI is a safe modality when appropriate safety protocols are followed, including screening for metallic implants, hearing protection, and continuous patient monitoring.
 
 Future Developments in MRI
 --------------------------
 
-   :alt: Future MRI technologies
-   :width: 800px
-   :align: center
+
 
 Advancements continue to improve MRI technology, including faster imaging techniques, higher field strength magnets, AI integration, and portable MRI systems.
 
