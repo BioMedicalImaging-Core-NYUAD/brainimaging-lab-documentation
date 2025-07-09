@@ -54,7 +54,6 @@ Types of MRI Sequences
 Clinical Applications of MRI
 ----------------------------
 
-.. image:: ../_static/clinical_mri_examples.png
    :alt: Clinical MRI applications
    :width: 800px
    :align: center
@@ -84,7 +83,6 @@ Advantages and Limitations
 MRI Safety and Precautions
 --------------------------
 
-.. image:: ../_static/mri_safety_checklist.png
    :alt: MRI safety checklist
    :width: 800px
    :align: center
@@ -94,7 +92,6 @@ MRI is a safe modality when appropriate safety protocols are followed, including
 Future Developments in MRI
 --------------------------
 
-.. image:: ../_static/future_mri_technologies.png
    :alt: Future MRI technologies
    :width: 800px
    :align: center
