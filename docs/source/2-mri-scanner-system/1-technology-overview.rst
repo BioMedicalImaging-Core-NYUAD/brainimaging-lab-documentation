@@ -5,7 +5,7 @@ Technology Overview
 Overview of Magnetic Resonance Imaging (MRI)
 ********************************************
 
-.. image:: ../_static/typical_mri_machine.png
+.. image:: ../_static/mri_scanner_inside.png
    :alt: Typical MRI machine
    :width: 800px
    :align: center
@@ -27,9 +27,9 @@ MRI technology is rooted in the principle of nuclear magnetic resonance (NMR). T
 Components of an MRI Scanner
 ----------------------------
 
-.. image:: ../_static/mri_components.png
+.. image:: ../_static/Components_of_an_MRI_Scanner.png
    :alt: MRI scanner components
-   :width: 800px
+   :width: 400px
    :align: center
 
 - **Main Magnet**: Usually a superconducting magnet, generating a very strong, stable magnetic field.
