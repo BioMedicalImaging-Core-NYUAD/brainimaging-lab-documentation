@@ -29,7 +29,7 @@ Components of an MRI Scanner
 
 .. image:: ../_static/Components_of_an_MRI_Scanner.png
    :alt: MRI scanner components
-   :width: 800px
+   :width: 400px
    :align: center
 
 - **Main Magnet**: Usually a superconducting magnet, generating a very strong, stable magnetic field.
