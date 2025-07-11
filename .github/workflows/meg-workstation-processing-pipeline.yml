@@ -44,5 +44,5 @@ jobs:
       # 5️⃣ Run fMRIPrep via your helper script
       - name: Run fMRIPrep in Docker
         run: |
-          python pipeline/fmri_pipelines/run_fmriprep_from_config.py \
+          python3 pipeline/fmri_pipelines/run_fmriprep_from_config.py \
             "${{ steps.detect.outputs.config_path }}"
