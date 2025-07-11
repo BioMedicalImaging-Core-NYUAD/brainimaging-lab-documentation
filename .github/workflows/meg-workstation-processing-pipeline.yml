@@ -1,0 +1,35 @@
+name: Run fMRIPrep on Config Change in PR (Self-Hosted)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    paths:
+      - 'pipeline/fmri_pipelines/projects/**/fmriprep_config.json'
+
+jobs:
+  run-fmriprep:
+    # ✅ Only if PR title starts with "Process"
+    if: startsWith(github.event.pull_request.title, 'Process')
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Detect modified config file
+        id: detect_config
+        run: |
+          CONFIG_PATH=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} | grep 'fmriprep_config.json' | head -n 1)
+          if [ -z "$CONFIG_PATH" ]; then
+            echo "❌ No modified config file found in PR diff."
+            exit 1
+          fi
+          echo "✅ Found modified config: $CONFIG_PATH"
+          echo "config_path=$CONFIG_PATH" >> $GITHUB_OUTPUT
+
+      - name: Install Python deps
+        run: pip install --upgrade pip json5
+
+      - name: Run fMRIPrep from config
+        run: |
+          python pipeline/fmri_pipelines/run_fmriprep_from_config.py "${{ steps.detect_config.outputs.config_path }}"
