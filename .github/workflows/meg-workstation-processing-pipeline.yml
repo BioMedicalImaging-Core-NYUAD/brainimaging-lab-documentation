@@ -1,4 +1,4 @@
-name: Run fMRIPrep on PR Config Push (Self-Hosted)
+name: Run fMRIPrep on Config Change in PR (Self-Hosted)
 
 on:
   pull_request:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   run-fmriprep:
+    # ✅ Only if PR title starts with "Process"
     if: startsWith(github.event.pull_request.title, 'Process')
     runs-on: self-hosted
 
@@ -15,15 +16,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Find modified config file
+      - name: Detect modified config file
         id: detect_config
         run: |
           CONFIG_PATH=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} | grep 'fmriprep_config.json' | head -n 1)
           if [ -z "$CONFIG_PATH" ]; then
-            echo "❌ No config file found in this PR."
+            echo "❌ No modified config file found in PR diff."
             exit 1
           fi
-          echo "✅ Found config: $CONFIG_PATH"
+          echo "✅ Found modified config: $CONFIG_PATH"
           echo "config_path=$CONFIG_PATH" >> $GITHUB_OUTPUT
 
       - name: Install Python deps
