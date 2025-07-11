@@ -22,7 +22,7 @@ n_cols_total = number_conditions+number_regressors_motion+number_regressors_extr
 run_length = 300; %In seconds (the TR was 1 seconds)
 nRuns = 3;
 block_size = 20;
-
+blocks_per_run = run_length/block_size
 designMatrix = zeros(run_length, n_cols_total,  nRuns);
 
 const_regress_vector = repelem(1, run_length)';
@@ -46,14 +46,21 @@ for iRun=1:nRuns
     data_output = readtable(fullpath);
     
 
+
     % the designmatrix is filled from data_output
     % the first column is for finger number 1 and so on, the last columns are
     % for the noise regressors
     % in data_output we look at the blocktype column, each block is 20 seconds,
     % so we need to create a repetition of 20 times the values
+    
+
 
     condition_vector = repelem(data_output.blocktype, 20);
     
+
+
+   
+
     % Determine the number of rows (same as number of elements in vector)
     num_rows = length(condition_vector);
     
@@ -69,9 +76,57 @@ for iRun=1:nRuns
     
     % Linear indexing to set the appropriate entries to 1
     binary_matrix(sub2ind(size(binary_matrix), row_indices, col_indices)) = 1;
+    
+
+    random_duration = data_output.interBlockRandomWaitduration
+
+    
+    % For every beginning of a block that stretches 20, check the value of
+    % the the interblockrandomwaitduration if the value is equal or greater
+    % than 0.6 and lower than 1.4, discard the first TR
+    % if the value is greater than 1.4, discard the two TR
+
+
+    % From the end of the block: discard 2-(already discarded) number of
+    % TR's
+
+    binary_matrix_corrected_IBS = binary_matrix;
+
+    for iBlock = 1:block_per_run
+
+        % Row index of first TR of each block iBlock
+        % Block 1 first row is 1 = iBlock
+        % Block 2 first row is 21 = 1 + block_size*(iBlock-1)
+        % Block 3 first row is 41 = 1+ block_size*(iBlock-1)
+        % Block 4
+        % ...
+        % Block 15 first row is 281 
+
+        first_TR_iblock = 1+block_size*(iBlock-1)
+        last_TR_iblock = block_size*iBlock
+
+        if random_duration(iBlock) >= 0.6 && random_duration(iBlock) <= 1.4
+            n_discard_TR_IBS = 1;
+            
+            binary_matrix_corrected_IBS(first_TR_iblock,:)=0;
+            binary_matrix_corrected_IBS(last_TR_iblock,:)=0;
+
+        elseif random_duration(iBlock) > 1.4
+            n_discard_TR_IBS = 2;
+            binary_matrix_corrected_IBS(first_TR_iblock,:)=0;
+            binary_matrix_corrected_IBS(first_TR_iblock+1,:)=0;
+        else
+            n_discard_TR_IBS = 0;
+            binary_matrix_corrected_IBS(last_TR_iblock,:)=0;
+            binary_matrix_corrected_IBS(last_TR_iblock-1,:)=0;
+        end
+    
+    end
 
     designMatrix(:,1:number_conditions,iRun) = binary_matrix;
     
+    
+
     % The noise regressors have already been loaded in load_data.m
 
     % PUTI - add constant 1s as a regressor, add linear drift 1:300 as
