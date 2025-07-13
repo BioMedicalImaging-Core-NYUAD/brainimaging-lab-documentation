@@ -48,6 +48,41 @@ function StroopTask(trialDuration, trialBlockDuration, restDuration, numBlocks)
     [xCenter, yCenter] = RectCenter(winRect);
     HideCursor;
 
+    % another screen before the experiment starts .. Will only respond once
+    % spacebar is pressed
+    Screen('TextSize', win, 40);
+    DrawFormattedText(win, 'Please wait...', 'center', 'center', [0 0 0]);
+    Screen('Flip', win);
+
+    spaceKey = KbName('space');
+    while 1
+        [keyIsDown, ~, keyCode] = KbCheck;
+        if keyIsDown
+            if keyCode(spaceKey)
+                break;
+            end
+        end
+    end
+
+    % instructions window
+    Screen('TextSize', win, 30);
+    instructions = ['In this task, you will see color words.\n\n',...
+        'Press the key that corresponds to the color of the ink. \n\n',...
+        'Press space to start.'];
+
+    DrawFormattedText(win, instructions, 'center', 'center', [0 0 0]);
+    Screen('Flip', win);
+
+    while 1
+        [keyIsDown, ~, keyCode] = KbCheck;
+        if keyIsDown
+            if keyCode(spaceKey)
+                break;
+            end
+        end
+    end
+
+
     % Prepare buttons layout
     buttonW = 150; buttonH = 100;
     gapX = 30; gapY = 30;
@@ -99,6 +134,22 @@ function StroopTask(trialDuration, trialBlockDuration, restDuration, numBlocks)
 
         for t = 1:trialsPerBlock  %run trials until one block ends before the rest period
             trial = trials(trialIdx);
+            % TODO: ADD EEG TRIGGER - at each trial start
+            % send different trigger based on trial type
+            % if strcmp(trial.type, 'congruent')
+            %     marker = 'S2';
+            % else
+            %     marker = 'S3';
+            % end
+            % Datapixx('SetDoutValues', trig_dict(marker));
+            % Datapixx('RegWrRd');
+            % disp([marker ' Marker On']);
+            % pause(0.1);
+            % Datapixx('SetDoutValues', 0);
+            % Datapixx('RegWrRd');
+            % disp('Triggers off');
+
+
 
             % Shuffling labels/text and colors of the buttons (mitigating
             % adaptability)
