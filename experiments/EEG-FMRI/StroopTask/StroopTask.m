@@ -10,8 +10,11 @@ function StroopTask(trialDuration, trialBlockDuration, restDuration, numBlocks)
 
     %setting default values if inputs not provided.
     
-    USE_VPIXX_RESPONSE = False;  % If set to True, we use the Vpixx response boxes in the NYUAD MRI LAB, if set to False we use the keyboard
-    USE_VPIXX_TRIGGERS = False;  
+    % For real participant, set all these variables to True.
+    
+    USE_VPIXX_RESPONSE = false;  % If set to True, we use the Vpixx response boxes in the NYUAD MRI LAB, if set to False we use the keyboard
+    USE_VPIXX_TRIGGERS = false;  
+    DEMO_MODE = false;  % Set to false, if we are not connecting to the MRI system and listening for a trigger, % Set to true for actual participant
     
     if USE_VPIXX_TRIGGERS
 
@@ -71,8 +74,10 @@ function StroopTask(trialDuration, trialBlockDuration, restDuration, numBlocks)
         'Press space to start.'];
 
     DrawFormattedText(win, instructions, 'center', 'center', [0 0 0]);
-    Screen('Flip', win);
-
+    Screen('Flip', win); 
+    
+    WaitSecs(2);  
+    
     while 1
         [keyIsDown, ~, keyCode] = KbCheck;
         if keyIsDown
@@ -83,6 +88,7 @@ function StroopTask(trialDuration, trialBlockDuration, restDuration, numBlocks)
     end
 
 
+    
     % Prepare buttons layout
     buttonW = 150; buttonH = 100;
     gapX = 30; gapY = 30;
@@ -128,7 +134,11 @@ function StroopTask(trialDuration, trialBlockDuration, restDuration, numBlocks)
     trialIdx = 1;
 
     % --------------------- Main Loop ---------------------- %
-
+    
+    % 
+    % Add code for demoMode or not, if demomode we do not listen to MRI
+    % trigger, and if not, we listen to MRI trigger  
+    
     for block = 1:numBlocks
 %         blockStartTime = GetSecs;
 
@@ -165,7 +175,7 @@ function StroopTask(trialDuration, trialBlockDuration, restDuration, numBlocks)
 
             startTime = GetSecs;
             keyPressed = '';
-            rt = NaN;
+            rt = NaN;   
 
             % time-limited trials - showing trial until a key is pressed or
             % trial duration ends
