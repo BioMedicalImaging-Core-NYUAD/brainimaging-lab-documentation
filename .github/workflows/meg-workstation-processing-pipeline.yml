@@ -4,30 +4,35 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, edited]
     paths:
-      # fires if *any* fmriprep_config.json is added *or* modified
       - 'pipeline/fmri_pipelines/projects/**/fmriprep_config.json'
 
 jobs:
-  run-fmriprep:
-    # 1 Gate on PR title
-    runs-on: self-hosted       # make sure your local runner shows “online” in Settings → Actions → Runners
-
+  check-pr-title:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
     steps:
-      - name: Exit if PR title does not start with "[Process]"
-        if: "!startsWith(github.event.pull_request.title, '[Process]')"
+      - id: check
         run: |
-          echo "❌ PR title does not start with '[Process]'. Skipping workflow."
-          exit 0
-      # 2 Checkout **with full history** so we can diff base↔head
+          if [[ "${{ github.event.pull_request.title }}" == "[Process]"* ]]; then
+            echo "✅ Title is valid."
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ PR title must start with [Process] to run fMRIPrep."
+            echo "should_run=false" >> $GITHUB_OUTPUT
+
+  run-fmriprep:
+    needs: check-pr-title
+    if: ${{ needs.check-pr-title.outputs.should_run == 'true' }}
+    runs-on: self-hosted
+    steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0       # REQUIRED for git diff on PRs
+          fetch-depth: 0
 
-      # 3 Find the config that changed
       - name: Locate modified fmriprep_config.json
         id: detect
         run: |
-          # diff between PR base SHA and head SHA covers new *and* edited files
           CONFIG_PATH=$(git diff --name-only \
             ${{ github.event.pull_request.base.sha }} \
             ${{ github.event.pull_request.head.sha }} \
@@ -41,10 +46,8 @@ jobs:
           echo "✅ Found config: $CONFIG_PATH"
           echo "config_path=$CONFIG_PATH" >> $GITHUB_OUTPUT
 
-      # 4️⃣ Install tiny Python deps (JSON parsing is in stdlib; json5 only if you need comments)
       - run: pip install --upgrade pip
 
-      # 5️⃣ Run fMRIPrep via your helper script
       - name: Run fMRIPrep in Docker
         run: |
           python3 pipeline/fmri_pipelines/run_fmriprep_from_config.py \
