@@ -4,7 +4,6 @@
   "output_dir": "/home/user/data/derivatives/fmriprep",
   "freesurfer_license": "/home/user/license.txt",
   "participant_label": ["sub-03"],
-  "fmriprep_version": "24.1.1",
   "nthreads": 16,
   "omp_nthreads": 8,
   "mem_mb": 32000
