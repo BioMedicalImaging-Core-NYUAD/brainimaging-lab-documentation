@@ -11,10 +11,14 @@ on:
 jobs:
   run-fmriprep:
     # 1 Gate on PR title
-    if: startsWith(github.event.pull_request.title, 'Process')
     runs-on: self-hosted       # make sure your local runner shows “online” in Settings → Actions → Runners
 
     steps:
+      - name: Exit if PR title does not start with "Process"
+        if: "!startsWith(github.event.pull_request.title, '[Process]')"
+        run: |
+          echo "❌ PR title does not start with 'Process'. Skipping workflow."
+          exit 0
       # 2 Checkout **with full history** so we can diff base↔head
       - uses: actions/checkout@v4
         with:
