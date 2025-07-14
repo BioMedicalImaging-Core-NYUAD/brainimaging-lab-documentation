@@ -13,13 +13,17 @@ jobs:
       should_run: ${{ steps.check.outputs.should_run }}
     steps:
       - id: check
+        name: "Verify PR title"
+        shell: bash
         run: |
-          if [[ "${{ github.event.pull_request.title }}" == "[Process]"* ]]; then
+          TITLE="${{ github.event.pull_request.title }}"
+          if [[ "$TITLE" == \[Process\]* ]]; then
             echo "✅ Title is valid."
             echo "should_run=true" >> $GITHUB_OUTPUT
           else
             echo "❌ PR title must start with [Process] to run fMRIPrep."
             echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
 
   run-fmriprep:
     needs: check-pr-title
@@ -37,16 +41,15 @@ jobs:
             ${{ github.event.pull_request.base.sha }} \
             ${{ github.event.pull_request.head.sha }} \
             -- 'pipeline/fmri_pipelines/projects/**/fmriprep_config.json' | head -n 1)
-
           if [ -z "$CONFIG_PATH" ]; then
             echo "❌ No config file changed – skipping."
             exit 1
           fi
-
           echo "✅ Found config: $CONFIG_PATH"
           echo "config_path=$CONFIG_PATH" >> $GITHUB_OUTPUT
 
-      - run: pip install --upgrade pip
+      - name: Install Python deps
+        run: pip install --upgrade pip
 
       - name: Run fMRIPrep in Docker
         run: |
