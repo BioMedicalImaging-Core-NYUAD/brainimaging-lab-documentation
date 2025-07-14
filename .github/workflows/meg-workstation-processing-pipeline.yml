@@ -1,4 +1,4 @@
-name: "[MEG Workstation] Processing data using fMRIPrep | New Config or Config Change"
+name: "[MEG Workstation] Process data check"
 
 on:
   pull_request:
@@ -21,7 +21,7 @@ jobs:
             echo "✅ Title is valid."
             echo "should_run=true" >> $GITHUB_OUTPUT
           else
-            echo "❌ PR title must start with [Process] to run fMRIPrep."
+            echo "No need to run fMRIprep ❌ PR title must start with [Process] to run fMRIPrep."
             echo "should_run=false" >> $GITHUB_OUTPUT
           fi
 
