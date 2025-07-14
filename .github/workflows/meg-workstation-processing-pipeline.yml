@@ -1,5 +1,5 @@
 # .github/workflows/fmriprep-pr-trigger.yml
-name: Run fMRIPrep on Config Change (Self-Hosted)
+name: [MEG Workstation] Processing data using fMRIPrep | New Config or Config Change
 
 on:
   pull_request:
@@ -14,10 +14,10 @@ jobs:
     runs-on: self-hosted       # make sure your local runner shows “online” in Settings → Actions → Runners
 
     steps:
-      - name: Exit if PR title does not start with "Process"
+      - name: Exit if PR title does not start with "[Process]"
         if: "!startsWith(github.event.pull_request.title, '[Process]')"
         run: |
-          echo "❌ PR title does not start with 'Process'. Skipping workflow."
+          echo "❌ PR title does not start with '[Process]'. Skipping workflow."
           exit 0
       # 2 Checkout **with full history** so we can diff base↔head
       - uses: actions/checkout@v4
