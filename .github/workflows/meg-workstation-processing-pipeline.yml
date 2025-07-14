@@ -10,17 +10,17 @@ on:
 
 jobs:
   run-fmriprep:
-    # 1️⃣ Gate on PR title
+    # 1 Gate on PR title
     if: startsWith(github.event.pull_request.title, 'Process')
     runs-on: self-hosted       # make sure your local runner shows “online” in Settings → Actions → Runners
 
     steps:
-      # 2️⃣ Checkout **with full history** so we can diff base↔head
+      # 2 Checkout **with full history** so we can diff base↔head
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0       # REQUIRED for git diff on PRs
 
-      # 3️⃣ Find the config that changed
+      # 3 Find the config that changed
       - name: Locate modified fmriprep_config.json
         id: detect
         run: |
