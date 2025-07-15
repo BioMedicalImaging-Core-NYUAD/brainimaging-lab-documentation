@@ -61,3 +61,44 @@ jobs:
         run: |
           cp "$(dirname "${{ steps.detect.outputs.config }}")"/fmriprep_*_*.log \
              /home/hz3752/fmriprep_logs/ 2>/dev/null || true
+
+      # ── copy logs to local stash for later artifact upload ──────────
+      - name: Collect logs
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p /home/hz3752/fmriprep_logs
+          cp "$(dirname "${{ steps.detect.outputs.config }}")"/fmriprep_*_*.log \
+             /home/hz3752/fmriprep_logs/ 2>/dev/null || true
+
+      # ── tar derivatives for Box upload (and artifact) ───────────────
+      - name: Tar derivatives
+        shell: bash
+        run: |
+          DERIV=/home/hz3752/PycharmProjects/brainimaging-lab-documentation/data-bids/eeg-fmri/${{ steps.detect.outputs.project }}/derivatives/fmriprep
+          TAR_NAME=fmriprep_${{ steps.detect.outputs.project }}_${{ github.run_id }}.tar.gz
+          tar -czf "$TAR_NAME" -C "$DERIV" .
+          echo "tar_name=$TAR_NAME" >> $GITHUB_OUTPUT
+        id: tarstep
+
+      # ── upload tarball to Box ───────────────────────────────────────
+      - name: Upload derivatives to Box
+        uses: benjaminejarrell/box-upload-gh-actions@v1.2
+        with:
+          box-client-sdk-config: ${{ secrets.BOX_CLIENT_SDK_CONFIG }}
+          box-folder-id: 331134301860
+          file: ${{ steps.tarstep.outputs.tar_name }}
+          destination-filename: ${{ steps.tarstep.outputs.tar_name }}
+
+      # ── attach logs & tarball as GitHub artifacts ───────────────────
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fmriprep-logs
+          path: /home/hz3752/fmriprep_logs/*.log
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fmriprep-derivatives
+          path: ${{ steps.tarstep.outputs.tar_name }}
