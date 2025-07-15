@@ -13,7 +13,7 @@ JSON example (minimal):
 import json, sys, subprocess, pathlib, os, datetime, shutil, importlib.util
 
 # ─── toggle dry-run (DEBUG) here ────────────────────────────────────────────
-DEBUG = True           # True → skip Docker, just create DRYRUN logs
+DEBUG = False           # True → skip Docker, just create DRYRUN logs
 # ---------------------------------------------------------------------------
 
 # ─── paths you rarely change ────────────────────────────────────────────────
