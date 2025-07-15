@@ -71,34 +71,56 @@ jobs:
           cp "$(dirname "${{ steps.detect.outputs.config }}")"/fmriprep_*_*.log \
              /home/hz3752/fmriprep_logs/ 2>/dev/null || true
 
-      # ── tar derivatives for Box upload (and artifact) ───────────────
-      - name: Tar derivatives
+      # 5-A  Tar fmriprep derivatives  ────────────────────────────────────
+      - name: Tar fmriprep derivatives
+        id: tar_fprep
         shell: bash
         run: |
-          DERIV=/home/hz3752/PycharmProjects/brainimaging-lab-documentation/data-bids/eeg-fmri/${{ steps.detect.outputs.project }}/derivatives/fmriprep
-          TAR_NAME=fmriprep_${{ steps.detect.outputs.project }}_${{ github.run_id }}.tar.gz
-          tar -czf "$TAR_NAME" -C "$DERIV" .
-          echo "tar_name=$TAR_NAME" >> $GITHUB_OUTPUT
-        id: tarstep
+          DERIV_FP=/home/hz3752/PycharmProjects/brainimaging-lab-documentation/data-bids/eeg-fmri/${{ steps.detect.outputs.project }}/derivatives/fmriprep
+          TAR_FP=fmriprep_${{ steps.detect.outputs.project }}_${{ github.run_id }}.tar.gz
+          tar -czf "$TAR_FP" -C "$DERIV_FP" .
+          echo "tar_fp=$TAR_FP" >> $GITHUB_OUTPUT
 
-      # ── upload tarball to Box ───────────────────────────────────────
-      - name: Upload derivatives to Box
+      # 5-B  Tar freesurfer derivatives  ──────────────────────────────────
+      - name: Tar freesurfer derivatives
+        id: tar_fs
+        shell: bash
+        run: |
+          DERIV_FS=/home/hz3752/PycharmProjects/brainimaging-lab-documentation/data-bids/eeg-fmri/${{ steps.detect.outputs.project }}/derivatives/freesurfer
+          TAR_FS=freesurfer_${{ steps.detect.outputs.project }}_${{ github.run_id }}.tar.gz
+          tar -czf "$TAR_FS" -C "$DERIV_FS" .
+          echo "tar_fs=$TAR_FS" >> $GITHUB_OUTPUT
+
+      # 6-A  Upload fmriprep tarball to Box  ──────────────────────────────
+      - name: Upload fmriprep to Box
         uses: benjaminejarrell/box-upload-gh-actions@v1.2
         with:
           box-client-sdk-config: ${{ secrets.BOX_CLIENT_SDK_CONFIG }}
           box-folder-id: 331134301860
-          file: ${{ steps.tarstep.outputs.tar_name }}
-          destination-filename: ${{ steps.tarstep.outputs.tar_name }}
+          file: ${{ steps.tar_fprep.outputs.tar_fp }}
+          destination-filename: ${{ steps.tar_fprep.outputs.tar_fp }}
 
-      # ── attach logs & tarball as GitHub artifacts ───────────────────
+      # 6-B  Upload freesurfer tarball to Box  ────────────────────────────
+      - name: Upload freesurfer to Box
+        uses: benjaminejarrell/box-upload-gh-actions@v1.2
+        with:
+          box-client-sdk-config: ${{ secrets.BOX_CLIENT_SDK_CONFIG }}
+          box-folder-id: 331134301860
+          file: ${{ steps.tar_fs.outputs.tar_fs }}
+          destination-filename: ${{ steps.tar_fs.outputs.tar_fs }}
+
+      # 7-A  Attach logs as artifact (unchanged)  ─────────────────────────
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: fmriprep-logs
           path: /home/hz3752/fmriprep_logs/*.log
 
+      # 7-B  Attach both tarballs as artifacts  ───────────────────────────
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: fmriprep-derivatives
-          path: ${{ steps.tarstep.outputs.tar_name }}
+          path: |
+            ${{ steps.tar_fprep.outputs.tar_fp }}
+            ${{ steps.tar_fs.outputs.tar_fs }}
