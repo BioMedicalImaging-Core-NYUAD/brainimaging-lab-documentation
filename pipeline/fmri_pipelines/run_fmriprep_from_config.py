@@ -13,7 +13,7 @@ JSON example (minimal):
 import json, sys, subprocess, pathlib, os, datetime, shutil, importlib.util
 
 # ─── toggle dry-run (DEBUG) here ────────────────────────────────────────────
-DEBUG = False           # True → skip Docker, just create DRYRUN logs
+DEBUG = True           # True → skip Docker, just create DRYRUN logs
 # ---------------------------------------------------------------------------
 
 # ─── paths you rarely change ────────────────────────────────────────────────
@@ -34,19 +34,13 @@ project   = cfg["project"]
 subjects  = cfg.get("participants", []) or ["ALL"]
 threads   = str(cfg.get("threads", 18))
 
-# ─── install braimcore if missing & fetch templates ─────────────────────────
-if importlib.util.find_spec("braimcore") is None:
-    print("🔧 Installing braimcore …")
-    subprocess.run(
-        [sys.executable, "-m", "pip", "install", "--quiet", "braimcore==3.1"],
-        check=True)
 
-os.environ["BRAIMCORE_ENGINE"] = "fmriprep"
+
+
 os.environ["TEMPLATEFLOW_HOME"] = str(TEMPLATEFLOW_HOME)
 TEMPLATEFLOW_HOME.mkdir(parents=True, exist_ok=True)
 
-print("📥 Pre-fetching TemplateFlow resources (braimcore fetch_templates)…")
-subprocess.run(["braimcore", "fetch_templates"], check=True)
+
 
 # ─── utility: write log into config directory (and print) ───────────────────
 def write_log(tag: str, text: str):
@@ -56,6 +50,13 @@ def write_log(tag: str, text: str):
     path.write_text(text)
     print(f"📝 wrote {path}")
     return path
+
+
+import templateflow.api as tf
+
+print("📥 Pre-fetching templates …")
+for tpl in ("OASIS30ANTs", "MNI152NLin2009cAsym", "fsaverage"):
+    tf.get(template=tpl, resolution=1)   # pulls if missing
 
 # ─── DEBUG branch: no Docker, just confirmation logs ────────────────────────
 if DEBUG:
@@ -73,8 +74,13 @@ paths  = {
     "WORK_DIR" : base / "tmp" / "fmriprep-work",
 }
 
+
+
 for p in paths.values():
     p.mkdir(parents=True, exist_ok=True)
+
+
+
 
 # ─── pull Docker image if it isn't on disk ──────────────────────────────────
 if subprocess.run(["docker", "image", "inspect", DOCKER_IMAGE],
