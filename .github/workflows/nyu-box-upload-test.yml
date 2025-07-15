@@ -2,9 +2,6 @@ name: "Box upload smoke-test"
 
 on:
   workflow_dispatch:          # visible “Run workflow” button
-  push:
-    paths:
-      - .github/workflows/nyu-box-upload-test.yml   # runs once when you push this file
 
 jobs:
   box-upload-test:
