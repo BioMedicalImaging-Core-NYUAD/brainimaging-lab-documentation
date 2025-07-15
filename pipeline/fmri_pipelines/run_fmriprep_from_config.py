@@ -1,120 +1,132 @@
 #!/usr/bin/env python3
 """
-Launch fMRIPrep from a JSON configuration.
+One-stop launcher for fMRIPrep + TemplateFlow + braimcore.
 
-JSON schema (minimal):
+JSON example (minimal):
 {
   "project": "finger-tapping",
-  "participants": ["sub-0665", "sub-1020"],   # optional, empty → ALL
+  "participants": ["sub-0665", "sub-1020"],   # optional, empty ⇒ ALL
   "threads": 18                               # optional, default 18
 }
-
-Usage
------
-python3 run_fmriprep_from_config.py /path/to/fmriprep_config.json
 """
 
-import json, sys, subprocess, pathlib, os, datetime
+import json, sys, subprocess, pathlib, os, datetime, shutil, importlib.util
 
-# ─── DEBUG switch ────────────────────────────────────────────────────────────
-DEBUG = True          # ← set True for a dry-run that skips Docker
+# ─── toggle dry-run (DEBUG) here ────────────────────────────────────────────
+DEBUG = False           # True → skip Docker, just create DRYRUN logs
 # ---------------------------------------------------------------------------
 
-# ─── Read configuration ─────────────────────────────────────────────────────
+# ─── paths you rarely change ────────────────────────────────────────────────
+HOST_REPO_ROOT = pathlib.Path(
+    "/home/hz3752/PycharmProjects/brainimaging-lab-documentation")
+DATA_ROOT      = HOST_REPO_ROOT / "data-bids" / "eeg-fmri"
+FS_LICENSE     = pathlib.Path("/home/hz3752/Documents/license.txt")
+TEMPLATEFLOW_HOME = pathlib.Path.home() / ".cache" / "templateflow"
+DOCKER_IMAGE   = "nipreps/fmriprep:24.1.1"
+# ---------------------------------------------------------------------------
+
+# ─── load JSON config ───────────────────────────────────────────────────────
 cfg_path = pathlib.Path(sys.argv[1]).resolve()
 cfg_dir  = cfg_path.parent
+cfg      = json.loads(cfg_path.read_text())
 
-cfg       = json.loads(cfg_path.read_text())
 project   = cfg["project"]
 subjects  = cfg.get("participants", []) or ["ALL"]
 threads   = str(cfg.get("threads", 18))
 
-# ─── Static paths (edit if you relocate data) ───────────────────────────────
-base   = pathlib.Path(
-           "/home/hz3752/PycharmProjects/brainimaging-lab-documentation"
-           "/data-bids/eeg-fmri") / project
-paths  = {
-    "BIDS_DIR"  : base / "rawdata",
-    "OUT_DIR"   : base / "derivatives" / "fmriprep",
-    "FS_DIR"    : base / "derivatives" / "freesurfer",
-    "WORK_DIR"  : base / "tmp"         / "fmriprep-work",
-    "FS_LICENSE": "/home/hz3752/Documents/license.txt",
-    "IMAGE"     : "nipreps/fmriprep:24.1.1",
-}
+# ─── install braimcore if missing & fetch templates ─────────────────────────
+if importlib.util.find_spec("braimcore") is None:
+    print("🔧 Installing braimcore …")
+    subprocess.run(
+        [sys.executable, "-m", "pip", "install", "--quiet", "braimcore==3.1"],
+        check=True)
 
-# ─── Dry-run branch ─────────────────────────────────────────────────────────
-if DEBUG:
+os.environ["BRAIMCORE_ENGINE"] = "fmriprep"
+os.environ["TEMPLATEFLOW_HOME"] = str(TEMPLATEFLOW_HOME)
+TEMPLATEFLOW_HOME.mkdir(parents=True, exist_ok=True)
+
+print("📥 Pre-fetching TemplateFlow resources (braimcore fetch_templates)…")
+subprocess.run(["braimcore", "fetch_templates"], check=True)
+
+# ─── utility: write log into config directory (and print) ───────────────────
+def write_log(tag: str, text: str):
     stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    for subj in subjects:
-        tag = subj if subj != "ALL" else "all"
-        log_path = cfg_dir / f"fmriprep_{project}_{tag}_{stamp}_DRYRUN.log"
-        log_path.write_text("Processing done\n")
-        print(f"[DEBUG] would process {tag}  →  {log_path.name}")
-        print(f"[DEBUG] wrote {log_path}")  # ← already prints filename
-        print("Processing done")  # ← also show contents
+    fname = f"fmriprep_{project}_{tag}_{stamp}{'_DRYRUN' if DEBUG else ''}.log"
+    path  = cfg_dir / fname
+    path.write_text(text)
+    print(f"📝 wrote {path}")
+    return path
 
+# ─── DEBUG branch: no Docker, just confirmation logs ────────────────────────
+if DEBUG:
+    for s in subjects:
+        tag = s if s != "ALL" else "all"
+        write_log(tag, "Processing done\n")
     sys.exit(0)
 
-# ─── Real run: ensure dirs & permissions ────────────────────────────────────
-for key in ("OUT_DIR", "FS_DIR", "WORK_DIR"):
-    paths[key].mkdir(parents=True, exist_ok=True)
-    if not os.access(paths[key], os.W_OK):
-        subprocess.run(["sudo", "chown", "-R",
-                        f"{os.getuid()}:{os.getgid()}",
-                        paths[key]], check=True)
+# ─── real run: build constant paths for this project ────────────────────────
+base   = DATA_ROOT / project
+paths  = {
+    "BIDS_DIR" : base / "rawdata",
+    "OUT_DIR"  : base / "derivatives" / "fmriprep",
+    "FS_DIR"   : base / "derivatives" / "freesurfer",
+    "WORK_DIR" : base / "tmp" / "fmriprep-work",
+}
 
-# pull image if missing
-if subprocess.run(["docker", "image", "inspect", paths["IMAGE"]],
+for p in paths.values():
+    p.mkdir(parents=True, exist_ok=True)
+
+# ─── pull Docker image if it isn't on disk ──────────────────────────────────
+if subprocess.run(["docker", "image", "inspect", DOCKER_IMAGE],
                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
-    print(f"Pulling {paths['IMAGE']} …")
-    subprocess.run(["docker", "pull", paths["IMAGE"]], check=True)
+    print(f"📦 Pulling {DOCKER_IMAGE} …")
+    subprocess.run(["docker", "pull", DOCKER_IMAGE], check=True)
 
-# ─── Build Docker command factory ───────────────────────────────────────────
-def docker_cmd(participant: str | None):
-    p_arg = [] if participant is None else ["--participant-label", participant]
-    home  = os.environ["HOME"]
-    return [
+# ─── helper to run Docker and stream log ────────────────────────────────────
+def run_one(participant: str | None):
+    tag = participant if participant else "all"
+    log  = write_log(tag, "")      # create empty file first
+    cmd  = [
         "docker", "run", "--rm",
         "-u", f"{os.getuid()}:{os.getgid()}",
         "-v", f"{paths['BIDS_DIR']}:/data:ro",
         "-v", f"{paths['OUT_DIR']}:/out",
         "-v", f"{paths['WORK_DIR']}:/work",
         "-v", f"{paths['FS_DIR']}:/reconall",
-        "-v", f"{paths['FS_LICENSE']}:/opt/freesurfer/license.txt:ro",
-        "-v", f"{home}/.cache/templateflow:{home}/.cache/templateflow",
-        "-e",  f"TEMPLATEFLOW_HOME={home}/.cache/templateflow",
-        paths["IMAGE"],
+        "-v", f"{FS_LICENSE}:/opt/freesurfer/license.txt:ro",
+        "-v", f"{TEMPLATEFLOW_HOME}:{TEMPLATEFLOW_HOME}",
+        "-e",  f"TEMPLATEFLOW_HOME={TEMPLATEFLOW_HOME}",
+        DOCKER_IMAGE,
         "/data", "/out", "participant",
-        *p_arg,
+    ]
+    if participant:
+        cmd += ["--participant-label", participant]
+    cmd += [
         "--fs-subjects-dir", "/reconall",
         "--skip-bids-validation",
-        "--output-spaces",
-        "T1w:res-native", "fsnative:den-41k",
-        "MNI152NLin2009cAsym:res-native",
-        "fsaverage:den-41k", "fsaverage",
+        "--output-spaces", "T1w:res-native", "fsnative:den-41k",
+                          "MNI152NLin2009cAsym:res-native",
+                          "fsaverage:den-41k", "fsaverage",
         "--nthreads", threads,
         "--mem_mb", "32000",
         "--work-dir", "/work",
         "--no-submm-recon",
     ]
 
-# ─── Execute per subject, capturing logs ­───────────────────────────────────
-stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-for subj in subjects:
-    tag      = subj if subj != "ALL" else "all"
-    log_file = cfg_dir / f"fmriprep_{project}_{tag}_{stamp}.log"
-    print(f"▶ Running fMRIPrep for {tag}  →  {log_file.name}")
-
-    with log_file.open("wb") as fh:
-        proc = subprocess.Popen(docker_cmd(None if subj == "ALL" else subj),
+    print(f"🚀 Running {tag} …")
+    with log.open("ab") as fh:
+        proc = subprocess.Popen(cmd,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.STDOUT)
         for line in proc.stdout:
             sys.stdout.buffer.write(line)
             fh.write(line)
         proc.wait()
-        if proc.returncode:
-            print(f"❌ {tag} failed (exit {proc.returncode}) — see log.")
-            sys.exit(proc.returncode)
+    if proc.returncode:
+        raise RuntimeError(f"fMRIPrep for {tag} failed – see {log}")
+
+# ─── launch for each participant ────────────────────────────────────────────
+for s in subjects:
+    run_one(None if s == "ALL" else s)
 
 print("✅ All requested runs finished successfully")
