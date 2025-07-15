@@ -1,10 +1,16 @@
 name: "[MEG Workstation] Process data check"
 
+concurrency:
+  group: fmriprep-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+
 on:
   pull_request:
     types: [opened, synchronize, reopened, edited]
     paths:
       - 'pipeline/fmri_pipelines/projects/**/fmriprep_config.json'
+      - '.github/workflows/**.yml'           # include any workflow edits
 
 jobs:
   check-pr-title:
@@ -73,6 +79,7 @@ jobs:
 
       # 5-A  Tar fmriprep derivatives  ────────────────────────────────────
       - name: Tar fmriprep derivatives
+        if: success()
         id: tar_fprep
         shell: bash
         run: |
@@ -83,6 +90,7 @@ jobs:
 
       # 5-B  Tar freesurfer derivatives  ──────────────────────────────────
       - name: Tar freesurfer derivatives
+        if: success()
         id: tar_fs
         shell: bash
         run: |
@@ -93,6 +101,7 @@ jobs:
 
       # 6-A  Upload fmriprep tarball to Box  ──────────────────────────────
       - name: Upload fmriprep to Box
+        if: success()
         uses: benjaminejarrell/box-upload-gh-actions@v1.2
         with:
           box-client-sdk-config: ${{ secrets.BOX_CLIENT_SDK_CONFIG }}
@@ -102,6 +111,7 @@ jobs:
 
       # 6-B  Upload freesurfer tarball to Box  ────────────────────────────
       - name: Upload freesurfer to Box
+        if: success()
         uses: benjaminejarrell/box-upload-gh-actions@v1.2
         with:
           box-client-sdk-config: ${{ secrets.BOX_CLIENT_SDK_CONFIG }}
