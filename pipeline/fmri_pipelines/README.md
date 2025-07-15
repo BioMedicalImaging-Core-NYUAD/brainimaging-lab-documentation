@@ -2,7 +2,7 @@ Process pipeline using workstation
 ==================================
 
 
-- Upon a pull request
+- Open a Pull Request whose title start with "[Processing]"
 
 - Pull the docker image: docker pull nipreps/fmriprep:24.1.1
 

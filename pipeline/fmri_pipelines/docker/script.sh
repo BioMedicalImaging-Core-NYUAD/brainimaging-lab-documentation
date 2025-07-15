@@ -10,19 +10,19 @@ fi
 
 ## ─── CONFIG ────────────────────────────────────────────────────────────────
 # Number of CPU threads to use
-NTHREADS=32
+NTHREADS=18
 
 # fMRIPrep Docker image
 IMAGE="nipreps/fmriprep:24.1.1"
-
+PROJECT = finger-tapping
 
 # Paths
 
 # --- in script.sh -------------------------------------------------
-BIDS_DIR="/home/hz3752/PycharmProjects/brainimaging-lab-documentation/data-bids/eeg-fmri/finger-tapping/rawdata"
-OUTPUT_DIR="/home/hz3752/PycharmProjects/brainimaging-lab-documentation/data-bids/eeg-fmri/finger-tapping/derivatives/fmriprep"
-RECONALL_DIR="/home/hz3752/PycharmProjects/brainimaging-lab-documentation/data-bids/eeg-fmri/finger-tapping/derivatives/freesurfer"
-WORKDIR="/home/hz3752/PycharmProjects/brainimaging-lab-documentation/data-bids/eeg-fmri/finger-tapping/tmp/fmriprep-work"
+BIDS_DIR="/home/hz3752/PycharmProjects/brainimaging-lab-documentation/data-bids/eeg-fmri/$PROJECT/rawdata"
+OUTPUT_DIR="/home/hz3752/PycharmProjects/brainimaging-lab-documentation/data-bids/eeg-fmri/$PROJECT/derivatives/fmriprep"
+RECONALL_DIR="/home/hz3752/PycharmProjects/brainimaging-lab-documentation/data-bids/eeg-fmri/$PROJECT/derivatives/freesurfer"
+WORKDIR="/home/hz3752/PycharmProjects/brainimaging-lab-documentation/data-bids/eeg-fmri/$PROJECT/tmp/fmriprep-work"
 # ------------------------------------------------------------------
 
 FS_LICENSE="/home/hz3752/Documents/license.txt"
