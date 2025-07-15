@@ -50,6 +50,9 @@ if DEBUG:
         log_path = cfg_dir / f"fmriprep_{project}_{tag}_{stamp}_DRYRUN.log"
         log_path.write_text("Processing done\n")
         print(f"[DEBUG] would process {tag}  →  {log_path.name}")
+        print(f"[DEBUG] wrote {log_path}")  # ← already prints filename
+        print("Processing done")  # ← also show contents
+
     sys.exit(0)
 
 # ─── Real run: ensure dirs & permissions ────────────────────────────────────

@@ -55,3 +55,9 @@ jobs:
         run: |
           python3 pipeline/fmri_pipelines/run_fmriprep_from_config.py \
             "${{ steps.detect.outputs.config_path }}"
+
+      - name: Keep log beside config on runner
+        if: always()
+        run: |
+          cp "$(dirname "${{ steps.detect.outputs.config }}")"/fmriprep_*_*.log \
+             /home/hz3752/fmriprep_logs/ 2>/dev/null || true
