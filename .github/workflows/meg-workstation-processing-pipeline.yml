@@ -1,35 +1,194 @@
-name: Run fMRIPrep on Config Change in PR (Self-Hosted)
+name: "[MEG Workstation] Process data check"
 
+#######################################################################
+#  Cancel any older run of the same PR/branch
+#######################################################################
+concurrency:
+  group: fmriprep-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+#######################################################################
+#  Triggers
+#######################################################################
 on:
   pull_request:
     types: [opened, synchronize, reopened, edited]
     paths:
       - 'pipeline/fmri_pipelines/projects/**/fmriprep_config.json'
+  workflow_dispatch:
+    inputs:
+      reprocess:
+        description: "Re-run fMRIPrep even if derivatives already exist?"
+        required: false
+        default: "no"   # yes / no
 
+#######################################################################
+#  0. Gate: PR title must start with [Process]
+#######################################################################
 jobs:
+  check-pr-title:
+    if: ${{ github.event_name == 'pull_request' }}      # skip when manual
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - id: check
+        shell: bash
+        run: |
+          [[ "${{ github.event.pull_request.title }}" =~ ^\[Process\] ]] \
+            && echo "should_run=true"  >> $GITHUB_OUTPUT \
+            || echo "should_run=false" >> $GITHUB_OUTPUT
+
+#######################################################################
+#  1. Main job
+#######################################################################
   run-fmriprep:
-    # ✅ Only if PR title starts with "Process"
-    if: startsWith(github.event.pull_request.title, 'Process')
+    needs: check-pr-title
+    # manual dispatch ignores title gate
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.check-pr-title.outputs.should_run == 'true' }}
     runs-on: self-hosted
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    ###################################################################
+    # 1-A  Check out repo
+    ###################################################################
+    - uses: actions/checkout@v4
+      with: { fetch-depth: 0 }
 
-      - name: Detect modified config file
-        id: detect_config
-        run: |
-          CONFIG_PATH=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} | grep 'fmriprep_config.json' | head -n 1)
-          if [ -z "$CONFIG_PATH" ]; then
-            echo "❌ No modified config file found in PR diff."
-            exit 1
-          fi
-          echo "✅ Found modified config: $CONFIG_PATH"
-          echo "config_path=$CONFIG_PATH" >> $GITHUB_OUTPUT
+    ###################################################################
+    # 1-B  Locate edited config and derive project name
+    ###################################################################
+    - id: detect
+      shell: bash
+      run: |
+        CONFIG=$(git diff --name-only \
+                 ${{ github.event.pull_request.base.sha || github.sha }} \
+                 ${{ github.event.pull_request.head.sha || github.sha }} \
+                 -- 'pipeline/fmri_pipelines/projects/**/fmriprep_config.json' \
+                 | head -n1)
 
-      - name: Install Python deps
-        run: pip install --upgrade pip json5
+        if [[ -z "$CONFIG" ]]; then
+          echo "No config change; using previous path from file list."
+          # fall back to first config committed in the repo (rare)
+          CONFIG=$(git ls-files 'pipeline/fmri_pipelines/projects/**/fmriprep_config.json' | head -n1)
+        fi
 
-      - name: Run fMRIPrep from config
-        run: |
-          python pipeline/fmri_pipelines/run_fmriprep_from_config.py "${{ steps.detect_config.outputs.config_path }}"
+        echo "config=$CONFIG" >> $GITHUB_OUTPUT
+        echo "project=$(basename "$(dirname "$CONFIG")")" >> $GITHUB_OUTPUT
+        echo "✔ Config: $CONFIG"
+
+    ###################################################################
+    # 1-C  Does derivatives folder already exist?
+    ###################################################################
+    - id: have_deriv
+      shell: bash
+      run: |
+        BASE=/home/hz3752/PycharmProjects/brainimaging-lab-documentation/data-bids/eeg-fmri/${{ steps.detect.outputs.project }}/derivatives
+        if [[ -d "$BASE/fmriprep" || -d "$BASE/freesurfer" ]]; then
+          echo "have=true"  >> $GITHUB_OUTPUT
+        else
+          echo "have=false" >> $GITHUB_OUTPUT
+        fi
+
+    ###################################################################
+    # 1-D  Decide whether to wipe old derivatives
+    ###################################################################
+    - name: Purge derivatives (if requested)
+      if: steps.have_deriv.outputs.have == 'true' && (
+            github.event.inputs.reprocess == 'yes' ||
+            contains(github.event.pull_request.labels.*.name, 'reprocess')
+          )
+      shell: bash
+      run: |
+        BASE=/home/hz3752/PycharmProjects/brainimaging-lab-documentation/data-bids/eeg-fmri/${{ steps.detect.outputs.project }}/derivatives
+        rm -rf "$BASE/fmriprep" "$BASE/freesurfer"
+        echo "🗑  Old derivatives removed."
+
+    ###################################################################
+    # 1-E  Run fMRIPrep only if needed
+    ###################################################################
+    - name: Run fMRIPrep launcher
+      if: steps.have_deriv.outputs.have == 'false' || (
+            github.event.inputs.reprocess == 'yes' ||
+            contains(github.event.pull_request.labels.*.name, 'reprocess')
+          )
+      run: |
+        python3 pipeline/fmri_pipelines/run_fmriprep_from_config.py \
+          "${{ steps.detect.outputs.config }}"
+
+    ###################################################################
+    # 1-F  Gather logs (always)
+    ###################################################################
+    - name: Collect logs
+      if: always()
+      shell: bash
+      run: |
+        mkdir -p /home/hz3752/fmriprep_logs
+        cp pipeline/fmri_pipelines/projects/**/fmriprep_*_*.log \
+           /home/hz3752/fmriprep_logs/ 2>/dev/null || true
+
+    ###################################################################
+    # 2-A  Tar fmriprep derivatives
+    ###################################################################
+    - name: Tar fmriprep derivatives
+      if: success()
+      id: tar_fprep
+      shell: bash
+      run: |
+        DERIV=/home/hz3752/PycharmProjects/brainimaging-lab-documentation/data-bids/eeg-fmri/${{ steps.detect.outputs.project }}/derivatives/fmriprep
+        TAR=fmriprep_${{ steps.detect.outputs.project }}_${{ github.run_id }}.tar.gz
+        tar -czf "$TAR" -C "$DERIV" .
+        echo "tar_fp=$TAR" >> $GITHUB_OUTPUT
+
+    ###################################################################
+    # 2-B  Tar freesurfer derivatives
+    ###################################################################
+    - name: Tar freesurfer derivatives
+      if: success()
+      id: tar_fs
+      shell: bash
+      run: |
+        DERIV=/home/hz3752/PycharmProjects/brainimaging-lab-documentation/data-bids/eeg-fmri/${{ steps.detect.outputs.project }}/derivatives/freesurfer
+        TAR=freesurfer_${{ steps.detect.outputs.project }}_${{ github.run_id }}.tar.gz
+        tar -czf "$TAR" -C "$DERIV" .
+        echo "tar_fs=$TAR" >> $GITHUB_OUTPUT
+
+    ###################################################################
+    # 3-A  Upload tarballs to Box
+    ###################################################################
+    - name: Upload fmriprep to Box
+      if: success()
+      uses: benjaminejarrell/box-upload-gh-actions@v1.2
+      with:
+        box-client-sdk-config: ${{ secrets.BOX_CLIENT_SDK_CONFIG }}
+        box-folder-id: 331134301860
+        file: ${{ steps.tar_fprep.outputs.tar_fp }}
+        destination-filename: ${{ steps.tar_fprep.outputs.tar_fp }}
+
+    - name: Upload freesurfer to Box
+      if: success()
+      uses: benjaminejarrell/box-upload-gh-actions@v1.2
+      with:
+        box-client-sdk-config: ${{ secrets.BOX_CLIENT_SDK_CONFIG }}
+        box-folder-id: 331134301860
+        file: ${{ steps.tar_fs.outputs.tar_fs }}
+        destination-filename: ${{ steps.tar_fs.outputs.tar_fs }}
+
+    ###################################################################
+    # 3-B  Upload artifacts
+    ###################################################################
+    - name: Logs artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: fmriprep-logs
+        path: /home/hz3752/fmriprep_logs/*.log
+
+    - name: Derivatives artifact
+      if: success()
+      uses: actions/upload-artifact@v4
+      with:
+        name: fmriprep-derivatives
+        path: |
+          ${{ steps.tar_fprep.outputs.tar_fp }}
+          ${{ steps.tar_fs.outputs.tar_fs }}
