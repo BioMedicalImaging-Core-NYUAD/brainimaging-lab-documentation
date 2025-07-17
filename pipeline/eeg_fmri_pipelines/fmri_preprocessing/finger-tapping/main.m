@@ -32,12 +32,17 @@ drift_regress_vector = drift_regress_vector';
 
 gam_x_values = linspace(1,block_size, block_size);
 
-hrf = gampdf(gam_x_values,2,3);
+% Previously used function
+%hrf = gampdf(gam_x_values,2,3);
+% From github https://github.com/cvnlab/knkutils/blob/master/mri/getcanonicalhrf.m
+
+hrf = getcanonicalhrf(block_size,TR);
+x_values = linspace(1,20,69)
 
 % Plot hrf
 % What do we need to ensure?
 
-plot(gam_x_values,hrf);
+plot(x_values,hrf);
 
 for iRun=1:nRuns
 
@@ -86,6 +91,8 @@ for iRun=1:nRuns
     % than 0.6 and lower than 1.4, discard the first TR
     % if the value is greater than 1.4, discard the two TR
 
+    % Also discard the TR's that are corresponding to the STOP tapping
+    % duration
 
     % From the end of the block: discard 2-(already discarded) number of
     % TR's
@@ -110,7 +117,13 @@ for iRun=1:nRuns
             
             binary_matrix_corrected_IBS(first_TR_iblock,:)=0;
             binary_matrix_corrected_IBS(last_TR_iblock,:)=0;
+            
+            % Every finger tap request (1.2 seconds) is followed by a "STOP" (for 0.8s)
+            % So we need to discard the second TR right after the first non
+            % zero TR
+            binary_matrix_corrected_IBS(first_TR_iblock+2,:)=0;
 
+            
         elseif random_duration(iBlock) > 1.4
             n_discard_TR_IBS = 2;
             binary_matrix_corrected_IBS(first_TR_iblock,:)=0;
@@ -120,10 +133,21 @@ for iRun=1:nRuns
             binary_matrix_corrected_IBS(last_TR_iblock,:)=0;
             binary_matrix_corrected_IBS(last_TR_iblock-1,:)=0;
         end
-    
+        
+
+        first_tap_TR = first_TR_iblock + n_discard_TR_IBS;
+        stop_rows = (first_tap_TR + 1) : 2 : last_TR_iblock;
+
+        binary_matrix_corrected_IBS(stop_rows, :) = 0;
+
     end
 
-    designMatrix(:,1:number_conditions,iRun) = binary_matrix;
+    % 
+    %binary_matrix_corrected_IBS_STOP_TAP = binary_matrix_corrected_IBS
+    
+
+
+    designMatrix(:,1:number_conditions,iRun) = binary_matrix_corrected_IBS;
     
     
 
