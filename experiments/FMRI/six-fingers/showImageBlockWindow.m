@@ -11,6 +11,9 @@ function [startTime, endTime] = showImageBlockWindow(imagePath)
         % Load image
         try
             imgMatrix = imread(imagePath);
+
+            scaleFactor = 0.8;
+            imgMatrix = imresize(imgMatrix, scaleFactor);
         catch
             error('Could not load image: %s', imagePath);
         end
