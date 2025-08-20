@@ -79,11 +79,8 @@ for block = 1:parameters.meNumberOfBlocks
 
         % Stimulus + Timing
         imgPath = fullfile('images', parameters.imageMap(trialList{i}));
-        [startTime, endTime] = showImageBlockWindow(imgPath);
+        [startTime, endTime] = showImageBlockWindow(imgPath, trialList{i});
         duration = endTime - startTime;
-
-        % Log trial
-        fprintf('ME Trial %d: %s\n', i, trialList{i});
 
         % Append timing
         timingsReport(end+1) = struct( ...
@@ -129,10 +126,8 @@ for block = 1:parameters.miNumberOfBlocks
     for i = 1:parameters.miTrials
         showFixationWindow();
         imgPath = fullfile('images', parameters.miImageMap(miTrialList{i}));
-        [startTime, endTime] = showImageBlockWindow(imgPath);
+        [startTime, endTime] = showImageBlockWindow(imgPath, miTrialList{i});
         duration = endTime - startTime;
-
-        fprintf('MI Trial %d: %s\n', i, miTrialList{i});
 
         % Append timing
         timingsReport(end+1) = struct( ...

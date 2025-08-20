@@ -3,6 +3,8 @@ function [startTime, endTime] = showFixationWindow()
     global parameters;
     global isTerminationKeyPressed;
 
+    fprintf('Resting...\n');
+
     if ~isTerminationKeyPressed
 
         topPriorityLevel = MaxPriority(screen.win);

@@ -1,4 +1,4 @@
-function [startTime, endTime] = showImageBlockWindow(imagePath)
+function [startTime, endTime] = showImageBlockWindow(imagePath, fingerName)
     global screen;
     global parameters;
     global isTerminationKeyPressed;
@@ -31,6 +31,7 @@ function [startTime, endTime] = showImageBlockWindow(imagePath)
             % Flip screen
             if frame == 1
                 [vbl, startTime] = Screen('Flip', screen.win);
+                fprintf('Stimulus: %s\n', fingerName);
             elseif frame == numFrames
                 [~, endTime] = Screen('Flip', screen.win);
                 endTime = endTime + screen.ifi;
