@@ -12,7 +12,7 @@ function [startTime, endTime] = showImageBlockWindow(imagePath, fingerName)
         try
             imgMatrix = imread(imagePath);
 
-            scaleFactor = 0.8;
+            scaleFactor = 0.7;
             imgMatrix = imresize(imgMatrix, scaleFactor);
         catch
             error('Could not load image: %s', imagePath);
