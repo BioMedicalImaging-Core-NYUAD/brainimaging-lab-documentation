@@ -65,13 +65,14 @@ ListenChar(2);  % Suspend keyboard echo to command line
 
 % ======================== MOTOR EXECUTION (ME) ==========================
 isTerminationKeyPressed = false;
+if parameters.isDemoMode
+    showTTLWindow_1();
+else
+    showTTLWindow_2();
+end
 
 for block = 1:parameters.meNumberOfBlocks
-    if parameters.isDemoMode
-        showTTLWindow_1();
-    else
-        showTTLWindow_2();
-    end
+    
     trialList = parameters.fingerList(randperm(length(parameters.fingerList))); % Randomized trial list
     for i = 1:parameters.meTrials
         % Fixation
