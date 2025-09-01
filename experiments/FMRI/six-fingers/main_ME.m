@@ -10,8 +10,6 @@ function main_ME(meNumberOfBlocks)
         meNumberOfBlocks = 4;
     end
 
-    clear all;
-    close all;
 
     global parameters;
     global screen;
@@ -85,7 +83,9 @@ function main_ME(meNumberOfBlocks)
         trialList = parameters.fingerList(randperm(length(parameters.fingerList))); % Randomized trial list
         for i = 1:parameters.meTrials
             % Fixation
-            showFixationWindow();
+%             showFixationWindow();
+            fixationPath = fullfile('images','Rest.png');
+            showImageBlockWindow(fixationPath,'rest');
 
             % Stimulus + Timing
             imgPath = fullfile('images', parameters.imageMap(trialList{i}));
