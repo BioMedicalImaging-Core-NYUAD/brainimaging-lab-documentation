@@ -10,8 +10,6 @@ function main_ME(meNumberOfBlocks)
         meNumberOfBlocks = 4;
     end
 
-
-
     global parameters;
     global screen;
     global tc;
@@ -60,7 +58,7 @@ function main_ME(meNumberOfBlocks)
     %   Initialize Datapixx
     %--------------------------------------------------------------------------------------------------------------------------------------%
     if ~parameters.isDemoMode
-        datapixx = 0;
+        datapixx = 1;
         AssertOpenGL;
         isReady = Datapixx('Open');
         Datapixx('StopAllSchedules');
@@ -84,7 +82,9 @@ function main_ME(meNumberOfBlocks)
         trialList = parameters.fingerList(randperm(length(parameters.fingerList))); % Randomized trial list
         for i = 1:parameters.meTrials
             % Fixation
-            showFixationWindow();
+%             showFixationWindow();
+            fixationPath = fullfile('images','Rest.png');
+            showImageBlockWindow(fixationPath,'rest');
 
             % Stimulus + Timing
             imgPath = fullfile('images', parameters.imageMap(trialList{i}));
