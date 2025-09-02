@@ -5,10 +5,6 @@ fMRI - Six Fingers
 The `six-fingers` experiment uses a block‐design paradigm to probe the five fingers.
 
 
-
-How to accessthe code
-
-
 :github-file:`experiments/FMRI/six-fingers`
 
 
@@ -16,4 +12,18 @@ How to accessthe code
 
 
 :github-file:`experiments/FMRI/six-fingers/main_MI.m`
+
+
+Instructions for accessing code on Stimulus computer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- On Stimulus computer, access Pycharm
+- Change `branch` to  "main"
+
+
+
+
+
+
+
 
