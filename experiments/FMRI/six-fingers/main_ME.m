@@ -10,9 +10,6 @@ function main_ME(meNumberOfBlocks)
         meNumberOfBlocks = 4;
     end
 
-    clear all;
-    close all;
-
     global parameters;
     global screen;
     global tc;
@@ -61,7 +58,7 @@ function main_ME(meNumberOfBlocks)
     %   Initialize Datapixx
     %--------------------------------------------------------------------------------------------------------------------------------------%
     if ~parameters.isDemoMode
-        datapixx = 0;
+        datapixx = 1;
         AssertOpenGL;
         isReady = Datapixx('Open');
         Datapixx('StopAllSchedules');
