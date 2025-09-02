@@ -8,7 +8,7 @@ function loadParameters()
     parameters.hideCursor = true;
     
     %   to set the demo mode with half-transparent screen
-    parameters.isDemoMode = false;
+    parameters.isDemoMode = true;
     
     %   screen transparency in demo mode
     parameters.transparency = 0.6;
@@ -45,7 +45,8 @@ function loadParameters()
     %   will set the name of the data file in the following format:
     %   currentStudy currentStudyVersion subNumStr  session '_' runNumberStr '_' currentDate '.csv'
     parameters.datafile = 'unitled.csv';
-    parameters.matfile = 'untitled.mat';
+    parameters.datafile_dm = 'unitled_2.csv';
+    parameters.matfile = 'untitled.csv';
   
     %---------------------------------------------------------------------%
     % experiment  parameters
@@ -82,10 +83,10 @@ function loadParameters()
     %---------------------------------------------------------------------%
     
     %   sample task duration
-    parameters.blockDuration = 10;
+    parameters.blockDuration = 2;
 
-    parameters.fixationDuration = 10;
-    parameters.stimulusDuration = 10;
+    parameters.fixationDuration = 2;
+    parameters.stimulusDuration = 2;
     
     %   eoe task duration
     parameters.eoeTaskDuration = 2;
@@ -95,7 +96,7 @@ function loadParameters()
     %---------------------------------------------------------------------%
 
     parameters.welcomeMsg = sprintf('Please wait until the experimenter sets up parameters.');
-    parameters.ttlMsg = sprintf('Initializing Scanner...');
+    parameters.ttlMsg = sprintf('Waiting for trigger...');
     parameters.thankYouMsg = sprintf('Thank you for your participation!!!');
     % % parameters.blockOneMsg = sprintf('Stop');
     % % parameters.blockTwoMsg = sprintf('Move tongue');

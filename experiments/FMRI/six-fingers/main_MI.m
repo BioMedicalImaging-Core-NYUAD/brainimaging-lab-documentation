@@ -11,6 +11,9 @@ function main_MI(blockNumber)
         blockNumber = 1;
     end
 
+    clear all;
+    close all;
+
     global parameters;
     global screen;
     global tc;

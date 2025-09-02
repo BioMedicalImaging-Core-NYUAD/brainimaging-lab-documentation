@@ -41,12 +41,15 @@ function initSubjectInfo()
 	runNumberStr = int2strz(runNumber,2);
 
     datafile = [RESULTS_DIR currentStudy num2str(currentStudyVersion) subNumStr  num2str(session) '_' runNumberStr '_' dateStr '.csv'];
+    datafile_dm = [RESULTS_DIR currentStudy num2str(currentStudyVersion) subNumStr  num2str(session) '_' runNumberStr '_' dateStr '_dm.csv'];
+
     matfile = [RESULTS_DIR currentStudy num2str(currentStudyVersion) subNumStr  num2str(session) '_' runNumberStr '_' dateStr '.mat'];
     taskMapFile = [TASK_MAPS currentStudy num2str(currentStudyVersion) subNumStr  num2str(session) '_' runNumberStr '_' dateStr '_taskMap.mat'];
     logFile = [LOG_DIR currentStudy num2str(currentStudyVersion) subNumStr  num2str(session) '_' runNumberStr '_' dateStr '_log.txt'];
     
     parameters.datafile = datafile;
-   
+    parameters.datafile_dm = datafile_dm;
+
     % check for existing result file to prevent accidentally overwriting
     % files from a previous subject/session (except for subject numbers > 99):
     if subNum>0 && subNum<99 && fopen(datafile, 'rt')~=-1
