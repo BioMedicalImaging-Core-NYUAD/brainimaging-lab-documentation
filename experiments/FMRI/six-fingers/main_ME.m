@@ -10,8 +10,7 @@ function main_ME(meNumberOfBlocks)
         meNumberOfBlocks = 4;
     end
 
-    clear all;
-    close all;
+
 
     global parameters;
     global screen;
