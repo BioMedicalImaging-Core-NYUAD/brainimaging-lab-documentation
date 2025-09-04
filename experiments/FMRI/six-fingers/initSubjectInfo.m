@@ -1,4 +1,4 @@
-function initSubjectInfo()
+function initSubjectInfo(PHASE)
     global parameters;
     runNumber = parameters.runNumber;
     currentStudy = parameters.currentStudy;
@@ -40,8 +40,8 @@ function initSubjectInfo()
 	subNumStr=int2strz(subNum,2);
 	runNumberStr = int2strz(runNumber,2);
 
-    datafile = [RESULTS_DIR currentStudy num2str(currentStudyVersion) subNumStr  num2str(session) '_' runNumberStr '_' dateStr '.csv'];
-    datafile_dm = [RESULTS_DIR currentStudy num2str(currentStudyVersion) subNumStr  num2str(session) '_' runNumberStr '_' dateStr '_dm.csv'];
+    datafile = [RESULTS_DIR currentStudy num2str(currentStudyVersion) '_' PHASE '_' subNumStr '_' num2str(session) '_'  dateStr '.csv'];
+    datafile_dm = [RESULTS_DIR currentStudy num2str(currentStudyVersion) '_' PHASE '_'  subNumStr '_' num2str(session) '_' dateStr '_dm.csv'];
 
     matfile = [RESULTS_DIR currentStudy num2str(currentStudyVersion) subNumStr  num2str(session) '_' runNumberStr '_' dateStr '.mat'];
     taskMapFile = [TASK_MAPS currentStudy num2str(currentStudyVersion) subNumStr  num2str(session) '_' runNumberStr '_' dateStr '_taskMap.mat'];
