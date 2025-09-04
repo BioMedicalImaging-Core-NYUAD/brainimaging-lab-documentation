@@ -5,7 +5,7 @@ function [startTime, endTime] = showImageBlockWindow(imagePath, fingerName)
 % precise, time-based control of the stimulus duration. It presents the
 % image with a single Screen('Flip'), waits for the block duration while
 % checking for an exit key, and then returns.
-
+    startTime = GetSecs;
     global screen;
     global parameters;
     global isTerminationKeyPressed;
@@ -41,19 +41,19 @@ function [startTime, endTime] = showImageBlockWindow(imagePath, fingerName)
     % Flip the screen to show the image. This command is the most critical
     % for timing. It executes at the next vertical retrace of the monitor.
     % The returned 'vbl' is a high-precision timestamp of when the flip occurred.
-    [vbl, startTime] = Screen('Flip', screen.win);
-    
+    [vbl, startTimex] = Screen('Flip', screen.win);
+%     startTime = GetSecs;
     % Log the precise start time to the command window for debugging
     fprintf('Stimulus ON: %s \n', fingerName);
 
     % Calculate the target end time for the block
-    endTime = startTime + parameters.stimulusDuration;
+    endTime_c = startTime + parameters.stimulusDuration;
 
     % --- Wait for the block duration to elapse ---
     % Instead of a 'for' loop counting frames, we use a 'while' loop that
     % continuously checks the master clock (GetSecs). The image remains on
     % screen during this time.
-    while GetSecs < endTime
+    while GetSecs < endTime_c
         % Check for a quit key press (e.g., 'q')
         [keyIsDown, ~, keyCode] = KbCheck();
         if keyIsDown && (keyCode(KbName('q')) || keyCode(KbName('Q')))
@@ -68,7 +68,6 @@ function [startTime, endTime] = showImageBlockWindow(imagePath, fingerName)
         % impact on timing precision for this purpose.
         WaitSecs(0.001);
     end
-
     % --- Clean Up for this Function ---
     % NOTE: The screen is NOT cleared here. The next call to Screen('Flip')
     % in your main script (e.g., to show a fixation cross) will replace the image.
@@ -84,4 +83,5 @@ function [startTime, endTime] = showImageBlockWindow(imagePath, fingerName)
     
     % Flush any pending events
     FlushEvents;
+    endTime = GetSecs;
 end

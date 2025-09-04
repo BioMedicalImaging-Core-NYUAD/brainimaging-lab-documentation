@@ -83,10 +83,10 @@ function loadParameters()
     %---------------------------------------------------------------------%
     
     %   sample task duration
-    parameters.blockDuration = 2;
+    parameters.blockDuration = 10;
 
-    parameters.fixationDuration = 2;
-    parameters.stimulusDuration = 2;
+    parameters.fixationDuration = 10;
+    parameters.stimulusDuration = 10;
     
     %   eoe task duration
     parameters.eoeTaskDuration = 2;
