@@ -65,7 +65,7 @@ function main_ME(meNumberOfBlocks)
     %   Initialize Datapixx
     %--------------------------------------------------------------------------------------------------------------------------------------%
     if ~parameters.isDemoMode
-        datapixx = 0;
+        datapixx = 1;
         AssertOpenGL;
         isReady = Datapixx('Open');
         Datapixx('StopAllSchedules');
@@ -84,7 +84,7 @@ function main_ME(meNumberOfBlocks)
     else
         showTTLWindow_2();
     end
-
+    
     for block = 1:meNumberOfBlocks
         trialList = parameters.fingerList(randperm(length(parameters.fingerList))); % Randomized trial list
         for i = 1:parameters.meTrials
@@ -104,7 +104,7 @@ function main_ME(meNumberOfBlocks)
                 'duration', duration ...
             );
             
-            % Append design matrix
+            % % Append design matrix
             designMatrix(end+1:end+parameters.fixationDuration) = struct( ...
                 'c1', 0, ...
                 'c2', 0, ...

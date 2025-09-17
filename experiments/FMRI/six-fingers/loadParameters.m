@@ -8,7 +8,7 @@ function loadParameters()
     parameters.hideCursor = true;
     
     %   to set the demo mode with half-transparent screen
-    parameters.isDemoMode = true;
+    parameters.isDemoMode = false;
     
     %   screen transparency in demo mode
     parameters.transparency = 0.6;
@@ -83,10 +83,10 @@ function loadParameters()
     %---------------------------------------------------------------------%
     
     %   sample task duration
-    parameters.blockDuration = 10;
+    parameters.blockDuration = 5;
 
-    parameters.fixationDuration = 10;
-    parameters.stimulusDuration = 10;
+    parameters.fixationDuration = 5;
+    parameters.stimulusDuration = 5;
     
     %   eoe task duration
     parameters.eoeTaskDuration = 2;

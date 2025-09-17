@@ -53,7 +53,7 @@ function [startTime, endTime] = showImageBlockWindow(imagePath, fingerName)
     % Instead of a 'for' loop counting frames, we use a 'while' loop that
     % continuously checks the master clock (GetSecs). The image remains on
     % screen during this time.
-    while GetSecs < endTime_c
+    while GetSecs < endTime_c-0.13
         % Check for a quit key press (e.g., 'q')
         [keyIsDown, ~, keyCode] = KbCheck();
         if keyIsDown && (keyCode(KbName('q')) || keyCode(KbName('Q')))
