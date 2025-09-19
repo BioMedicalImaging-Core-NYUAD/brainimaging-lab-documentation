@@ -1,18 +1,15 @@
-function main_MI(blockNumber)
-    % main_MI(blockNumber)
+function main_MI(miNumberOfBlocks)
+    % main_MI(miNumberOfBlocks)
     %
     % Motor Imagery (MI) part of the six-fingers experiment.
-    % This script runs a single block of the MI experiment.
     %
     % Input:
-    %   blockNumber - (optional) the block number for the current run. Default is 1.
+    %   miNumberOfBlocks - (optional) number of blocks to run. Default is 4.
 
     if nargin < 1
-        blockNumber = 1;
+        miNumberOfBlocks = 4;
     end
 
-    clear all;
-    close all;
 
     global parameters;
     global screen;
@@ -34,21 +31,20 @@ function main_MI(blockNumber)
         'duration', {} ...
     );
 
-
     designMatrix = struct( ...
         'c1', {}, ...
         'c2', {}, ...
         'c3', {}, ...
         'c4', {}, ...
-        'c5', {} ...
+        'c5', {}, ...
+        'c6', {} ...
         );
-      % Initialize empty struct array
 
     addpath('supportFiles');
 
     %   Load parameters
     %--------------------------------------------------------------------------------------------------------------------------------------%
-    loadParameters();
+    loadParameters(' MOTOR IMAGERY ');
 
     %   Initialize the subject info
     %--------------------------------------------------------------------------------------------------------------------------------------%
@@ -70,7 +66,7 @@ function main_MI(blockNumber)
     %   Initialize Datapixx
     %--------------------------------------------------------------------------------------------------------------------------------------%
     if ~parameters.isDemoMode
-        datapixx = 0;
+        datapixx = 1;
         AssertOpenGL;
         isReady = Datapixx('Open');
         Datapixx('StopAllSchedules');
@@ -89,100 +85,108 @@ function main_MI(blockNumber)
     else
         showTTLWindow_2();
     end
+    
+    for block = 1:miNumberOfBlocks
+        trialList = parameters.fingerList_MI(randperm(length(parameters.fingerList_MI))); % Randomized trial list
+        for i = 1:parameters.miTrials
+            % Fixation
+%             showFixationWindow();
+            fixationPath = fullfile('images','hand.png');
+            [startTime, endTime] = showImageBlockWindow(fixationPath,'rest');
+            duration = endTime - startTime;
 
-    % Alternate NT/ST
-    if rand < 0.5
-        conds = repmat({'NT','ST'}, 1, parameters.miTrials / 2);
-    else
-        conds = repmat({'ST','NT'}, 1, parameters.miTrials / 2);
-    end
-
-    miTrialList = cell(1, parameters.miTrials);
-    for i = 1:parameters.miTrials
-        if strcmp(conds{i}, 'NT')
-            miTrialList{i} = parameters.NT_fingers{randi(numel(parameters.NT_fingers))};
-        else
-            miTrialList{i} = parameters.ST_finger;
-        end
-    end
-
-    for i = 1:parameters.miTrials
-        %showFixationWindow();
-        fixationPath = fullfile('images','hand.png');
-        [startTime, endTime] = showImageBlockWindow(fixationPath,'rest');
-        duration = endTime - startTime;
-
-        % Append timing
-        timingsReport(end+1) = struct( ...
-            'trial', i, ...
-            'phase', 'MI', ...
-            'finger', 'Rest', ...
-            'startTime', startTime, ...
-            'endTime', endTime, ...
-            'duration', duration ...
-        );
-
-
-        % Append design matrix
-        designMatrix(end+1:end+parameters.fixationDuration) = struct( ...
-            'c1', 0, ...
-            'c2', 0, ...
-            'c3', 0, ...
-            'c4', 0, ...
-            'c5', 0);
+%             % Append timing
+            timingsReport(end+1) = struct( ...
+                'trial', i, ...
+                'phase', 'MI', ...
+                'finger', 'Rest', ...
+                'startTime', startTime, ...
+                'endTime', endTime, ...
+                'duration', duration ...
+            );
             
-        imgPath = fullfile('images', parameters.miImageMap(miTrialList{i}));
-        [startTime, endTime] = showImageBlockWindow(imgPath, miTrialList{i});
-        duration = endTime - startTime;
+            % % Append design matrix
+            designMatrix(end+1:end+parameters.fixationDuration) = struct( ...
+                'c1', 0, ...
+                'c2', 0, ...
+                'c3', 0, ...
+                'c4', 0, ...
+                'c5', 0, ...
+                'c6', 0);
 
-        % Append timing
-        timingsReport(end+1) = struct( ...
-            'trial', i, ...
-            'phase', 'MI', ...
-            'finger', miTrialList{i}, ...
-            'startTime', startTime, ...
-            'endTime', endTime, ...
-            'duration', duration ...
-        );
-        % Append design matrix
-        designMatrix(end+1:end+parameters.stimulusDuration) = struct( ...
-            'c1', 0, ...
-            'c2', 0, ...
-            'c3', 0, ...
-            'c4', 0, ...
-            'c5', 0);
 
-        if miTrialList{i} == "thumb"
-            [designMatrix(end+1-parameters.stimulusDuration:end).c1] = deal(1);
-        elseif miTrialList{i} == "index"
-            [designMatrix(end+1-parameters.stimulusDuration:end).c2] = deal(1);
-        elseif miTrialList{i} == "middle"
-            [designMatrix(end+1-parameters.stimulusDuration:end).c3] = deal(1);
-        elseif miTrialList{i} == "ring"
-            [designMatrix(end+1-parameters.stimulusDuration:end).c4] = deal(1);
-        elseif miTrialList{i} == "pinky"
-            [designMatrix(end+1-parameters.stimulusDuration:end).c5] = deal(1);
+            % Stimulus + Timing
+            imgPath = fullfile('images', parameters.miImageMap(trialList{i}));
+            [startTime, endTime] = showImageBlockWindow(imgPath, trialList{i});
+            duration = endTime - startTime;
+
+%             % Append timing
+            timingsReport(end+1) = struct( ...
+                'trial', i, ...
+                'phase', 'MI', ...
+                'finger', trialList{i}, ...
+                'startTime', startTime, ...
+                'endTime', endTime, ...
+                'duration', duration ...
+            );
+            % Append design matrix
+            designMatrix(end+1:end+parameters.stimulusDuration) = struct( ...
+                'c1', 0, ...
+                'c2', 0, ...
+                'c3', 0, ...
+                'c4', 0, ...
+                'c5', 0, ...
+                'c6', 0);
+            if trialList{i} == "thumb"
+                [designMatrix(end+1-parameters.stimulusDuration:end).c1] = deal(1);
+            elseif trialList{i} == "index"
+                [designMatrix(end+1-parameters.stimulusDuration:end).c2] = deal(1);
+            elseif trialList{i} == "middle"
+                [designMatrix(end+1-parameters.stimulusDuration:end).c3] = deal(1);
+            elseif trialList{i} == "ring"
+                [designMatrix(end+1-parameters.stimulusDuration:end).c4] = deal(1);
+            elseif trialList{i} == "pinky"
+                [designMatrix(end+1-parameters.stimulusDuration:end).c5] = deal(1);
+            elseif trialList{i} == "sixth"
+                [designMatrix(end+1-parameters.stimulusDuration:end).c6] = deal(1);
+            end
+
+
+
         end
-
     end
+
+    fixationPath = fullfile('images','hand.png');
+    [startTime, endTime] = showImageBlockWindow(fixationPath,'rest');
+    duration = endTime - startTime;
+    
+    % Append timing
+    timingsReport(end+1) = struct( ...
+        'trial', i, ...
+        'phase', 'MI', ...
+        'finger', trialList{i}, ...
+        'startTime', startTime, ...
+        'endTime', endTime, ...
+        'duration', duration ...
+    );
+
+    % Append design matrix
+    designMatrix(end+1:end+parameters.fixationDuration) = struct( ...
+        'c1', 0, ...
+        'c2', 0, ...
+        'c3', 0, ...
+        'c4', 0, ...
+        'c5', 0, ...
+        'c6', 0 ...
+        );
+
 
     % End of experiment screen
     startEoeTime = showEoeWindow();
 
     % ======================== SAVE DATA ==========================
-    % Check if the datafile exists, if so, append to it.
-    if isfile(parameters.datafile)
-        existingData = readtable(parameters.datafile);
-        newData = struct2table(timingsReport);
-        writetable([existingData; newData], parameters.datafile);
-        existingData2 = readtable(parameters.datafile_dm);
-        newData = struct2table(designMatrix);
-        writetable([existingData2; newData], parameters.datafile_dm);
-    else
-        writetable(struct2table(timingsReport), parameters.datafile);
-        writetable(struct2table(designMatrix), parameters.datafile_dm);
-    end
-
+    writetable(struct2table(timingsReport), parameters.datafile);
+    writetable(struct2table(designMatrix), parameters.datafile_dm);
 
     % Re-enable keyboard input to command line
     ListenChar(1);

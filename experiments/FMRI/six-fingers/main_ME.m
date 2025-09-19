@@ -4,10 +4,10 @@ function main_ME(meNumberOfBlocks)
     % Motor Execution (ME) part of the six-fingers experiment.
     %
     % Input:
-    %   meNumberOfBlocks - (optional) number of blocks to run. Default is 4.
+    %   meNumberOfBlocks - (optional) number of blocks to run. Default is 5.
 
     if nargin < 1
-        meNumberOfBlocks = 4;
+        meNumberOfBlocks = 5;
     end
 
 
@@ -43,7 +43,7 @@ function main_ME(meNumberOfBlocks)
 
     %   Load parameters
     %--------------------------------------------------------------------------------------------------------------------------------------%
-    loadParameters();
+    loadParameters(' MOTOR EXECUTION ');
 
     %   Initialize the subject info
     %--------------------------------------------------------------------------------------------------------------------------------------%

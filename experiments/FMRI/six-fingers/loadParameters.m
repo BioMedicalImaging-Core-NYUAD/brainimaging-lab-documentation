@@ -1,5 +1,5 @@
 %   loads experimental parameters
-function loadParameters()
+function loadParameters(PHASE)
     global parameters;
     %---------------------------------------------------------------------%
     % 
@@ -54,7 +54,8 @@ function loadParameters()
 
     
     %   set the number of blocks in your experiment
-    parameters.meNumberOfBlocks = 4;
+    parameters.meNumberOfBlocks = 5;
+    parameters.miNumberOfBlocks = 4;
     parameters.meTrials = 5;
 
     parameters.fingerList = {'thumb', 'index', 'middle', 'ring', 'pinky'};
@@ -65,12 +66,14 @@ function loadParameters()
          'hand-05.png'} ...
     );
 
-    parameters.miTrials = 20;
-    parameters.miNumberOfBlocks = 3;
+    parameters.miTrials = 6;
+%     parameters.miNumberOfBlocks = 3;
 
     parameters.NT_fingers = {'thumb', 'index', 'middle', 'ring', 'pinky'};
     parameters.ST_finger  = 'sixth';
-     parameters.miImageMap = containers.Map(...
+    parameters.fingerList_MI = {'thumb', 'index', 'middle', 'ring', 'pinky','sixth'};
+
+    parameters.miImageMap = containers.Map(...
         [parameters.NT_fingers, parameters.ST_finger], ...
         {'hand-01.png', 'hand-02.png', ...
          'hand-03.png', 'hand-04.png', ...
@@ -83,10 +86,10 @@ function loadParameters()
     %---------------------------------------------------------------------%
     
     %   sample task duration
-    parameters.blockDuration = 5;
+    parameters.blockDuration = 12;
 
-    parameters.fixationDuration = 5;
-    parameters.stimulusDuration = 5;
+    parameters.fixationDuration = 12;
+    parameters.stimulusDuration = 12;
     
     %   eoe task duration
     parameters.eoeTaskDuration = 2;
@@ -96,7 +99,7 @@ function loadParameters()
     %---------------------------------------------------------------------%
 
     parameters.welcomeMsg = sprintf('Please wait until the experimenter sets up parameters.');
-    parameters.ttlMsg = sprintf('Waiting for trigger...');
+    parameters.ttlMsg = sprintf('Waiting for trigger. Time to perform ' + PHASE);
     parameters.thankYouMsg = sprintf('Thank you for your participation!!!');
     % % parameters.blockOneMsg = sprintf('Stop');
     % % parameters.blockTwoMsg = sprintf('Move tongue');
