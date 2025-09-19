@@ -99,7 +99,7 @@ function loadParameters(PHASE)
     %---------------------------------------------------------------------%
 
     parameters.welcomeMsg = sprintf('Please wait until the experimenter sets up parameters.');
-    parameters.ttlMsg = sprintf('Waiting for trigger. Time to perform ' + PHASE);
+    parameters.ttlMsg = sprintf('Waiting for trigger. Time to perform %s', PHASE);
     parameters.thankYouMsg = sprintf('Thank you for your participation!!!');
     % % parameters.blockOneMsg = sprintf('Stop');
     % % parameters.blockTwoMsg = sprintf('Move tongue');
