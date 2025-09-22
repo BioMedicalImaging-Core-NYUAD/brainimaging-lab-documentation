@@ -86,7 +86,6 @@ Documentation content
     :maxdepth: 2
 
     1-lab-overview/0-brainimaging-lab-description.rst
-    1-lab-overview/1-brainimaging-policies.rst
     1-lab-overview/2-brainimaging-processes.rst
     1-lab-overview/3-brainimaging-publications.rst
     1-lab-overview/4-brainimaging-collaborations.rst
