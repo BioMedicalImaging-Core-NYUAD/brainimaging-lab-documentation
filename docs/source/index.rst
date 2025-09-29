@@ -158,8 +158,8 @@ Documentation content
 
 .. raw:: html
 
-   <div id="container3D" style="width:100%; height:600px; background:#1a1a2e; border-radius:8px; position:relative;">
-       <div id="loading" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:white; font-size:18px;">Loading 3D Brain Model...</div>
+   <div id="container3D" style="width:100%; height:600px; position:relative;">
+       <div id="loading" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#666; font-size:18px;">Loading 3D Brain Model...</div>
    </div>
    
    <script type="module">
@@ -174,7 +174,8 @@ Documentation content
        
        //Create a Three.JS Scene
        const scene = new THREE.Scene();
-       scene.background = new THREE.Color(0x1a1a2e);
+       // Transparent background to match website
+       scene.background = null;
        
        //Get the container
        const container = document.getElementById("container3D");
@@ -221,14 +222,15 @@ Documentation content
                    }
                });
                
-               // Center and scale the model
+               // Center the model
                const box = new THREE.Box3().setFromObject(object);
                const center = box.getCenter(new THREE.Vector3());
                object.position.sub(center);
                
+               // Make it bigger - increased scale factor from 2 to 4
                const size = box.getSize(new THREE.Vector3());
                const maxDim = Math.max(size.x, size.y, size.z);
-               object.scale.setScalar(2 / maxDim);
+               object.scale.setScalar(4 / maxDim);  // Increased from 2 to 4
                
                scene.add(object);
                loading.style.display = 'none';
@@ -249,14 +251,18 @@ Documentation content
        );
        
        //Instantiate a new renderer and set its size
-       const renderer = new THREE.WebGLRenderer({ antialias: true });
+       const renderer = new THREE.WebGLRenderer({ 
+           antialias: true,
+           alpha: true  // Enable transparency
+       });
        renderer.setSize(container.clientWidth, container.clientHeight);
        
        //Add the renderer to the DOM
        container.appendChild(renderer.domElement);
        
-       //Set how far the camera will be from the 3D model
-       camera.position.set(3, 3, 5);
+       //Position camera to center the model - moved closer
+       camera.position.set(2, 2, 3);  // Moved from (3,3,5) to (2,2,3) - closer to model
+       camera.lookAt(0, 0, 0);  // Ensure camera looks at center
        
        //Add lights to the scene, so we can actually see the 3D model
        const topLight = new THREE.DirectionalLight(0xffffff, 1);
@@ -276,6 +282,7 @@ Documentation content
        controls.enableDamping = true;
        controls.dampingFactor = 0.05;
        controls.enableZoom = true;
+       controls.target.set(0, 0, 0);  // Set orbit target to center
        
        //Render the scene
        function animate() {
