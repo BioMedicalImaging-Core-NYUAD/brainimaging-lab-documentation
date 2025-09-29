@@ -85,7 +85,7 @@ Heart
        }
 
        loader.load(
-           '_static/heart.glb',
+           '../../_static/heart.glb',   // 🔴 FIXED PATH: go up 2 folders to reach _static
            function (gltf) {
                console.log('Heart model loaded successfully!');
                object = gltf.scene;
