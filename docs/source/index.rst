@@ -158,86 +158,131 @@ Documentation content
 
 .. raw:: html
 
-   <div id="stl-viewer" style="width:100%; height:600px; background:#1a1a2e; border-radius:8px;"></div>
-
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-   <script>
-       // Scene setup
-       const container = document.getElementById('stl-viewer');
+   <div id="container3D" style="width:100%; height:600px; background:#1a1a2e; border-radius:8px; position:relative;">
+       <div id="loading" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:white; font-size:18px;">Loading 3D Brain Model...</div>
+   </div>
+   
+   <script type="module">
+       //Import the THREE.js library
+       import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module.js";
+       // To allow for the camera to move around the scene
+       import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
+       // To allow for importing the .gltf file
+       import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
+       
+       //Create a Three.JS Scene
        const scene = new THREE.Scene();
        scene.background = new THREE.Color(0x1a1a2e);
-
-       const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-       const renderer = new THREE.WebGLRenderer({ antialias: true });
-       renderer.setSize(container.clientWidth, container.clientHeight);
-       container.appendChild(renderer.domElement);
-
-       // Lighting
-       const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-       scene.add(ambientLight);
-       const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-       directionalLight.position.set(1, 1, 1);
-       scene.add(directionalLight);
-
-       // Load STL
-       fetch('_static/new_rh_white.stl')
-           .then(response => response.arrayBuffer())
-           .then(buffer => {
-               const geometry = parseSTLBinary(new DataView(buffer));
-               geometry.computeVertexNormals();
-               geometry.center();
-
-               const material = new THREE.MeshPhongMaterial({ color: 0xff6b6b });
-               const mesh = new THREE.Mesh(geometry, material);
-               scene.add(mesh);
-
-               // Auto-scale
-               const box = new THREE.Box3().setFromObject(mesh);
+       
+       //Get the container
+       const container = document.getElementById("container3D");
+       const loading = document.getElementById("loading");
+       
+       //create a new camera with positions and angles
+       const camera = new THREE.PerspectiveCamera(
+           75, 
+           container.clientWidth / container.clientHeight, 
+           0.1, 
+           1000
+       );
+       
+       //Keep the 3D object on a global variable so we can access it later
+       let object;
+       
+       //OrbitControls allow the camera to move around the scene
+       let controls;
+       
+       //Instantiate a loader for the .gltf file
+       const loader = new GLTFLoader();
+       
+       //Load the file
+       loader.load(
+           '_static/model.glb',  // Changed to .glb
+           function (gltf) {
+               //If the file is loaded, add it to the scene
+               object = gltf.scene;
+               
+               // Optional: Change the material/color
+               object.traverse((child) => {
+                   if (child.isMesh) {
+                       child.material = new THREE.MeshPhongMaterial({ 
+                           color: 0xff6b6b,
+                           shininess: 100
+                       });
+                   }
+               });
+               
+               // Center and scale the model
+               const box = new THREE.Box3().setFromObject(object);
+               const center = box.getCenter(new THREE.Vector3());
+               object.position.sub(center);
+               
                const size = box.getSize(new THREE.Vector3());
                const maxDim = Math.max(size.x, size.y, size.z);
-               mesh.scale.setScalar(2 / maxDim);
-           })
-           .catch(err => console.error('Error loading STL:', err));
-
-       function parseSTLBinary(view) {
-           const faces = view.getUint32(80, true);
-           const geometry = new THREE.BufferGeometry();
-           const vertices = [];
-
-           for (let i = 0; i < faces; i++) {
-               const offset = 84 + i * 50;
-               for (let j = 0; j < 3; j++) {
-                   const vOffset = offset + 12 + j * 12;
-                   vertices.push(
-                       view.getFloat32(vOffset, true),
-                       view.getFloat32(vOffset + 4, true),
-                       view.getFloat32(vOffset + 8, true)
-                   );
-               }
+               object.scale.setScalar(2 / maxDim);
+               
+               scene.add(object);
+               loading.style.display = 'none';
+           },
+           function (xhr) {
+               //While it is loading, log the progress
+               const percent = Math.round((xhr.loaded / xhr.total * 100));
+               loading.textContent = `Loading: ${percent}%`;
+               console.log(percent + '% loaded');
+           },
+           function (error) {
+               //If there is an error, log it
+               loading.innerHTML = '<div style="color:#ff6b6b;">Error loading model</div>';
+               console.error(error);
            }
-
-           geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-           return geometry;
-       }
-
-       // Camera controls
-       let rotation = { x: 0.3, y: 0 };
-       container.addEventListener('mousemove', (e) => {
-           if (e.buttons === 1) {
-               rotation.y += e.movementX * 0.01;
-               rotation.x += e.movementY * 0.01;
-           }
-       });
-
+       );
+       
+       //Instantiate a new renderer and set its size
+       const renderer = new THREE.WebGLRenderer({ antialias: true });
+       renderer.setSize(container.clientWidth, container.clientHeight);
+       
+       //Add the renderer to the DOM
+       container.appendChild(renderer.domElement);
+       
+       //Set how far the camera will be from the 3D model
        camera.position.set(3, 3, 5);
-
+       
+       //Add lights to the scene, so we can actually see the 3D model
+       const topLight = new THREE.DirectionalLight(0xffffff, 1);
+       topLight.position.set(500, 500, 500);
+       topLight.castShadow = true;
+       scene.add(topLight);
+       
+       const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+       scene.add(ambientLight);
+       
+       const backLight = new THREE.DirectionalLight(0xffffff, 0.5);
+       backLight.position.set(-500, -500, -500);
+       scene.add(backLight);
+       
+       //This adds controls to the camera, so we can rotate / zoom it with the mouse
+       controls = new OrbitControls(camera, renderer.domElement);
+       controls.enableDamping = true;
+       controls.dampingFactor = 0.05;
+       controls.enableZoom = true;
+       
+       //Render the scene
        function animate() {
            requestAnimationFrame(animate);
-           camera.position.x = 5 * Math.sin(rotation.y) * Math.cos(rotation.x);
-           camera.position.y = 5 * Math.sin(rotation.x);
-           camera.position.z = 5 * Math.cos(rotation.y) * Math.cos(rotation.x);
-           camera.lookAt(0, 0, 0);
+           
+           // Update controls
+           if (controls) controls.update();
+           
            renderer.render(scene, camera);
        }
+       
+       //Add a listener to the window, so we can resize the window and the camera
+       window.addEventListener("resize", function () {
+           camera.aspect = container.clientWidth / container.clientHeight;
+           camera.updateProjectionMatrix();
+           renderer.setSize(container.clientWidth, container.clientHeight);
+       });
+       
+       //Start the 3D rendering
        animate();
    </script>
