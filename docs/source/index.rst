@@ -161,8 +161,8 @@ Documentation content
    :caption: Beyond 2D
    :maxdepth: 2
 
-   9-3D/Heart
-   9-3D/Spine
+   9-3D/Heart/Heart.rst
+   9-3D/Spine/Spine.rst
 
 .. raw:: html
 
