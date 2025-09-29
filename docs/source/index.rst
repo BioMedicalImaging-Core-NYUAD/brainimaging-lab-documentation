@@ -169,6 +169,8 @@ Documentation content
        import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
        // To allow for importing the .gltf file
        import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
+       // Import DracoLoader for compressed models
+       import { DRACOLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/DRACOLoader.js";
        
        //Create a Three.JS Scene
        const scene = new THREE.Scene();
@@ -195,74 +197,56 @@ Documentation content
        //Instantiate a loader for the .gltf file
        const loader = new GLTFLoader();
        
-       // Try multiple paths
-       const possiblePaths = [
+       // Setup the DracoLoader for compressed models
+       const dracoLoader = new DRACOLoader();
+       dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+       dracoLoader.setDecoderConfig({ type: 'js' });
+       loader.setDRACOLoader(dracoLoader);
+       
+       //Load the file
+       loader.load(
            '_static/model.glb',
-           '../_static/model.glb',
-           './model.glb',
-           'model.glb'
-       ];
-       
-       let currentPathIndex = 0;
-       
-       function tryLoadModel() {
-           if (currentPathIndex >= possiblePaths.length) {
-               loading.innerHTML = '<div style="color:#ff6b6b;">Could not find model.glb. Check browser console (F12) for details.</div>';
-               return;
-           }
-           
-           const path = possiblePaths[currentPathIndex];
-           console.log('Trying to load from:', path);
-           loading.textContent = `Trying path ${currentPathIndex + 1}/${possiblePaths.length}...`;
-           
-           //Load the file
-           loader.load(
-               path,
-               function (gltf) {
-                   //If the file is loaded, add it to the scene
-                   console.log('Model loaded successfully from:', path);
-                   object = gltf.scene;
-                   
-                   // Optional: Change the material/color
-                   object.traverse((child) => {
-                       if (child.isMesh) {
-                           child.material = new THREE.MeshPhongMaterial({ 
-                               color: 0xff6b6b,
-                               shininess: 100
-                           });
-                       }
-                   });
-                   
-                   // Center and scale the model
-                   const box = new THREE.Box3().setFromObject(object);
-                   const center = box.getCenter(new THREE.Vector3());
-                   object.position.sub(center);
-                   
-                   const size = box.getSize(new THREE.Vector3());
-                   const maxDim = Math.max(size.x, size.y, size.z);
-                   object.scale.setScalar(2 / maxDim);
-                   
-                   scene.add(object);
-                   loading.style.display = 'none';
-               },
-               function (xhr) {
-                   //While it is loading, log the progress
-                   if (xhr.total > 0) {
-                       const percent = Math.round((xhr.loaded / xhr.total * 100));
-                       loading.textContent = `Loading: ${percent}%`;
-                       console.log(percent + '% loaded');
+           function (gltf) {
+               //If the file is loaded, add it to the scene
+               console.log('Model loaded successfully!');
+               object = gltf.scene;
+               
+               // Optional: Change the material/color
+               object.traverse((child) => {
+                   if (child.isMesh) {
+                       child.material = new THREE.MeshPhongMaterial({ 
+                           color: 0xff6b6b,
+                           shininess: 100
+                       });
                    }
-               },
-               function (error) {
-                   //If there is an error, try next path
-                   console.error('Failed to load from', path, ':', error);
-                   currentPathIndex++;
-                   tryLoadModel();
+               });
+               
+               // Center and scale the model
+               const box = new THREE.Box3().setFromObject(object);
+               const center = box.getCenter(new THREE.Vector3());
+               object.position.sub(center);
+               
+               const size = box.getSize(new THREE.Vector3());
+               const maxDim = Math.max(size.x, size.y, size.z);
+               object.scale.setScalar(2 / maxDim);
+               
+               scene.add(object);
+               loading.style.display = 'none';
+           },
+           function (xhr) {
+               //While it is loading, log the progress
+               if (xhr.total > 0) {
+                   const percent = Math.round((xhr.loaded / xhr.total * 100));
+                   loading.textContent = `Loading: ${percent}%`;
+                   console.log(percent + '% loaded');
                }
-           );
-       }
-       
-       tryLoadModel();
+           },
+           function (error) {
+               //If there is an error, log it
+               loading.innerHTML = '<div style="color:#ff6b6b;">Error loading model. Check console for details.</div>';
+               console.error('Error loading model:', error);
+           }
+       );
        
        //Instantiate a new renderer and set its size
        const renderer = new THREE.WebGLRenderer({ antialias: true });
