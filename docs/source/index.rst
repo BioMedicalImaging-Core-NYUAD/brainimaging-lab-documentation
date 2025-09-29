@@ -222,15 +222,15 @@ Documentation content
                    }
                });
                
-               // Center the model
+               // Center the model at origin (0, 0, 0)
                const box = new THREE.Box3().setFromObject(object);
                const center = box.getCenter(new THREE.Vector3());
                object.position.sub(center);
                
-               // Make it bigger - increased scale factor from 2 to 4
+               // Make it bigger
                const size = box.getSize(new THREE.Vector3());
                const maxDim = Math.max(size.x, size.y, size.z);
-               object.scale.setScalar(4 / maxDim);  // Increased from 2 to 4
+               object.scale.setScalar(4 / maxDim);
                
                scene.add(object);
                loading.style.display = 'none';
@@ -253,18 +253,18 @@ Documentation content
        //Instantiate a new renderer and set its size
        const renderer = new THREE.WebGLRenderer({ 
            antialias: true,
-           alpha: true  // Enable transparency
+           alpha: true
        });
        renderer.setSize(container.clientWidth, container.clientHeight);
        
        //Add the renderer to the DOM
        container.appendChild(renderer.domElement);
        
-       //Position camera to center the model - moved closer
-       camera.position.set(2, 2, 3);  // Moved from (3,3,5) to (2,2,3) - closer to model
-       camera.lookAt(0, 0, 0);  // Ensure camera looks at center
+       //Position camera
+       camera.position.set(2, 2, 3);
+       camera.lookAt(0, 0, 0);
        
-       //Add lights to the scene, so we can actually see the 3D model
+       //Add lights to the scene
        const topLight = new THREE.DirectionalLight(0xffffff, 1);
        topLight.position.set(500, 500, 500);
        topLight.castShadow = true;
@@ -277,12 +277,24 @@ Documentation content
        backLight.position.set(-500, -500, -500);
        scene.add(backLight);
        
-       //This adds controls to the camera, so we can rotate / zoom it with the mouse
+       //Setup orbit controls with restrictions
        controls = new OrbitControls(camera, renderer.domElement);
        controls.enableDamping = true;
        controls.dampingFactor = 0.05;
+       
+       // Lock the target to center - brain stays in middle
+       controls.target.set(0, 0, 0);
+       controls.enablePan = false;  // Disable panning - brain won't move
+       
+       // Enable zoom but limit it
        controls.enableZoom = true;
-       controls.target.set(0, 0, 0);  // Set orbit target to center
+       controls.minDistance = 2;   // Can't zoom in too close
+       controls.maxDistance = 10;  // Can't zoom out too far
+       
+       // Camera rotates 360° around the fixed center point
+       controls.enableRotate = true;
+       
+       controls.update();
        
        //Render the scene
        function animate() {
