@@ -67,6 +67,7 @@ templates_path = ["_templates"]
 epub_show_urls = "footnote"
 
 html_static_path = ['_static']
+html_favicon = "_static/mri.png"
 
 html_css_files = [
     "custom.css",
