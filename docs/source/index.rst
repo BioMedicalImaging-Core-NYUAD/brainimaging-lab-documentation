@@ -156,6 +156,14 @@ Documentation content
 
    8-mri-talks-demos/1-talks-demos
 
+
+.. toctree::
+   :caption: Beyond 2D
+   :maxdepth: 2
+
+   9-3D/Heart
+   9-3D/Spine
+
 .. raw:: html
 
    <div id="container3D" style="width:100%; height:600px; position:relative;">
