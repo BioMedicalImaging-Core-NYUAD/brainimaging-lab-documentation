@@ -155,3 +155,89 @@ Documentation content
    :maxdepth: 2
 
    8-mri-talks-demos/1-talks-demos
+
+.. raw:: html
+
+   <div id="stl-viewer" style="width:100%; height:600px; background:#1a1a2e; border-radius:8px;"></div>
+
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+   <script>
+       // Scene setup
+       const container = document.getElementById('stl-viewer');
+       const scene = new THREE.Scene();
+       scene.background = new THREE.Color(0x1a1a2e);
+
+       const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+       const renderer = new THREE.WebGLRenderer({ antialias: true });
+       renderer.setSize(container.clientWidth, container.clientHeight);
+       container.appendChild(renderer.domElement);
+
+       // Lighting
+       const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+       scene.add(ambientLight);
+       const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+       directionalLight.position.set(1, 1, 1);
+       scene.add(directionalLight);
+
+       // Load STL
+       fetch('_static/new_rh_white.stl')
+           .then(response => response.arrayBuffer())
+           .then(buffer => {
+               const geometry = parseSTLBinary(new DataView(buffer));
+               geometry.computeVertexNormals();
+               geometry.center();
+
+               const material = new THREE.MeshPhongMaterial({ color: 0xff6b6b });
+               const mesh = new THREE.Mesh(geometry, material);
+               scene.add(mesh);
+
+               // Auto-scale
+               const box = new THREE.Box3().setFromObject(mesh);
+               const size = box.getSize(new THREE.Vector3());
+               const maxDim = Math.max(size.x, size.y, size.z);
+               mesh.scale.setScalar(2 / maxDim);
+           })
+           .catch(err => console.error('Error loading STL:', err));
+
+       function parseSTLBinary(view) {
+           const faces = view.getUint32(80, true);
+           const geometry = new THREE.BufferGeometry();
+           const vertices = [];
+
+           for (let i = 0; i < faces; i++) {
+               const offset = 84 + i * 50;
+               for (let j = 0; j < 3; j++) {
+                   const vOffset = offset + 12 + j * 12;
+                   vertices.push(
+                       view.getFloat32(vOffset, true),
+                       view.getFloat32(vOffset + 4, true),
+                       view.getFloat32(vOffset + 8, true)
+                   );
+               }
+           }
+
+           geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+           return geometry;
+       }
+
+       // Camera controls
+       let rotation = { x: 0.3, y: 0 };
+       container.addEventListener('mousemove', (e) => {
+           if (e.buttons === 1) {
+               rotation.y += e.movementX * 0.01;
+               rotation.x += e.movementY * 0.01;
+           }
+       });
+
+       camera.position.set(3, 3, 5);
+
+       function animate() {
+           requestAnimationFrame(animate);
+           camera.position.x = 5 * Math.sin(rotation.y) * Math.cos(rotation.x);
+           camera.position.y = 5 * Math.sin(rotation.x);
+           camera.position.z = 5 * Math.cos(rotation.y) * Math.cos(rotation.x);
+           camera.lookAt(0, 0, 0);
+           renderer.render(scene, camera);
+       }
+       animate();
+   </script>
