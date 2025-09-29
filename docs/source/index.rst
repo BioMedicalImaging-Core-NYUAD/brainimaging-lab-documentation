@@ -163,80 +163,136 @@ Documentation content
    </div>
    
    <script type="module">
-       //Import the THREE.js library
        import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module.js";
-       // To allow for the camera to move around the scene
        import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
-       // To allow for importing the .gltf file
        import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
-       // Import DracoLoader for compressed models
        import { DRACOLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/DRACOLoader.js";
        
-       //Create a Three.JS Scene
        const scene = new THREE.Scene();
-       // Transparent background to match website
        scene.background = null;
-       
-       //Get the container
+
        const container = document.getElementById("container3D");
        const loading = document.getElementById("loading");
-       
-       //create a new camera with positions and angles
+
        const camera = new THREE.PerspectiveCamera(
-           75, 
-           container.clientWidth / container.clientHeight, 
-           0.1, 
-           1000
+           60, // a bit tighter FOV helps fitting
+           container.clientWidth / container.clientHeight,
+           0.01,
+           2000
        );
-       
-       //Keep the 3D object on a global variable so we can access it later
+
        let object;
-       
-       //OrbitControls allow the camera to move around the scene
        let controls;
-       
-       //Instantiate a loader for the .gltf file
+
+       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+       renderer.setPixelRatio(window.devicePixelRatio); // NEW: crisp rendering
+       renderer.setSize(container.clientWidth, container.clientHeight);
+       container.appendChild(renderer.domElement);
+
        const loader = new GLTFLoader();
-       
-       // Setup the DracoLoader for compressed models
        const dracoLoader = new DRACOLoader();
        dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
        dracoLoader.setDecoderConfig({ type: 'js' });
        loader.setDRACOLoader(dracoLoader);
-       
-       //Load the file
+
+       const topLight = new THREE.DirectionalLight(0xffffff, 1);
+       topLight.position.set(500, 500, 500);
+       topLight.castShadow = true;
+       scene.add(topLight);
+
+       const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+       scene.add(ambientLight);
+
+       const backLight = new THREE.DirectionalLight(0xffffff, 0.5);
+       backLight.position.set(-500, -500, -500);
+       scene.add(backLight);
+
+       // Utility: fit camera to an object using its bounding sphere
+       function fitCameraToObject(object, camera, controls, padding = 1.1) { // NEW: helper
+           const box = new THREE.Box3().setFromObject(object);
+           const sphere = box.getBoundingSphere(new THREE.Sphere());
+
+           // If the model has zero size, bail
+           if (!isFinite(sphere.radius) || sphere.radius === 0) return;
+
+           // Center the model at origin so rotation is natural
+           object.position.sub(sphere.center);
+
+           // After moving the object, recompute center/radius
+           const box2 = new THREE.Box3().setFromObject(object);
+           const sphere2 = box2.getBoundingSphere(new THREE.Sphere());
+
+           // Put camera back on a consistent axis and distance
+           const fov = THREE.MathUtils.degToRad(camera.fov);
+           const distance = (sphere2.radius * padding) / Math.sin(fov / 2);
+
+           camera.position.set(0, 0, distance); // look straight on
+           camera.near = Math.max(0.01, distance / 1000);
+           camera.far = distance * 1000;
+           camera.updateProjectionMatrix();
+
+           // Lock the controls target at the true center (origin after reposition)
+           controls.target.set(0, 0, 0);
+           controls.update();
+
+           // Sensible zoom limits relative to model size
+           controls.minDistance = sphere2.radius * 0.8;  // can’t get *inside* the brain
+           controls.maxDistance = sphere2.radius * 10;   // can’t zoom out to oblivion
+
+           // Optional: limit vertical tilt so users don’t flip under the model
+           controls.minPolarAngle = 0.05;
+           controls.maxPolarAngle = Math.PI - 0.05;
+
+           // Store for runtime clamping
+           controls.__minD = controls.minDistance;
+           controls.__maxD = controls.maxDistance;
+       }
+
        loader.load(
            '_static/model.glb',
            function (gltf) {
-               //If the file is loaded, add it to the scene
                console.log('Model loaded successfully!');
                object = gltf.scene;
-               
-               // Optional: Change the material/color
+
                object.traverse((child) => {
                    if (child.isMesh) {
                        child.material = new THREE.MeshPhongMaterial({ 
                            color: 0xff6b6b,
                            shininess: 100
                        });
+                       child.castShadow = true;
+                       child.receiveShadow = true;
                    }
                });
-               
-               // Center the model at origin (0, 0, 0)
+
+               // Scale to a consistent size (approx. 4 units max dim)
                const box = new THREE.Box3().setFromObject(object);
-               const center = box.getCenter(new THREE.Vector3());
-               object.position.sub(center);
-               
-               // Make it bigger
                const size = box.getSize(new THREE.Vector3());
-               const maxDim = Math.max(size.x, size.y, size.z);
+               const maxDim = Math.max(size.x, size.y, size.z) || 1;
                object.scale.setScalar(4 / maxDim);
-               
+
                scene.add(object);
                loading.style.display = 'none';
+
+               // Now that the model exists, initialize controls & fit
+               controls = new OrbitControls(camera, renderer.domElement);
+               controls.enableDamping = true;
+               controls.dampingFactor = 0.05;
+               controls.enablePan = false;       // can’t shift target
+               controls.enableRotate = true;
+               controls.enableZoom = true;
+               controls.rotateSpeed = 0.9;
+               controls.zoomSpeed = 0.8;
+
+               // Keep target pinned forever (safety net)
+               controls.addEventListener('change', () => { // NEW: hard-lock target
+                   controls.target.set(0, 0, 0);
+               });
+
+               // Fit once model is ready
+               fitCameraToObject(object, camera, controls, 1.25);
            },
            function (xhr) {
-               //While it is loading, log the progress
                if (xhr.total > 0) {
                    const percent = Math.round((xhr.loaded / xhr.total * 100));
                    loading.textContent = `Loading: ${percent}%`;
@@ -244,75 +300,42 @@ Documentation content
                }
            },
            function (error) {
-               //If there is an error, log it
                loading.innerHTML = '<div style="color:#ff6b6b;">Error loading model. Check console for details.</div>';
                console.error('Error loading model:', error);
            }
        );
-       
-       //Instantiate a new renderer and set its size
-       const renderer = new THREE.WebGLRenderer({ 
-           antialias: true,
-           alpha: true
-       });
-       renderer.setSize(container.clientWidth, container.clientHeight);
-       
-       //Add the renderer to the DOM
-       container.appendChild(renderer.domElement);
-       
-       //Position camera
-       camera.position.set(2, 2, 3);
-       camera.lookAt(0, 0, 0);
-       
-       //Add lights to the scene
-       const topLight = new THREE.DirectionalLight(0xffffff, 1);
-       topLight.position.set(500, 500, 500);
-       topLight.castShadow = true;
-       scene.add(topLight);
-       
-       const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-       scene.add(ambientLight);
-       
-       const backLight = new THREE.DirectionalLight(0xffffff, 0.5);
-       backLight.position.set(-500, -500, -500);
-       scene.add(backLight);
-       
-       //Setup orbit controls with restrictions
-       controls = new OrbitControls(camera, renderer.domElement);
-       controls.enableDamping = true;
-       controls.dampingFactor = 0.05;
-       
-       // Lock the target to center - brain stays in middle
-       controls.target.set(0, 0, 0);
-       controls.enablePan = false;  // Disable panning - brain won't move
-       
-       // Enable zoom but limit it
-       controls.enableZoom = true;
-       controls.minDistance = 2;   // Can't zoom in too close
-       controls.maxDistance = 10;  // Can't zoom out too far
-       
-       // Camera rotates 360° around the fixed center point
-       controls.enableRotate = true;
-       
-       controls.update();
-       
-       //Render the scene
+
        function animate() {
            requestAnimationFrame(animate);
-           
-           // Update controls
-           if (controls) controls.update();
-           
+
+           // NEW: distance clamp every frame — you’ll never lose the model
+           if (controls) {
+               const dist = camera.position.length();
+               const minD = controls.__minD ?? 0.1;
+               const maxD = controls.__maxD ?? 1000;
+               if (dist < minD) camera.position.setLength(minD);
+               if (dist > maxD) camera.position.setLength(maxD);
+               controls.update();
+           }
+
            renderer.render(scene, camera);
        }
-       
-       //Add a listener to the window, so we can resize the window and the camera
-       window.addEventListener("resize", function () {
-           camera.aspect = container.clientWidth / container.clientHeight;
+
+       // Handle container resizes robustly
+       function onResize() {
+           const w = container.clientWidth;
+           const h = container.clientHeight;
+           camera.aspect = w / h;
            camera.updateProjectionMatrix();
-           renderer.setSize(container.clientWidth, container.clientHeight);
-       });
-       
-       //Start the 3D rendering
+           renderer.setSize(w, h);
+       }
+       window.addEventListener("resize", onResize);
+
+       // Optional: better resize handling when container size (not window) changes
+       // (comment out if not needed on RTD)
+       const ro = new ResizeObserver(onResize); // NEW
+       ro.observe(container);
+
        animate();
    </script>
+
