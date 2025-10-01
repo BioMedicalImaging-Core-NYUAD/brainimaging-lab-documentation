@@ -78,12 +78,103 @@ Lab Address
    Abu Dhabi, Saadiyat Island
 
 
+
+
+*********************
+Documentation content
+*********************
+
 .. toctree::
+    :hidden:
+    :caption: Lab Overview
+    :maxdepth: 2
+
+    1-lab-overview/0-brainimaging-lab-description.rst
+    1-lab-overview/1-brainimaging-policies.rst
+    1-lab-overview/2-brainimaging-processes.rst
+    1-lab-overview/3-brainimaging-publications.rst
+    1-lab-overview/4-brainimaging-collaborations.rst
+    1-lab-overview/5-brainimaging-useful-links.rst
+    1-lab-overview/6-brainimaging-contribution.rst
+
+
+.. toctree::
+    :hidden:
+    :caption: MRI System
+    :maxdepth: 2
+
+    2-mri-scanner-system/1-technology-overview.rst
+    2-mri-scanner-system/2-system-specification.rst
+    2-mri-scanner-system/3-main-applications.rst
+    2-mri-scanner-system/4-experiment-design.rst
+
+
+.. toctree::
+    :caption: EEG-fMRI System
+    :maxdepth: 2
+
+    3-eeg-fmri-system/1-technology-overview.rst
+    3-eeg-fmri-system/2-system-specification.rst
+    3-eeg-fmri-system/3-main-applications.rst
+    3-eeg-fmri-system/4-operational-protocol.rst
+    3-eeg-fmri-system/5-experiment-design.rst
+
+
+.. toctree::
+   :hidden:
+   :caption: MR spectroscopy
+   :maxdepth: 2
+
+   4-spectroscopy/introduction
+   4-spectroscopy/pipeline/1-pipeline_overview
+   4-spectroscopy/pipeline/data_acquisition
+   4-spectroscopy/pipeline/basis_file
+   4-spectroscopy/pipeline/organization
+   4-spectroscopy/pipeline/lcmodel_control
+   4-spectroscopy/pipeline/notes
+   4-spectroscopy/manuals/index.rst
+   4-spectroscopy/manuals/lcmodel_manual.rst
+
+
+.. toctree::
+   :hidden:
+   :caption: Experiments Gallery
+   :maxdepth: 2
+
+   5-mri-experiments-gallery/1-mri-experiments
+
+.. toctree::
+   :hidden:
+   :caption: Data Gallery
+   :maxdepth: 2
+
+   6-mri-data-gallery/1-data-use-cases.rst
+
+.. toctree::
+   :hidden:
+   :caption: Pipeline Gallery
+   :maxdepth: 2
+
+   7-mri-pipeline-gallery/1-mri-pipeline-overview
+   7-mri-pipeline-gallery/2-mri-pipeline-gallery
+
+
+.. toctree::
+   :hidden:
+   :caption: Talks and demos
+   :maxdepth: 2
+
+   8-mri-talks-demos/1-talks-demos
+
+
+.. toctree::
+   :hidden:
    :caption: Beyond 2D
    :maxdepth: 2
 
    9-3D/Heart/Heart.rst
    9-3D/Spine/Spine.rst
+
 
 .. raw:: html
 
