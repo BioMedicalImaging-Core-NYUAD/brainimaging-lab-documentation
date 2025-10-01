@@ -104,8 +104,7 @@ Lab Address
 
     2-mri-scanner-system/1-technology-overview.rst
     2-mri-scanner-system/2-system-specification.rst
-    2-mri-scanner-system/3-main-applications.rst
-    2-mri-scanner-system/4-experiment-design.rst
+
 
 
 .. toctree::
@@ -113,9 +112,8 @@ Lab Address
     :caption: EEG-fMRI System
     :maxdepth: 2
 
-    3-eeg-fmri-system/1-technology-overview.rst
+
     3-eeg-fmri-system/2-system-specification.rst
-    3-eeg-fmri-system/3-main-applications.rst
     3-eeg-fmri-system/4-operational-protocol.rst
     3-eeg-fmri-system/5-experiment-design.rst
 
