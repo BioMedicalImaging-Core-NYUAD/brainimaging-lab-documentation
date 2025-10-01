@@ -80,9 +80,9 @@ Lab Address
 
 
 
-*********************
-Documentation content
-*********************
+.. *********************
+.. Documentation content
+.. *********************
 
 .. toctree::
     :hidden:
@@ -109,6 +109,7 @@ Documentation content
 
 
 .. toctree::
+    :hidden:
     :caption: EEG-fMRI System
     :maxdepth: 2
 
