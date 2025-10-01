@@ -77,11 +77,15 @@ Lab Address
    New York University,
    Abu Dhabi, Saadiyat Island
 
+
+
+
 *********************
 Documentation content
 *********************
 
 .. toctree::
+    :hidden:
     :caption: Lab Overview
     :maxdepth: 2
 
@@ -95,6 +99,7 @@ Documentation content
 
 
 .. toctree::
+    :hidden:
     :caption: MRI System
     :maxdepth: 2
 
@@ -116,6 +121,7 @@ Documentation content
 
 
 .. toctree::
+   :hidden:
    :caption: MR spectroscopy
    :maxdepth: 2
 
@@ -131,18 +137,21 @@ Documentation content
 
 
 .. toctree::
+   :hidden:
    :caption: Experiments Gallery
    :maxdepth: 2
 
    5-mri-experiments-gallery/1-mri-experiments
 
 .. toctree::
+   :hidden:
    :caption: Data Gallery
    :maxdepth: 2
 
    6-mri-data-gallery/1-data-use-cases.rst
 
 .. toctree::
+   :hidden:
    :caption: Pipeline Gallery
    :maxdepth: 2
 
@@ -151,6 +160,7 @@ Documentation content
 
 
 .. toctree::
+   :hidden:
    :caption: Talks and demos
    :maxdepth: 2
 
@@ -158,11 +168,13 @@ Documentation content
 
 
 .. toctree::
+   :hidden:
    :caption: Beyond 2D
    :maxdepth: 2
 
    9-3D/Heart/Heart.rst
    9-3D/Spine/Spine.rst
+
 
 .. raw:: html
 
