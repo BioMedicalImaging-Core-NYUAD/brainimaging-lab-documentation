@@ -94,7 +94,7 @@ Lab Address
     1-lab-overview/2-brainimaging-processes.rst
     1-lab-overview/3-brainimaging-publications.rst
     1-lab-overview/4-brainimaging-collaborations.rst
-    1-lab-overview/5-brainimaging-useful-links.rst
+    .. 1-lab-overview/5-brainimaging-useful-links.rst
     1-lab-overview/6-brainimaging-contribution.rst
 
 
