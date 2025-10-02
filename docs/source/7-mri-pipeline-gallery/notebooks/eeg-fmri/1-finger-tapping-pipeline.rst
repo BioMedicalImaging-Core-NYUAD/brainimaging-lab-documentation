@@ -1,6 +1,8 @@
 Finger tapping pipeline
 =======================
 
+Author: Hadi Zaatiti <hadi.zaatiti@nyu.edu>
+
 .. contents:: Table of Contents
    :depth: 3
    :local:
@@ -22,7 +24,6 @@ Setup your workspace
 - Press New then set the Raw, History and Export to the created folders above
     - your workspace is saved in a .wksp
 - You should now see the datasets as folders in your Primary view
-
 
 
 EEG data triggers

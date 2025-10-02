@@ -57,7 +57,8 @@ The generic pipeline for EEG-fMRI data processing involves the following steps, 
 Preprocessing of the EEG data
 -----------------------------
 
-Preprocessing of the EEG data involves multiple step. We will be using BrainVision Analyzer. Plug the BrainVision dongle onto any windows comptuer you will be using it for the Analysis.
+Preprocessing of the EEG data involves multiple step. We will be using BrainVision Analyzer.
+Plug the BrainVision dongle onto any windows comptuer you will be using it for the Analysis.
 
 - Open BrainVision Analyzer
 
@@ -82,8 +83,6 @@ The EEG data from an EEG/fMRI experiment should have the following trigger signa
        :width: 50%
 
        One TR (repetition time) corresponds to T 1_off - T 1_on.
-
-
 
 
 ECG Removal
@@ -508,6 +507,27 @@ The following explains how to learn a GLM from the fMRIprep output, the provided
            :figclass: align-center
 
            Pinkie finger.
+
+
+    - We can visualise the pial (non-inflated) brain surface instead, find the scripts under rh_visualise_betas_fingers.pial/inflated.sh
+    - Load an ATLAS by going, in freeview, to Annotation, then choose lh.aparc.annot to load the Desikan-Killiany Atlas
+
+
+- The design matrix include TR's that do not correspond to any stimulus mainly:
+- The STOP part of the finger-tap experiment: Remind that the participant was asked to tap a finger and then stop. The design Matrix can be corrected to remove the TR's where the finger was stopped.
+    - from the experiment design the values for an EEG trial are the following:
+        - 1.2 seconds : message duration during which we tell participant to tap a finger
+        - 0.8 seconds: message duration during which we tell participant to stop
+
+- The Inter-Block Random Stimulus time (IBS) Also remind that conducting an EEG-fMRI experiment requires adding a random inter-block stimulus time (IBS), for the finger-tapping we chose:
+    - maximum random waiting time is 2 seconds
+    - the IBS is sampled from 0:2 with a step of 0.2
+    - the values are stored in the MATLAB output of the script in the `interBlockRandomWaitduration`
+    - All blocks should be of same duration, this implies that: if we wait for a 0.4 seconds at the beginning of a block, then we wait for 1.6 seconds before the end of the block, so that the total wait time is always 2 seconds
+
+To remove the non-stimulus TR's we assume that if the non-stimulus duration exceeds 0.5 seconds then the TR is discarded by setting the values of the designMatrix to 0.
+
+
 
 
 
