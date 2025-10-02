@@ -57,7 +57,8 @@ The generic pipeline for EEG-fMRI data processing involves the following steps, 
 Preprocessing of the EEG data
 -----------------------------
 
-Preprocessing of the EEG data involves multiple step. We will be using BrainVision Analyzer. Plug the BrainVision dongle onto any windows comptuer you will be using it for the Analysis.
+Preprocessing of the EEG data involves multiple step. We will be using BrainVision Analyzer.
+Plug the BrainVision dongle onto any windows comptuer you will be using it for the Analysis.
 
 - Open BrainVision Analyzer
 
@@ -82,8 +83,6 @@ The EEG data from an EEG/fMRI experiment should have the following trigger signa
        :width: 50%
 
        One TR (repetition time) corresponds to T 1_off - T 1_on.
-
-
 
 
 ECG Removal
