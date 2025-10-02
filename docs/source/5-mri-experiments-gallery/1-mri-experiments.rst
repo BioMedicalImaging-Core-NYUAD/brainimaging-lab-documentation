@@ -14,7 +14,10 @@ fMRI
 ^^^^
 
 
-NA
+.. nbgallery::
+    :glob:
+
+    experiments/fmri/*
 
 
 EEG-fMRI

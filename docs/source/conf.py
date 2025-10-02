@@ -67,9 +67,11 @@ templates_path = ["_templates"]
 epub_show_urls = "footnote"
 
 html_static_path = ['_static']
+html_favicon = "_static/mri.png"
 
 html_css_files = [
     "custom.css",
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css",
 ]
 
 
@@ -109,3 +111,40 @@ html_logo = "graphic/NYU_Logo.png"
 
 # -- Math options ---------------------------------------------------------
 mathjax_path = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
+
+
+
+
+from docutils import nodes
+from docutils.parsers.rst import roles
+
+# -- tweak these to match your repo/branch docs layout --
+GITHUB_USER   = "BioMedicalImaging-Core-NYUAD"
+GITHUB_REPO   = "brainimaging-lab-documentation"
+GITHUB_BRANCH = "main"
+
+
+
+def github_file_role(role, rawtext, text, lineno, inliner, options=None, content=None):
+    # determine if it's a directory
+    is_dir = text.endswith("/")
+    kind   = "tree" if is_dir else "blob"
+    relpath = text.rstrip("/")    # strip slash for URL parts
+
+    # always build from repo root—no DOCS_DIR at all
+    parts = [GITHUB_USER, GITHUB_REPO, kind, GITHUB_BRANCH] + relpath.split("/")
+    url   = "https://github.com/" + "/".join(parts)
+    display = relpath + ("/" if is_dir else "")
+
+    html = (
+        f'<a class="github-link" href="{url}" target="_blank">'
+        '<i class="fab fa-github"></i> '
+        f'{display}</a>'
+    )
+    return [nodes.raw("", html, format="html")], []
+
+# register the role
+roles.register_local_role("github-file", github_file_role)
+
+
+

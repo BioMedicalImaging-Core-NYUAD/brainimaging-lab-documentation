@@ -1,0 +1,13 @@
+# .github/workflows/meg-workstation-self-runner-test.yml
+name: MEG-Workstation Self-Runner Test
+
+on:
+  workflow_dispatch:  # 💡 Enables the "Run workflow" button in the UI
+
+jobs:
+  run-on-self-hosted:
+    runs-on: self-hosted
+
+    steps:
+      - name: Print Message
+        run: echo "✅ Running on self-hosted by manual trigger"

@@ -6,14 +6,16 @@ After building an initial draft of your experiment code and you wish to start te
 The contribution will be submitted for review through github. If you already have a github account sign in to it, if not create a github account.
 
 - Fork the current repository to your account
-- On the created fork, create a new branch named with the feature you are developping or change you are making
-- Add the directory containing the files of your experiment under the `experiments`.
+- On the created fork, create a new branch named with the feature you are developping or change you are making or the name of your experiment/project
+- Add the directory containing the files of your experiment under the `experiments` directory.
+- Add a README.md file detailing your experiment, project context, block design, research question you are trying to answer, add any relevant references
 - Create a pull request from your branch from your forked repository into the main branch of the source repository (origin)
 - Add any comments you want the reviewer to know of
 - A reviewer will review your code and either approve or ask for changes
 - If changes are needed, make the changes and push your new code to the same branch, your PR (Pull Request) will then get automatically updated
-- Consider adding a page describing your experiment to the `docs\source\5-mri-experiments-galleryh\experiments`
-- Once your branch is merged to the main branch (meaning your experiment is approved), your code will be available in the MEG lab Stimulus computer
+- Consider adding a page describing your experiment to the `docs/source/5-mri-experiments-gallery/experiments`
+- Once your branch is merged to the main branch (meaning your experiment is approved), your code will be available in the MRI lab Stimulus computer
+
 
 Building your processing pipeline
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
