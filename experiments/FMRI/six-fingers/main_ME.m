@@ -7,7 +7,7 @@ function main_ME(meNumberOfBlocks)
     %   meNumberOfBlocks - (optional) number of blocks to run. Default is 5.
 
     if nargin < 1
-        meNumberOfBlocks = 5;
+        meNumberOfBlocks = 3;
     end
 
 
@@ -43,7 +43,7 @@ function main_ME(meNumberOfBlocks)
 
     %   Load parameters
     %--------------------------------------------------------------------------------------------------------------------------------------%
-    loadParameters('MOTOR EXECUTION');
+    loadParameters('EXECUTION');
 
     %   Initialize the subject info
     %--------------------------------------------------------------------------------------------------------------------------------------%
@@ -94,6 +94,10 @@ function main_ME(meNumberOfBlocks)
             [startTime, endTime] = showImageBlockWindow(fixationPath,'rest');
             duration = endTime - startTime;
 
+
+
+
+          
 %             % Append timing
             timingsReport(end+1) = struct( ...
                 'trial', i, ...

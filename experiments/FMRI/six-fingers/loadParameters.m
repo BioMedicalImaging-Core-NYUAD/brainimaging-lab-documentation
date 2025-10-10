@@ -15,7 +15,7 @@ function loadParameters(PHASE)
     
     %   to make screen background darker (close to 0) or lighter (close to 1)
     parameters.greyFactor = 0.6; 
-    
+    parameters.pacingFrequency = 0.5;
  
     parameters.viewDistance = 60;%default
     
@@ -54,8 +54,8 @@ function loadParameters(PHASE)
 
     
     %   set the number of blocks in your experiment
-    parameters.meNumberOfBlocks = 5;
-    parameters.miNumberOfBlocks = 4;
+    parameters.meNumberOfBlocks = 3;
+    parameters.miNumberOfBlocks = 2;
     parameters.meTrials = 5;
 
     parameters.fingerList = {'thumb', 'index', 'middle', 'ring', 'pinky'};
@@ -99,7 +99,7 @@ function loadParameters(PHASE)
     %---------------------------------------------------------------------%
 
     parameters.welcomeMsg = sprintf('Please wait until the experimenter sets up parameters.');
-    parameters.ttlMsg = sprintf('Waiting for trigger. Time to perform %s', PHASE);
+    parameters.ttlMsg = sprintf('Time for %s', PHASE);
     parameters.thankYouMsg = sprintf('Thank you for your participation!!!');
     % % parameters.blockOneMsg = sprintf('Stop');
     % % parameters.blockTwoMsg = sprintf('Move tongue');

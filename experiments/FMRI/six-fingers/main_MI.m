@@ -7,7 +7,7 @@ function main_MI(miNumberOfBlocks)
     %   miNumberOfBlocks - (optional) number of blocks to run. Default is 4.
 
     if nargin < 1
-        miNumberOfBlocks = 4;
+        miNumberOfBlocks = 2;
     end
 
 
@@ -44,7 +44,7 @@ function main_MI(miNumberOfBlocks)
 
     %   Load parameters
     %--------------------------------------------------------------------------------------------------------------------------------------%
-    loadParameters(' MOTOR IMAGERY ');
+    loadParameters(' IMAGERY ');
 
     %   Initialize the subject info
     %--------------------------------------------------------------------------------------------------------------------------------------%

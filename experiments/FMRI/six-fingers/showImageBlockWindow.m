@@ -29,6 +29,9 @@ function [startTime, endTime] = showImageBlockWindow(imagePath, fingerName)
     % Get the start time and calculate the target end time
     
     endTime_c = startTime + parameters.stimulusDuration;
+    % >> First, draw the background image texture on every frame
+    Screen('DrawTexture', screen.win, imageTexture);
+    Screen('Flip', screen.win);
     
     fprintf('Stimulus ON: %s \n', fingerName);
     oldTextSize = Screen('TextSize', screen.win);
@@ -42,30 +45,29 @@ function [startTime, endTime] = showImageBlockWindow(imagePath, fingerName)
             break; 
         end
         
-        % >> First, draw the background image texture on every frame
-        Screen('DrawTexture', screen.win, imageTexture);
+
         
-        % >> PACING CUE LOGIC
-        % >> Determine the color of the cross based on time
-        % >> This creates a pulse at the frequency defined in your parameters
-        pulseInterval = 1 / parameters.pacingFrequency;
-        if mod(GetSecs - startTime, pulseInterval) < (pulseInterval / 2)
-            crossColor = [255 255 255]; % Light grey
-        else
-            crossColor = [80 80 80]; % Dark grey
-        end
-        
-        windowRect = Screen('Rect', screen.win);
-        [xCenter, yCenter] = RectCenter(windowRect);
-        verticalOffset = 50; 
-        xPosition = 'center';
-        yPosition = yCenter + verticalOffset;
-        
-        DrawFormattedText(screen.win, '+', xPosition, yPosition, crossColor);
+        % % >> PACING CUE LOGIC
+        % % >> Determine the color of the cross based on time
+        % % >> This creates a pulse at the frequency defined in your parameters
+        % pulseInterval = 1 / parameters.pacingFrequency;
+        % if mod(GetSecs - startTime, pulseInterval) < (pulseInterval / 2)
+        %     crossColor = [255 255 255]; % Light grey
+        % else
+        %     crossColor = [80 80 80]; % Dark grey
+        % end
+        % 
+        % windowRect = Screen('Rect', screen.win);
+        % [xCenter, yCenter] = RectCenter(windowRect);
+        % verticalOffset = 50; 
+        % xPosition = 'center';
+        % yPosition = yCenter + verticalOffset;
+        % 
+        % DrawFormattedText(screen.win, '+', xPosition, yPosition, crossColor);
         % >> END PACING CUE LOGIC
         
         % >> Flip the screen to show the updated frame (image + cross)
-        Screen('Flip', screen.win);
+        
     end
     Screen('TextSize', screen.win, oldTextSize);
 
