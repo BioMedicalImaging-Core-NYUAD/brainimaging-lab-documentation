@@ -124,10 +124,11 @@ Lab Address
    :maxdepth: 2
 
    4-spectroscopy/introduction
-   4-spectroscopy/pipeline/data_acquisition
-   4-spectroscopy/pipeline/basis_file
-   4-spectroscopy/pipeline/lcmodel_control
-   4-spectroscopy/pipeline/notes
+   4-spectroscopy/pipeline/data_acquisition.rst
+   4-spectroscopy/pipeline/basis_file.rst
+   4-spectroscopy/pipeline/lcmodel_control.rst
+   4-spectroscopy/pipeline/organization.rst
+   4-spectroscopy/pipeline/notes.rst
    4-spectroscopy/manuals/index.rst
    4-spectroscopy/manuals/lcmodel_manual.rst
 
