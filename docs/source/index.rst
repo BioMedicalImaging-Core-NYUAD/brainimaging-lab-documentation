@@ -124,7 +124,6 @@ Lab Address
    :maxdepth: 2
 
    4-spectroscopy/introduction
-   4-spectroscopy/pipeline/1-pipeline_overview
    4-spectroscopy/pipeline/data_acquisition
    4-spectroscopy/pipeline/basis_file
    4-spectroscopy/pipeline/organization
