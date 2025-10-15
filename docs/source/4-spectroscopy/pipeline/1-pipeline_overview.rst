@@ -1,3 +1,6 @@
+:orphan:
+
+
 ######################################
 MR Spectroscopy Pipeline Documentation
 ######################################

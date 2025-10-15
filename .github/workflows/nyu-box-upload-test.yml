@@ -1,0 +1,21 @@
+name: "Box upload smoke-test"
+
+on:
+  workflow_dispatch:          # visible “Run workflow” button
+
+jobs:
+  box-upload-test:
+    runs-on: self-hosted
+
+    steps:
+      # 1) Create a tiny file to upload
+      - name: Create dummy file
+        run: echo "Hello Box – $(date)" > hello_box.txt
+
+      - name: Upload dummy file
+        uses: benjaminejarrell/box-upload-gh-actions@v1.2
+        id: BoxUpload
+        with:
+          box-client-sdk-config: ${{ secrets.BOX_CLIENT_SDK_CONFIG }}
+          box-folder-id: 331134301860
+          file: hello_box.txt

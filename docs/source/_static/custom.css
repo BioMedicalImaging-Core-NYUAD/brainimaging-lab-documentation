@@ -53,3 +53,15 @@ body {
     margin-top: 1em !important;
     margin-bottom: 0.3em !important;
 }
+
+
+
+.github-link {
+  text-decoration: none;
+  color: inherit;
+  font-size: 0.95em;
+}
+.github-link i.fab {
+  margin-right: 0.3em;
+  vertical-align: text-bottom;
+}
