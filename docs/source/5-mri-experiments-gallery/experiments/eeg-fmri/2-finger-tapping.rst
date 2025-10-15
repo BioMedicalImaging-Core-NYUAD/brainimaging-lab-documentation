@@ -88,4 +88,4 @@ Analysis results
 
 A generic pipeline is being built and documented here:
 
-:doc:`7-mri-pipeline-gallery/notebooks/eeg-fmri/0-generic-pipeline.rst`
+:doc:`7-mri-pipeline-gallery/notebooks/eeg-fmri/0-generic-pipeline`
