@@ -50,10 +50,10 @@ MRI lab flowchart
 
 .. mermaid::
    :align: center
-   :caption: "MEG Lab Flowchart"
+   :caption: "MRI Lab Flowchart"
 
    flowchart TB
-       A("User arrives at MEG lab") --> B("Start")
+       A("User arrives at MRI lab") --> B("Start")
        B --> C("Design Experiment")
        C --> D("Present")
        D --> E("Present Research")
