@@ -3,11 +3,6 @@ Data Storage
 ------------
 
 
-MRI
-^^^
-
-NA
-
 
 
 

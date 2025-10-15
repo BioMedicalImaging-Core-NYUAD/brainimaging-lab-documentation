@@ -3,11 +3,6 @@ Pipelines Gallery
 -----------------
 
 
-fMRI pipelines
-^^^^^^^^^^^^^^
-
-NA
-
 EEG-fMRI pipelines
 ^^^^^^^^^^^^^^^^^^
 
