@@ -121,7 +121,6 @@ GITHUB_REPO   = "brainimaging-lab-documentation"
 GITHUB_BRANCH = "main"
 
 
-
 def github_file_role(role, rawtext, text, lineno, inliner, options=None, content=None):
     import re
     from docutils.utils import unescape
