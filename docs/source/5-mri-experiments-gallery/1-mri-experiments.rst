@@ -3,12 +3,6 @@ Example Experiments
 -------------------
 
 
-General demo scripts
-^^^^^^^^^^^^^^^^^^^^
-
-NA
-
-
 
 fMRI
 ^^^^
