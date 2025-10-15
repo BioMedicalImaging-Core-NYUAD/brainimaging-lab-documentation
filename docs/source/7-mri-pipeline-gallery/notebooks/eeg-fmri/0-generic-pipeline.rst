@@ -1,4 +1,4 @@
-
+.. _generic_pipeline:
 
 Generic pipeline for EEG-fMRI processing: Example on fingertapping experiment
 =============================================================================
