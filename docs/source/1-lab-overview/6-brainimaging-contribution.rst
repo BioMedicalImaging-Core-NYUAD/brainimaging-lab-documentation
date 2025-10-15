@@ -62,5 +62,49 @@ If you'd like to contribute to this documentation, please follow the heading-ado
 | Fifth-level         | N/A                    | ``++++++++``   | ``+``      |
 +---------------------+------------------------+----------------+------------+
 
+
+Adding a toctree within a page
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To add a toctree with the content of your page, copy the following code at the beginning of your page contents::
+
+   .. contents::
+      :local:
+      :depth: 2
+
+This will render as:
+
+.. contents::
+   :local:
+   :depth: 2
+
+
+Reference links from within the repository
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Referencing code files and directories on Github repository
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+
+For a directory:
+
+- Syntax: ``:github-file:`experiments/psychtoolbox/general``
+- Rendered: :github-file:`experiments/psychtoolbox/general`
+
+For a file:
+
+- Syntax: ``:github-file:`docs/source/4-meg-experiments-gallery/experiments/psychtoolbox/attention-experiment.rst``
+- Rendered: :github-file:`docs/source/4-meg-experiments-gallery/experiments/psychtoolbox/attention-experiment.rst`
+
+Masking link with text, file:
+
+- Syntax: ``:github-file:`Psychtoolbox Scripts <experiments/psychtoolbox/general>``
+- Rendered: :github-file:`Psychtoolbox Scripts <experiments/psychtoolbox/general>`
+
+Masking link with text, directory:
+
+- Syntax: ``:github-file:`Psychtoolbox Scripts <experiments/psychtoolbox/general>``
+- Rendered: :github-file:`Psychtoolbox Scripts <experiments/psychtoolbox/general>`
+
 Thank you for your contribution!
 

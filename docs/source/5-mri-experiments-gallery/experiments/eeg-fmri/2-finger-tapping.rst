@@ -2,8 +2,10 @@
 EEG-fMRI - Finger-tapping experiment
 ------------------------------------
 
-Context
-^^^^^^^
+Author: Hadi Zaatiti <hadi.zaatiti@nyu.edu>
+
+Description
+^^^^^^^^^^^
 
 In this experiment, the participant will tap each finger in a random order for 20 seconds continuously.
 The participant is asked by a text message to tap and then stop.
@@ -11,11 +13,9 @@ As an EEG-fMRI experiment, it is important that the action is not repeated conti
 If we are doing frequency analysis of the EEG data, then it is possible to repeat continuously the action throughout the block duration.
 This is repeated 3 times per finger, so a total of 15 blocks.
 
-Code
-^^^^
+
 
 The experiment is coded in PsychToolBox.
-The experiment folder found in the `experiments` folder on the github repository, contains:
 
 - `main.m` main file to run for experiment
 - `loadParameters.m` defines the parameters for the experiment
@@ -41,7 +41,51 @@ The experiment folder found in the `experiments` folder on the github repository
 
     Finger tapping experiment diagram
 
+
+Code access
+^^^^^^^^^^^
+
+Full directory
+""""""""""""""
+
+:github-file:`experiments/EEG-FMRI/finger-tapping`
+
+
+Snapshot of main file to run
+""""""""""""""""""""""""""""
+
 .. dropdown:: Finger Tapping task code
 
     .. literalinclude:: ../../../../../experiments/EEG-FMRI/finger-tapping/main.m
       :language: matlab
+
+
+
+Data access
+^^^^^^^^^^^
+
+EEG
+"""
+
+Acquired datasets are stored safely on NYU Box under `resting-state`.
+
+`MEG Data Directory <https://nyu.box.com/v/eeg-fmri-data>`_
+
+
+fMRI data
+"""""""""
+
+fMRI data is hosted on XNAT
+
+.. admonition:: Link to MRI data (Access given after requesting and upon eligibility)
+
+    `https://xnat.abudhabi.nyu.edu/#/login <https://xnat.abudhabi.nyu.edu/#/login>`_
+    Contact the xnat administrator `admin.nyuad.xnat@nyu.edu`
+
+
+Analysis results
+^^^^^^^^^^^^^^^^
+
+A generic pipeline is being built and documented here:
+
+:ref:`generic_pipeline`

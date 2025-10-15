@@ -114,7 +114,6 @@ mathjax_path = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
 
 
 
-
 from docutils import nodes
 from docutils.parsers.rst import roles
 
@@ -148,3 +147,46 @@ roles.register_local_role("github-file", github_file_role)
 
 
 
+
+
+
+
+from docutils import nodes
+from docutils.parsers.rst import roles
+
+# -- tweak these to match your repo/branch docs layout --
+GITHUB_USER   = "BioMedicalImaging-Core-NYUAD"
+GITHUB_REPO   = "brainimaging-lab-documentation"
+GITHUB_BRANCH = "main"
+
+
+def github_file_role(role, rawtext, text, lineno, inliner, options=None, content=None):
+    import re
+    from docutils.utils import unescape
+
+    options = options or {}
+
+    # Check for custom link text using the format: Custom Text <path/to/file>
+    match = re.match(r'(.+?)\s*<(.+)>', text)
+    if match:
+        display_text = match.group(1).strip()
+        relpath = match.group(2).strip()
+    else:
+        relpath = text.strip()
+        display_text = relpath
+
+    is_dir = relpath.endswith("/")
+    kind = "tree" if is_dir else "blob"
+    relpath_clean = relpath.rstrip("/")  # remove trailing slash for URL
+
+    url = f"https://github.com/{GITHUB_USER}/{GITHUB_REPO}/{kind}/{GITHUB_BRANCH}/{relpath_clean}"
+
+    html = (
+        f'<a class="github-link" href="{url}" target="_blank">'
+        f'<i class="fab fa-github"></i> {unescape(display_text)}</a>'
+    )
+    return [nodes.raw("", html, format="html")], []
+
+
+# register the role
+roles.register_local_role("github-file", github_file_role)
