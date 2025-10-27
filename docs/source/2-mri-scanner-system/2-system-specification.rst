@@ -68,6 +68,20 @@ Available coils
       Integrated into the patient table, works with Head and Neck Matrix coils.
 
 
+
+Stimulus Computer
+*****************
+
+Psychtoolbox
+^^^^^^^^^^^^
+
+Psychtoolbox is installed under:
+- Version: 3.0.22 `Documents/Psychtoolbox`
+
+
+
+
+
 Vpixx System
 ************
 
@@ -123,3 +137,12 @@ By default, the eyetracker .mex file within Psychtoolbox wouldn't work on the st
 
 - Download the Eyetracker API developper kit from the SR Research website after creating an account there
 - Open MATLAB and attempt `EyelinkInit` command, the eyetracker should be working
+
+Installation path on Stimulus computer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- The Eyelink Development kit is installed on the stimulus computer in the following path:
+    - `Macintosh HD -> Eyelink`
+    - `Macintosh HD -> Library -> Frameworks -> eyelink*`
+
+
