@@ -1,8 +1,9 @@
-function [VP pa] = setup_param(VP)
+function [VP pa] = setup_param(VP, debugConfig)
 % SETUP_PARAM - Set up single dot button-pressing experiment parameters
 %
 % Input:
 %   VP - Viewing Parameters structure from setup_display
+%   debugConfig - Debug configuration structure
 %
 % Output:
 %   VP - Updated Viewing Parameters structure
@@ -14,7 +15,7 @@ function [VP pa] = setup_param(VP)
 pa.totalDuration = 60.0;       % Total experiment duration in seconds (1 minute)
 pa.stimulusDuration = 1.0;     % seconds - dot presentation
 pa.responseWindow = 2.0;       % seconds - max response time
-pa.feedbackDuration = 2.0;     % seconds - feedback display
+pa.feedbackDuration = 0.5;     % seconds - feedback display (fixation turns green)
 pa.itiDuration = 1.0;          % seconds - inter-trial interval
 pa.trialCycleDuration = pa.stimulusDuration + pa.responseWindow + pa.feedbackDuration + pa.itiDuration; % Total cycle time
 
@@ -107,9 +108,10 @@ pa.experimentName = 'Single Dot Button Pressing Experiment';
 pa.dataFileName = 'single_dot_data.mat';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SCANNER TRIGGER PARAMETERS
+% DEBUG AND TRIGGER PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-pa.debugMode = true;           % true = manual trigger (5 or t), false = scanner trigger
-pa.useScannerTrigger = ~pa.debugMode; % Automatically set based on debug mode
+pa.debugMode = debugConfig.enabled;           % Use debug configuration from main
+pa.useVPixx = debugConfig.useVPixx;          % Use VPixx hardware or keyboard
+pa.useScannerTrigger = ~debugConfig.manualTrigger; % Scanner vs manual trigger
 
 end

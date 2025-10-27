@@ -8,8 +8,8 @@ function main()
 % Trial structure:
 % 1. Fixation cross + 5 colored dots (1 second)
 % 2. Target dot stays, others disappear (1 second) 
-% 3. All dots reappear, participant responds (2 seconds max)
-% 4. Feedback (dot disappears 200ms, fixation turns green if correct)
+% 3. All dots disappear, participant responds (2 seconds)
+% 4. Feedback (fixation turns green if correct)
 % 5. Blank screen (1 second)
 % 6. Next trial
 
@@ -17,13 +17,25 @@ function main()
 clear all; close all; sca;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DEBUG CONFIGURATION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Centralized debug settings - modify these to control experiment behavior
+debugConfig = struct();
+debugConfig.enabled = 1;              % 1 = debug mode, 0 = production mode
+debugConfig.useVPixx = 1;             % 1 = use VPixx hardware, 0 = use keyboard
+debugConfig.fullscreen = 1;            % 1 = fullscreen, 0 = windowed mode
+debugConfig.skipSyncTests = 1;         % 1 = skip sync tests, 0 = run sync tests
+debugConfig.displayMode = 1;          % 1 = NYUAD lab, 2 = laptop/development
+debugConfig.manualTrigger = 1;        % 1 = manual trigger (5 or t), 0 = scanner trigger
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SETUP DISPLAY AND EXPERIMENT PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Setup display (skipSync=1, Display=2 for laptop, debugTrigger=0)
-VP = setup_display(1, 2, 0);
+% Setup display with debug configuration
+VP = setup_display(debugConfig);
 
 % Setup experiment parameters
-[VP, pa] = setup_param(VP);
+[VP, pa] = setup_param(VP, debugConfig);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % START EXPERIMENT
@@ -33,7 +45,7 @@ try
     fprintf('\n=== %s ===\n', pa.experimentName);
 
     % Wait for scanner trigger or manual trigger
-    wait_trigger(pa.debugMode);
+    wait_trigger(debugConfig.manualTrigger);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % MAIN EXPERIMENT LOOP
@@ -52,7 +64,7 @@ try
             pa.stimulusDuration, pa.responseWindow, pa.feedbackDuration, pa.itiDuration, pa.trialCycleDuration);
 
     % Display input method
-    if pa.debugMode
+    if debugConfig.enabled
         fprintf('\nDEBUG MODE - Keyboard Controls:\n');
         fprintf('  Press 1 = White\n');
         fprintf('  Press 2 = Red\n');
@@ -139,16 +151,15 @@ while GetSecs < experimentEndTime
         currentTime = GetSecs;
         currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
         
-        % Draw stimulus with moving fixation
-        drawSingleDotStimulus(VP.window, pa.dotCenter, pa.colorRGB(targetIdx,:), pa.dotRadiusPix, ...
-                             VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
-                             pa.fixationSize, pa.fixationThickness, pa.fixColor, VP.backGroundColor);
+        % Draw only fixation during response phase (no dots)
+        drawFixationOnly(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
+                        pa.fixationSize, pa.fixationThickness, pa.fixColor, VP.backGroundColor);
         Screen('Flip', VP.window);
 
         % Check for button press using KbQueue
-        [pressed, firstPress] = KbQueueCheck();
+        [pressed, ~] = KbQueueCheck();
         if pressed
-            if pa.debugMode
+            if debugConfig.enabled
                 % DEBUG MODE: Check keyboard keys 1-5 for colors
                 % 1=white, 2=red, 3=yellow, 4=green, 5=blue
                 [~, ~, keyCode] = KbCheck(-1);
@@ -225,10 +236,9 @@ while GetSecs < experimentEndTime
             fixColor = pa.fixColorIncorrect; % No response = incorrect
         end
         
-        % Draw stimulus with colored fixation
-        drawSingleDotStimulus(VP.window, pa.dotCenter, pa.colorRGB(targetIdx,:), pa.dotRadiusPix, ...
-                             VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
-                             pa.fixationSize, pa.fixationThickness, fixColor, VP.backGroundColor);
+        % Draw only fixation during feedback phase (no dots, colored fixation)
+        drawFixationOnly(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
+                        pa.fixationSize, pa.fixationThickness, fixColor, VP.backGroundColor);
         Screen('Flip', VP.window);
         
         % Small delay
@@ -326,21 +336,67 @@ fprintf('Data saved to %s\n', pa.dataFileName);
 end
 
 % Helper function to draw single dot with moving fixation
+function drawFixationOnly(window, screenCenter, fixationRadiusPix, fixationAngle, fixSize, fixThickness, fixColor, backGroundColor)
+% DRAW_FIXATION_ONLY - Draw only the moving fixation cross without any dots
+%
+% Inputs:
+%   window - Psychtoolbox window pointer
+%   screenCenter - [x, y] center of screen
+%   fixationRadiusPix - radius of fixation movement in pixels
+%   fixationAngle - current angle of fixation in radians
+%   fixSize - size of fixation cross
+%   fixThickness - thickness of fixation lines
+%   fixColor - color of fixation cross [R, G, B]
+%   backGroundColor - background color
+
+% Clear screen
+Screen('FillRect', window, backGroundColor);
+
+% Calculate fixation position
+fixationX = screenCenter(1) + fixationRadiusPix * cos(fixationAngle);
+fixationY = screenCenter(2) + fixationRadiusPix * sin(fixationAngle);
+
+% Draw fixation cross
+Screen('DrawLine', window, fixColor, ...
+       fixationX - fixSize/2, fixationY, fixationX + fixSize/2, fixationY, fixThickness);
+Screen('DrawLine', window, fixColor, ...
+       fixationX, fixationY - fixSize/2, fixationX, fixationY + fixSize/2, fixThickness);
+end
+
+% Helper function to draw single dot with moving fixation
 function drawSingleDotStimulus(window, dotCenter, dotColor, dotRadiusPix, screenCenter, fixationRadiusPix, fixationAngle, fixSize, fixThickness, fixColor, backGroundColor)
-    % Clear screen with background color
-    Screen('FillRect', window, backGroundColor);
-    
-    % Draw single dot at center
-    Screen('FillOval', window, dotColor, ...
-           [dotCenter(1)-dotRadiusPix, dotCenter(2)-dotRadiusPix, ...
-            dotCenter(1)+dotRadiusPix, dotCenter(2)+dotRadiusPix]);
-    
-    % Calculate fixation position on circular path
-    fixationX = screenCenter(1) + fixationRadiusPix * cos(fixationAngle);
-    fixationY = screenCenter(2) + fixationRadiusPix * sin(fixationAngle);
-    
-    % Draw fixation cross at calculated position
-    drawFixation(window, fixationX, fixationY, fixSize, fixThickness, fixColor);
+% DRAW_SINGLE_DOT_STIMULUS - Draw single dot with moving fixation cross
+%
+% Inputs:
+%   window - Psychtoolbox window pointer
+%   dotCenter - [x, y] center of dot
+%   dotColor - color of dot [R, G, B]
+%   dotRadiusPix - radius of dot in pixels
+%   screenCenter - [x, y] center of screen
+%   fixationRadiusPix - radius of fixation movement in pixels
+%   fixationAngle - current angle of fixation in radians
+%   fixSize - size of fixation cross
+%   fixThickness - thickness of fixation lines
+%   fixColor - color of fixation cross [R, G, B]
+%   backGroundColor - background color
+
+% Clear screen with background color
+Screen('FillRect', window, backGroundColor);
+
+% Draw single dot at center
+Screen('FillOval', window, dotColor, ...
+       [dotCenter(1)-dotRadiusPix, dotCenter(2)-dotRadiusPix, ...
+        dotCenter(1)+dotRadiusPix, dotCenter(2)+dotRadiusPix]);
+
+% Calculate fixation position on circular path
+fixationX = screenCenter(1) + fixationRadiusPix * cos(fixationAngle);
+fixationY = screenCenter(2) + fixationRadiusPix * sin(fixationAngle);
+
+% Draw fixation cross at calculated position
+Screen('DrawLine', window, fixColor, ...
+       fixationX - fixSize/2, fixationY, fixationX + fixSize/2, fixationY, fixThickness);
+Screen('DrawLine', window, fixColor, ...
+       fixationX, fixationY - fixSize/2, fixationX, fixationY + fixSize/2, fixThickness);
 end
 
 
