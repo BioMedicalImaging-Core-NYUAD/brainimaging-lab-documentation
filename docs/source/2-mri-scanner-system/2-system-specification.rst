@@ -91,7 +91,11 @@ The system includes:
 Eyelink Eyetracker system
 *************************
 
-We have an SR Research Eyetracker system
+We have an SR Research Eyetracker system.
+
+
+Network settings for Eyetracker system
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+-------------------+
 | **Eyelink**      | **Connected**     |
