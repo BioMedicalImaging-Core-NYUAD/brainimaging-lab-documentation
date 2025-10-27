@@ -394,7 +394,7 @@ else
 end
 
 
-
+end
 %% Use the ROI as filter for betas
 
 % The ROI_voxels_mask is a list of the voxels number that belongs to the ROI
