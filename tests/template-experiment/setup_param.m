@@ -9,15 +9,47 @@ function [VP pa] = setup_param(VP, debugConfig)
 %   VP - Updated Viewing Parameters structure
 %   pa - Parameters structure with all experiment settings
 
+% Input validation
+if ~isstruct(VP)
+    error('setup_param:invalidInput', 'VP must be a structure');
+end
+
+requiredVPFields = {'window', 'windowCenter', 'pixelsPerDegree'};
+for i = 1:length(requiredVPFields)
+    if ~isfield(VP, requiredVPFields{i})
+        error('setup_param:missingField', 'VP missing required field: %s', requiredVPFields{i});
+    end
+end
+
+if ~isstruct(debugConfig)
+    error('setup_param:invalidInput', 'debugConfig must be a structure');
+end
+
+requiredDebugFields = {'enabled', 'useVPixx', 'manualTrigger'};
+for i = 1:length(requiredDebugFields)
+    if ~isfield(debugConfig, requiredDebugFields{i})
+        error('setup_param:missingField', 'debugConfig missing required field: %s', requiredDebugFields{i});
+    end
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % EXPERIMENT TIMING PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-pa.totalDuration = 60.0;       % Total experiment duration in seconds (1 minute)
+% Trial phase durations
 pa.stimulusDuration = 1.0;     % seconds - dot presentation
 pa.responseWindow = 2.0;       % seconds - max response time
 pa.feedbackDuration = 0.5;     % seconds - feedback display (fixation turns green)
-pa.itiDuration = 1.0;          % seconds - inter-trial interval
+pa.itiDuration = 0.5;          % seconds - inter-trial interval
 pa.trialCycleDuration = pa.stimulusDuration + pa.responseWindow + pa.feedbackDuration + pa.itiDuration; % Total cycle time
+
+% Number of trials (5 colors × 2 repeats)
+pa.nTrials = 10;
+
+% End screen duration
+pa.endScreenDuration = 5.0;    % seconds - final fixation display
+
+% Calculate total experiment duration based on planned trials
+pa.totalDuration = (pa.nTrials * pa.trialCycleDuration) + pa.endScreenDuration;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % STIMULUS PARAMETERS
@@ -34,12 +66,17 @@ pa.dotCenter = VP.windowCenter; % Center of screen
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % MOVING FIXATION PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Circular path parameters (1.5 degrees radius)
-pa.fixationRadiusDeg = 1.5;    % degrees
+% Circular path parameters
+pa.fixationRadiusDeg = 1.5;    % degrees - radius of circular fixation path
 pa.fixationRadiusPix = pa.fixationRadiusDeg * VP.pixelsPerDegree; % pixels
-pa.fixationSpeed = 2*pi / 36;  % radians per second (36 seconds per full circle)
-pa.fixationSize = 20;          % pixels
-pa.fixationThickness = 3;      % pixels
+
+% Fixation rotation parameters
+pa.fixationRotationPeriod = 36; % seconds - time for one full circle
+pa.fixationSpeed = 2*pi / pa.fixationRotationPeriod; % radians per second
+
+% Fixation cross appearance
+pa.fixationSize = 20;          % pixels - size of fixation cross
+pa.fixationThickness = 3;      % pixels - line thickness
 
 % Fixation colors
 pa.fixColor = [1 1 1];         % White fixation
@@ -61,44 +98,56 @@ pa.buttonSelection.right_box = pa.rightBoxColors;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TRIAL STRUCTURE PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Calculate approximate number of trials based on total duration
-pa.estimatedTrials = floor(pa.totalDuration / pa.trialCycleDuration);
-fprintf('Estimated trials for %.1f seconds: %d\n', pa.totalDuration, pa.estimatedTrials);
-
 % Create randomized color sequence: 2 repeats of each color (10 trials total)
-pa.nTrials = 10; % 5 colors × 2 repeats = 10 trials
 pa.colorSequence = repmat(pa.colors, 1, 2); % [white, red, yellow, green, blue, white, red, yellow, green, blue]
 pa.colorSequence = pa.colorSequence(randperm(pa.nTrials)); % Randomize order
 
+fprintf('=== Experiment Timing ===\n');
+fprintf('Trials planned: %d\n', pa.nTrials);
+fprintf('Trial cycle duration: %.1fs (%.1fs stim + %.1fs response + %.1fs feedback + %.1fs ITI)\n', ...
+        pa.trialCycleDuration, pa.stimulusDuration, pa.responseWindow, pa.feedbackDuration, pa.itiDuration);
+fprintf('End screen duration: %.1fs\n', pa.endScreenDuration);
+fprintf('Total experiment duration: %.1fs\n', pa.totalDuration);
 fprintf('Color sequence: %s\n', strjoin(pa.colorSequence, ', '));
-fprintf('Total trials planned: %d\n', pa.nTrials);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DATA COLLECTION PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Initialize data storage structure (dynamic sizing)
+% Pre-allocate data storage arrays for performance
+% Allocate 50% extra space in case trials complete faster than expected
+pa.maxTrials = ceil(pa.nTrials * 1.5);
+
 pa.data = struct();
-pa.data.trialNumber = [];
-pa.data.targetColor = {};
-pa.data.response = {};
-pa.data.correct = [];
-pa.data.reactionTime = [];
-pa.data.trialStartTime = [];
-pa.data.cumulativeTime = [];
-pa.data.fixationAngle = [];
+pa.data.trialNumber = zeros(1, pa.maxTrials);
+pa.data.targetColor = cell(1, pa.maxTrials);
+pa.data.response = cell(1, pa.maxTrials);
+pa.data.correct = zeros(1, pa.maxTrials);
+pa.data.reactionTime = nan(1, pa.maxTrials);
+pa.data.trialStartTime = zeros(1, pa.maxTrials);
+pa.data.cumulativeTime = zeros(1, pa.maxTrials);
+pa.data.fixationAngle = zeros(1, pa.maxTrials);
 pa.trialCounter = 0; % Track actual number of trials completed
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % VPIXX INITIALIZATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Initialize VPixx for button detection
-try
-    Datapixx('Open');
-    Datapixx('DisablePixelMode');
-    Datapixx('RegWr');
-    fprintf('VPixx initialized successfully\n');
-catch
-    error('Failed to initialize VPixx. Make sure it is connected.');
+% Initialize VPixx for button detection if not already initialized
+if debugConfig.useVPixx
+    if ~Datapixx('IsReady')
+        try
+            Datapixx('Open');
+            Datapixx('DisablePixelMode');
+            Datapixx('RegWr');
+            fprintf('VPixx initialized successfully for button detection\n');
+        catch ME
+            warning('Failed to initialize VPixx: %s', ME.message);
+            fprintf('Falling back to keyboard input\n');
+        end
+    else
+        fprintf('VPixx already initialized\n');
+    end
+else
+    fprintf('Using keyboard input (VPixx disabled in debug config)\n');
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

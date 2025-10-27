@@ -13,8 +13,7 @@ function loadParameters()
     parameters.hideCursor = true;
     
     %   to set the demo mode with half-transparent screen
-    parameters.isDemoMode = true;
-    parameters.useVpixx = false;
+    parameters.isDemoMode = false;
     
     %   screen transparency in demo mode
     parameters.transparency = 0.8;

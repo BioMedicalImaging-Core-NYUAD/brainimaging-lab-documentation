@@ -16,6 +16,9 @@ function main()
 % Clear workspace and close any open windows
 clear all; close all; sca;
 
+% Add general experiments folder to path for utility functions
+addpath('/Users/pw1246/Documents/GitHub/brainimaging-lab-documentation/experiments/general/vpixx-utilities');
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEBUG CONFIGURATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -59,9 +62,6 @@ try
 
     % Main time-based loop
     experimentEndTime = experimentStartTime + pa.totalDuration;
-    fprintf('Experiment will run for %.1f seconds\n', pa.totalDuration);
-    fprintf('Each cycle: %.1fs stimulus + %.1fs response + %.1fs feedback + %.1fs ITI = %.1fs total\n', ...
-            pa.stimulusDuration, pa.responseWindow, pa.feedbackDuration, pa.itiDuration, pa.trialCycleDuration);
 
     % Display input method
     if debugConfig.enabled
@@ -103,12 +103,12 @@ while GetSecs < experimentEndTime
         targetColor = pa.colors{colorIdx};
     end
     
-    % Store trial data
-    pa.data.trialNumber(end+1) = pa.trialCounter;
-    pa.data.targetColor{end+1} = targetColor;
-    pa.data.trialStartTime(end+1) = trialStartTime - experimentStartTime;
-    pa.data.cumulativeTime(end+1) = trialStartTime - experimentStartTime;
-    pa.data.fixationAngle(end+1) = currentFixationAngle;
+    % Store trial data (use direct indexing with pre-allocated arrays)
+    pa.data.trialNumber(pa.trialCounter) = pa.trialCounter;
+    pa.data.targetColor{pa.trialCounter} = targetColor;
+    pa.data.trialStartTime(pa.trialCounter) = trialStartTime - experimentStartTime;
+    pa.data.cumulativeTime(pa.trialCounter) = trialStartTime - experimentStartTime;
+    pa.data.fixationAngle(pa.trialCounter) = currentFixationAngle;
     
     fprintf('Trial %d: Target = %s (%.1fs remaining)\n', pa.trialCounter, targetColor, remainingTime);
     
@@ -116,20 +116,20 @@ while GetSecs < experimentEndTime
     targetIdx = find(strcmp(targetColor, pa.colors));
     stimulusStartTime = GetSecs;
     stimulusEndTime = stimulusStartTime + pa.stimulusDuration;
-    
+    vbl = stimulusStartTime;
+
     while GetSecs < stimulusEndTime && GetSecs < experimentEndTime
         % Update fixation position continuously
         currentTime = GetSecs;
         currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
-        
+
         % Draw stimulus with current fixation position
         drawSingleDotStimulus(VP.window, pa.dotCenter, pa.colorRGB(targetIdx,:), pa.dotRadiusPix, ...
                              VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
                              pa.fixationSize, pa.fixationThickness, pa.fixColor, VP.backGroundColor);
-        Screen('Flip', VP.window);
-        
-        % Small delay for smooth fixation movement
-        WaitSecs(0.016); % ~60 FPS
+
+        % Use optimized flip timing for smooth animation
+        vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
     end
     
     % Check if experiment should end
@@ -142,6 +142,7 @@ while GetSecs < experimentEndTime
     responseReceived = false;
     responseTime = NaN;
     responseButton = '';
+    vbl = responseStartTime;
 
     % Flush KbQueue to ignore any previous button presses
     KbQueueFlush();
@@ -150,38 +151,43 @@ while GetSecs < experimentEndTime
         % Update fixation position
         currentTime = GetSecs;
         currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
-        
+
         % Draw only fixation during response phase (no dots)
         drawFixationOnly(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
                         pa.fixationSize, pa.fixationThickness, pa.fixColor, VP.backGroundColor);
-        Screen('Flip', VP.window);
+
+        % Use optimized flip timing for smooth animation
+        vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
 
         % Check for button press using KbQueue
-        [pressed, ~] = KbQueueCheck();
+        [pressed, firstPress] = KbQueueCheck();
         if pressed
             if debugConfig.enabled
-                % DEBUG MODE: Check keyboard keys 1-5 for colors
+                % DEBUG MODE: Check keyboard keys 1-5 for colors using KbQueue
                 % 1=white, 2=red, 3=yellow, 4=green, 5=blue
-                [~, ~, keyCode] = KbCheck(-1);
-                if keyCode(KbName('1!'))
+                if firstPress(KbName('1!'))
                     responseButton = 'white';
                     responseReceived = true;
-                elseif keyCode(KbName('2@'))
+                    responseTime = firstPress(KbName('1!')) - responseStartTime;
+                elseif firstPress(KbName('2@'))
                     responseButton = 'red';
                     responseReceived = true;
-                elseif keyCode(KbName('3#'))
+                    responseTime = firstPress(KbName('2@')) - responseStartTime;
+                elseif firstPress(KbName('3#'))
                     responseButton = 'yellow';
                     responseReceived = true;
-                elseif keyCode(KbName('4$'))
+                    responseTime = firstPress(KbName('3#')) - responseStartTime;
+                elseif firstPress(KbName('4$'))
                     responseButton = 'green';
                     responseReceived = true;
-                elseif keyCode(KbName('5%'))
+                    responseTime = firstPress(KbName('4$')) - responseStartTime;
+                elseif firstPress(KbName('5%'))
                     responseButton = 'blue';
                     responseReceived = true;
+                    responseTime = firstPress(KbName('5%')) - responseStartTime;
                 end
 
                 if responseReceived
-                    responseTime = GetSecs - responseStartTime;
                     break;
                 end
             else
@@ -195,20 +201,17 @@ while GetSecs < experimentEndTime
                 end
             end
         end
-        
-        % Small delay for smooth animation
-        WaitSecs(0.016);
     end
 
-    % Record response data
+    % Record response data (use direct indexing with pre-allocated arrays)
     if responseReceived
-        pa.data.response{end+1} = responseButton;
-        pa.data.reactionTime(end+1) = responseTime;
-        pa.data.correct(end+1) = strcmp(responseButton, targetColor);
+        pa.data.response{pa.trialCounter} = responseButton;
+        pa.data.reactionTime(pa.trialCounter) = responseTime;
+        pa.data.correct(pa.trialCounter) = strcmp(responseButton, targetColor);
     else
-        pa.data.response{end+1} = 'no_response';
-        pa.data.reactionTime(end+1) = NaN;
-        pa.data.correct(end+1) = 0;
+        pa.data.response{pa.trialCounter} = 'no_response';
+        pa.data.reactionTime(pa.trialCounter) = NaN;
+        pa.data.correct(pa.trialCounter) = 0;
     end
     
     % Check if experiment should end
@@ -216,15 +219,16 @@ while GetSecs < experimentEndTime
         break;
     end
     
-    % Phase 3: Feedback (2 seconds)
+    % Phase 3: Feedback
     feedbackStartTime = GetSecs;
     feedbackEndTime = feedbackStartTime + pa.feedbackDuration;
-    
+    vbl = feedbackStartTime;
+
     while GetSecs < feedbackEndTime && GetSecs < experimentEndTime
         % Update fixation position
         currentTime = GetSecs;
         currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
-        
+
         % Choose fixation color based on correctness
         if responseReceived
             if pa.data.correct(end)
@@ -235,14 +239,13 @@ while GetSecs < experimentEndTime
         else
             fixColor = pa.fixColorIncorrect; % No response = incorrect
         end
-        
+
         % Draw only fixation during feedback phase (no dots, colored fixation)
         drawFixationOnly(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
                         pa.fixationSize, pa.fixationThickness, fixColor, VP.backGroundColor);
-        Screen('Flip', VP.window);
-        
-        % Small delay
-        WaitSecs(0.016);
+
+        % Use optimized flip timing for smooth animation
+        vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
     end
     
     % Check if experiment should end
@@ -250,24 +253,24 @@ while GetSecs < experimentEndTime
         break;
     end
     
-    % Phase 4: Inter-trial interval (1 second)
+    % Phase 4: Inter-trial interval
     itiStartTime = GetSecs;
     itiEndTime = itiStartTime + pa.itiDuration;
-    
+    vbl = itiStartTime;
+
     while GetSecs < itiEndTime && GetSecs < experimentEndTime
         % Update fixation position
         currentTime = GetSecs;
         currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
-        
+
         % Draw only moving fixation (no dot)
         fixationX = VP.windowCenter(1) + pa.fixationRadiusPix * cos(currentFixationAngle);
         fixationY = VP.windowCenter(2) + pa.fixationRadiusPix * sin(currentFixationAngle);
         Screen('FillRect', VP.window, VP.backGroundColor);
         drawFixation(VP.window, fixationX, fixationY, pa.fixationSize, pa.fixationThickness, pa.fixColor);
-        Screen('Flip', VP.window);
-        
-        % Small delay
-        WaitSecs(0.016);
+
+        % Use optimized flip timing for smooth animation
+        vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
     end
     
     % Print trial result
@@ -282,32 +285,68 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % END EXPERIMENT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % End screen - static fixation for 5 seconds
+    % Trim pre-allocated arrays to actual number of trials completed
+    nCompleted = pa.trialCounter;
+    pa.data.trialNumber = pa.data.trialNumber(1:nCompleted);
+    pa.data.targetColor = pa.data.targetColor(1:nCompleted);
+    pa.data.response = pa.data.response(1:nCompleted);
+    pa.data.correct = pa.data.correct(1:nCompleted);
+    pa.data.reactionTime = pa.data.reactionTime(1:nCompleted);
+    pa.data.trialStartTime = pa.data.trialStartTime(1:nCompleted);
+    pa.data.cumulativeTime = pa.data.cumulativeTime(1:nCompleted);
+    pa.data.fixationAngle = pa.data.fixationAngle(1:nCompleted);
+
+    % End screen - static fixation
     Screen('FillRect', VP.window, VP.backGroundColor);
     drawFixation(VP.window, VP.windowCenter(1), VP.windowCenter(2), pa.fixationSize, pa.fixationThickness, pa.fixColor);
     Screen('Flip', VP.window);
-    WaitSecs(5.0);
+    WaitSecs(pa.endScreenDuration);
 
 catch ME
-    % Error occurred - display message
+    % Error occurred - display detailed message
     fprintf('\n!!! ERROR OCCURRED !!!\n');
     fprintf('Error message: %s\n', ME.message);
-    fprintf('Error in: %s (line %d)\n', ME.stack(1).name, ME.stack(1).line);
+    if ~isempty(ME.stack)
+        fprintf('Error in: %s (line %d)\n', ME.stack(1).name, ME.stack(1).line);
+        % Print full stack trace
+        fprintf('\nStack trace:\n');
+        for i = 1:length(ME.stack)
+            fprintf('  %d. %s (line %d)\n', i, ME.stack(i).name, ME.stack(i).line);
+        end
+    end
 end
 
 % Clean up resources (always executed)
+fprintf('\nCleaning up resources...\n');
+
+% Clean up keyboard queue
 try
     KbQueueStop();
     KbQueueRelease();
-catch
-    % KbQueue might not be initialized
+    fprintf('  Keyboard queue released\n');
+catch ME
+    fprintf('  Warning: Could not release keyboard queue: %s\n', ME.message);
 end
-sca; % Screen('CloseAll')
+
+% Close Psychtoolbox windows
 try
-    Datapixx('Close');
-catch
-    % Datapixx might not be open
+    sca; % Screen('CloseAll')
+    fprintf('  Psychtoolbox windows closed\n');
+catch ME
+    fprintf('  Warning: Could not close Psychtoolbox windows: %s\n', ME.message);
 end
+
+% Close VPixx connection
+try
+    if Datapixx('IsReady')
+        Datapixx('Close');
+        fprintf('  VPixx connection closed\n');
+    end
+catch ME
+    fprintf('  Warning: Could not close VPixx connection: %s\n', ME.message);
+end
+
+fprintf('Cleanup complete.\n');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % CALCULATE AND DISPLAY RESULTS

@@ -1,19 +1,33 @@
-function VP = setup_display(skipSync, Display, debugTrigger)
+function VP = setup_display(debugConfig)
 % SETUP_DISPLAY - Configure display parameters and initialize Psychtoolbox
 %
-% Inputs:
-%   skipSync - Skip sync tests (1) or not (0)
-%   Display - Display configuration (1=NYUAD, 2=laptop, etc.)
-%   debugTrigger - Debug mode flag
+% Input:
+%   debugConfig - Debug configuration structure with display settings
 %
 % Output:
 %   VP - Viewing Parameters structure with all display settings
 
-if skipSync == 1
+% Input validation
+if ~isstruct(debugConfig)
+    error('setup_display:invalidInput', 'debugConfig must be a structure');
+end
+
+requiredFields = {'skipSyncTests', 'enabled', 'displayMode', 'fullscreen'};
+for i = 1:length(requiredFields)
+    if ~isfield(debugConfig, requiredFields{i})
+        error('setup_display:missingField', 'debugConfig missing required field: %s', requiredFields{i});
+    end
+end
+
+if ~ismember(debugConfig.displayMode, [1, 2])
+    error('setup_display:invalidDisplayMode', 'debugConfig.displayMode must be 1 (NYUAD Lab) or 2 (Laptop)');
+end
+
+if debugConfig.skipSyncTests == 1
     Screen('Preference','SkipSyncTests',1);
 end
 
-VP.debugTrigger = debugTrigger;
+VP.debugTrigger = debugConfig.enabled;
 global GL;
 AssertOpenGL;
 InitializeMatlabOpenGL(0,3);
@@ -22,7 +36,7 @@ PsychImaging('PrepareConfiguration');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEFINE DISPLAY SPECIFIC VIEWING CONDITIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-switch(Display)
+switch(debugConfig.displayMode)
     case 1 % NYUAD Lab Setup
         VP.screenDistance = 880;   % mm
         VP.IOD = 66.5;             % mm
@@ -31,7 +45,11 @@ switch(Display)
         VP.whiteValue = 255;
         VP.stereoMode = 0;
         VP.multiSample = 32;
-        VP.fullscreen = [];
+        if debugConfig.fullscreen == 1
+            VP.fullscreen = []; % Fullscreen
+        else
+            VP.fullscreen = [0 0 1024 768]; % Windowed
+        end
         
     case 2 % Laptop/Development
         VP.screenDistance = 500;   % mm
@@ -41,12 +59,16 @@ switch(Display)
         VP.whiteValue = 255;
         VP.stereoMode = 0;
         VP.multiSample = 32;
-        VP.fullscreen = [0 0 800 500];
+        if debugConfig.fullscreen == 1
+            VP.fullscreen = []; % Fullscreen
+        else
+            VP.fullscreen = [0 0 800 500]; % Windowed
+        end
         
 
 end
 
-VP.Display = Display;
+VP.Display = debugConfig.displayMode;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SETUP PSYCHTOOLBOX WITH OPENGL
@@ -58,7 +80,7 @@ VP.screenID = max(Screen('Screens'));
 VP.centerPatch = 0.75;
 
 % Setup VPixx if needed
-switch Display
+switch VP.Display
     case 1
         PsychImaging('AddTask','General','UseDataPixx');
         

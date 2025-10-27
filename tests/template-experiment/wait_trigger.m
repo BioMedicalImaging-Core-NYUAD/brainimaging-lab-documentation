@@ -1,8 +1,8 @@
-function wait_trigger(debugMode)
+function wait_trigger(manualTrigger)
 % WAIT_TRIGGER - Wait for scanner trigger or manual trigger
 %
 % Inputs:
-%   debugMode - Boolean: true = manual trigger, false = scanner trigger
+%   manualTrigger - Boolean: true = manual trigger, false = scanner trigger
 %
 % Output:
 %   none (function blocks until trigger received)
@@ -11,7 +11,16 @@ function wait_trigger(debugMode)
 %   wait_trigger(true);   % Debug mode (press 5 or t)
 %   wait_trigger(false);  % Scanner mode
 
-if debugMode
+% Input validation
+if nargin < 1
+    error('wait_trigger:missingInput', 'manualTrigger parameter is required');
+end
+
+if ~islogical(manualTrigger) && ~isnumeric(manualTrigger)
+    error('wait_trigger:invalidInput', 'manualTrigger must be a boolean or numeric value');
+end
+
+if manualTrigger
     % DEBUG MODE: Manual trigger via keyboard (5 or t)
     fprintf('DEBUG MODE: Press 5 or t to start experiment\n');
     
