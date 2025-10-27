@@ -87,3 +87,25 @@ The system includes:
 
    Figure 3. VPixx System
 
+
+Eyelink Eyetracker system
+*************************
+
+We have an SR Research Eyetracker system
+
++------------------+-------------------+
+| **Eyelink**      | **Connected**     |
++------------------+-------------------+
+| **IPv4 Configured** | Manually       |
++------------------+-------------------+
+| **IP address**   | 100.1.1.2         |
++------------------+-------------------+
+| **Subnet mask**  | 255.255.255.0     |
++------------------+-------------------+
+| **Router**       | Router            |
++------------------+-------------------+
+| **DNS Servers**  | DNS Servers       |
++------------------+-------------------+
+| **Search Domains** | Search Domains  |
++------------------+-------------------+
+
