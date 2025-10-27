@@ -113,3 +113,12 @@ Network settings for Eyetracker system
 | **Search Domains**  | Search Domains    |
 +---------------------+-------------------+
 
+The Eyetracker is connected to the Stimulus computer on the bottom-most ethernet card in the Stimulus computer.
+
+
+Installing the Eyetracker software and API
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+By default, the eyetracker .mex file within Psychtoolbox wouldn't work on the stimulus computer architecture.
+
+- Download the Eyetracker API developper kit from the SR Research website after creating an account there
