@@ -76,7 +76,9 @@ Psychtoolbox
 ^^^^^^^^^^^^
 
 Psychtoolbox is installed under:
-- Version: 3.0.22 `Documents/Psychtoolbox`
+- Version: 3.0.22 `Documents/Psychtoolbox_versions/Psychtoolbox-3.0.22.1`
+
+Other versions exist as well.
 
 
 
