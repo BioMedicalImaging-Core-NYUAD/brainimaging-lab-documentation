@@ -122,3 +122,4 @@ Installing the Eyetracker software and API
 By default, the eyetracker .mex file within Psychtoolbox wouldn't work on the stimulus computer architecture.
 
 - Download the Eyetracker API developper kit from the SR Research website after creating an account there
+- Open MATLAB and attempt `EyelinkInit` command, the eyetracker should be working
