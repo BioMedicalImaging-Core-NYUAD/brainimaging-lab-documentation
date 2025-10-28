@@ -1,5 +1,5 @@
 function [VP pa] = setup_param(VP, debugConfig)
-% SETUP_PARAM - Set up single dot button-pressing experiment parameters
+% SETUP_PARAM - Set up button-pressing experiment parameters with circular path
 %
 % Input:
 %   VP - Viewing Parameters structure from setup_display
@@ -8,6 +8,9 @@ function [VP pa] = setup_param(VP, debugConfig)
 % Output:
 %   VP - Updated Viewing Parameters structure
 %   pa - Parameters structure with all experiment settings
+%
+% This function configures timing, visual parameters, and data structures
+% for the circular path + traveling dot button-pressing experiment.
 
 % Input validation
 if ~isstruct(VP)
@@ -42,8 +45,10 @@ pa.feedbackDuration = 0.5;     % seconds - feedback display (fixation turns gree
 pa.itiDuration = 0.5;          % seconds - inter-trial interval
 pa.trialCycleDuration = pa.stimulusDuration + pa.responseWindow + pa.feedbackDuration + pa.itiDuration; % Total cycle time
 
-% Number of trials (5 colors × 2 repeats)
-pa.nTrials = 10;
+% Number of trials
+pa.colors = {'white', 'red', 'yellow', 'green', 'blue'};
+pa.nRepeats = 2;               % Number of times to repeat each color
+pa.nTrials = numel(pa.colors) * pa.nRepeats; % 5 colors × 2 repeats = 10 trials
 
 % End screen duration
 pa.endScreenDuration = 5.0;    % seconds - final fixation display
@@ -55,33 +60,29 @@ pa.totalDuration = (pa.nTrials * pa.trialCycleDuration) + pa.endScreenDuration;
 % STIMULUS PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Color definitions
-pa.colors = {'white', 'red', 'yellow', 'green', 'blue'};
 pa.colorRGB = [1 1 1; 1 0 0; 1 1 0; 0 1 0; 0 0 1]; % RGB values
 
-% Single dot parameters (0.5 degrees visual angle radius)
-pa.dotRadiusDeg = 0.5;         % degrees
-pa.dotRadiusPix = pa.dotRadiusDeg * VP.pixelsPerDegree; % pixels
-pa.dotCenter = VP.windowCenter; % Center of screen
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% MOVING FIXATION PARAMETERS
+% CIRCULAR PATH AND TRAVELING DOT PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Circular path parameters
-pa.fixationRadiusDeg = 1.5;    % degrees - radius of circular fixation path
+pa.fixationRadiusDeg = 3.0;    % degrees - radius of circular path
 pa.fixationRadiusPix = pa.fixationRadiusDeg * VP.pixelsPerDegree; % pixels
 
-% Fixation rotation parameters
+% Traveling dot rotation parameters
 pa.fixationRotationPeriod = 36; % seconds - time for one full circle
-pa.fixationSpeed = 2*pi / pa.fixationRotationPeriod; % radians per second
+pa.fixationSpeed = 2*pi / pa.fixationRotationPeriod; % radians per second (rotation speed)
 
-% Fixation cross appearance
-pa.fixationSize = 20;          % pixels - size of fixation cross
-pa.fixationThickness = 3;      % pixels - line thickness
+% Traveling dot appearance
+pa.travelingDotRadiusDeg = 0.25; % degrees - radius of traveling dot
+pa.travelingDotRadiusPix = pa.travelingDotRadiusDeg * VP.pixelsPerDegree; % pixels
+pa.dotColor = [0 0 0];         % White dot color (default)
+pa.dotColorCorrect = [0 1 0];  % Green for correct responses
+pa.dotColorIncorrect = [0 0 0]; 
 
-% Fixation colors
-pa.fixColor = [1 1 1];         % White fixation
-pa.fixColorCorrect = [0 1 0];  % Green for correct responses
-pa.fixColorIncorrect = [1 0 0]; % Red for incorrect responses
+% Circular path appearance
+pa.circleLineWidth = 3;        % pixels - thickness of circular path outline
+pa.circleColorDefault = [0 0 0]; % Black circle color (default for all non-stimulus phases)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BUTTON MAPPING PARAMETERS
@@ -98,8 +99,8 @@ pa.buttonSelection.right_box = pa.rightBoxColors;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TRIAL STRUCTURE PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Create randomized color sequence: 2 repeats of each color (10 trials total)
-pa.colorSequence = repmat(pa.colors, 1, 2); % [white, red, yellow, green, blue, white, red, yellow, green, blue]
+% Create randomized color sequence
+pa.colorSequence = repmat(pa.colors, 1, pa.nRepeats);
 pa.colorSequence = pa.colorSequence(randperm(pa.nTrials)); % Randomize order
 
 fprintf('=== Experiment Timing ===\n');
@@ -153,8 +154,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % EXPERIMENT CONTROL PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-pa.experimentName = 'Single Dot Button Pressing Experiment';
-pa.dataFileName = 'single_dot_data.mat';
+pa.experimentName = 'Circular Path Button Pressing Experiment';
+pa.dataFileName = 'circular_path_data.mat';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEBUG AND TRIGGER PARAMETERS

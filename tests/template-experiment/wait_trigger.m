@@ -1,24 +1,46 @@
-function wait_trigger(manualTrigger)
+function wait_trigger(VP, manualTrigger)
 % WAIT_TRIGGER - Wait for scanner trigger or manual trigger
 %
 % Inputs:
+%   VP - Viewing Parameters structure (for screen display)
 %   manualTrigger - Boolean: true = manual trigger, false = scanner trigger
 %
 % Output:
 %   none (function blocks until trigger received)
 %
 % Usage:
-%   wait_trigger(true);   % Debug mode (press 5 or t)
-%   wait_trigger(false);  % Scanner mode
+%   wait_trigger(VP, true);   % Debug mode (press t)
+%   wait_trigger(VP, false);  % Scanner mode
 
 % Input validation
-if nargin < 1
-    error('wait_trigger:missingInput', 'manualTrigger parameter is required');
+if nargin < 2
+    error('wait_trigger:missingInput', 'Both VP and manualTrigger parameters are required');
+end
+
+if ~isstruct(VP)
+    error('wait_trigger:invalidInput', 'VP must be a structure');
 end
 
 if ~islogical(manualTrigger) && ~isnumeric(manualTrigger)
     error('wait_trigger:invalidInput', 'manualTrigger must be a boolean or numeric value');
 end
+
+% Display "Waiting for Trigger..." message on screen
+Screen('FillRect', VP.window, VP.backGroundColor);
+
+% Set text properties
+Screen('TextSize', VP.window, 36);
+Screen('TextFont', VP.window, 'Arial');
+
+% Draw "Waiting for Trigger..." message
+DrawFormattedText(VP.window, 'Waiting for Trigger...', 'center', VP.windowCenter(2) - 40, [1 1 1] * 255);
+
+% If debug mode, add second line with instruction
+if manualTrigger
+    DrawFormattedText(VP.window, '(debug mode - press ''t'')', 'center', VP.windowCenter(2) + 20, [0.7 0.7 0.7] * 255);
+end
+
+Screen('Flip', VP.window);
 
 if manualTrigger
     % DEBUG MODE: Manual trigger via keyboard (5 or t)

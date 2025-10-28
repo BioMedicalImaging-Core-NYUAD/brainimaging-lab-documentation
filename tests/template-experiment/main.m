@@ -1,23 +1,28 @@
 function main()
-% MAIN - Simple button-pressing experiment with colored dots
-% 
-% This experiment presents 10 trials where participants see 5 colored dots
-% (white, red, yellow, green, blue) and must press the corresponding button
-% on the VPixx response box.
+% MAIN - Button-pressing experiment with circular path and traveling dot
+%
+% Participants view a circular path with a continuously traveling dot. During
+% stimulus presentation, the circular path changes to a target color (white,
+% red, yellow, green, or blue). Participants press the corresponding button
+% for the color they see.
+%
+% Visual elements:
+% - Circular path: Black during non-stimulus phases, changes to target color during stimulus
+% - Traveling dot: Continuously moves along path; changes to green/red for feedback
 %
 % Trial structure:
-% 1. Fixation cross + 5 colored dots (1 second)
-% 2. Target dot stays, others disappear (1 second) 
-% 3. All dots disappear, participant responds (2 seconds)
-% 4. Feedback (fixation turns green if correct)
-% 5. Blank screen (1 second)
-% 6. Next trial
+% 1. Stimulus: Circular path displays target color
+% 2. Response: Participant responds while path returns to black
+% 3. Feedback: Traveling dot changes color to indicate correctness
+% 4. Inter-trial interval: Brief pause before next trial
+%
+% All timing and visual parameters are configurable in setup_param.m
 
 % Clear workspace and close any open windows
 clear all; close all; sca;
 
 % Add general experiments folder to path for utility functions
-addpath('/Users/pw1246/Documents/GitHub/brainimaging-lab-documentation/experiments/general/vpixx-utilities');
+addpath('~/Documents/GitHub/brainimaging-lab-documentation/experiments/general/test-vpixx-utilities/');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEBUG CONFIGURATION
@@ -25,10 +30,10 @@ addpath('/Users/pw1246/Documents/GitHub/brainimaging-lab-documentation/experimen
 % Centralized debug settings - modify these to control experiment behavior
 debugConfig = struct();
 debugConfig.enabled = 1;              % 1 = debug mode, 0 = production mode
-debugConfig.useVPixx = 1;             % 1 = use VPixx hardware, 0 = use keyboard
-debugConfig.fullscreen = 1;            % 1 = fullscreen, 0 = windowed mode
-debugConfig.skipSyncTests = 1;         % 1 = skip sync tests, 0 = run sync tests
-debugConfig.displayMode = 1;          % 1 = NYUAD lab, 2 = laptop/development
+debugConfig.useVPixx = 0;             % 1 = use VPixx hardware, 0 = use keyboard
+debugConfig.fullscreen = 0;            % 1 = fullscreen, 0 = windowed mode
+debugConfig.skipSyncTests = 1;       % 1 = skip sync tests, 0 = run sync tests
+debugConfig.displayMode = 2;          % 1 = NYUAD lab, 2 = laptop/development
 debugConfig.manualTrigger = 1;        % 1 = manual trigger (5 or t), 0 = scanner trigger
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -40,15 +45,18 @@ VP = setup_display(debugConfig);
 % Setup experiment parameters
 [VP, pa] = setup_param(VP, debugConfig);
 
+% Setup keyboard mappings
+kb = setup_keyboard();
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % START EXPERIMENT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 try
+    % Wait for scanner trigger or manual trigger (displays message on screen)
+    wait_trigger(VP, debugConfig.manualTrigger);
+
     experimentStartTime = GetSecs;
     fprintf('\n=== %s ===\n', pa.experimentName);
-
-    % Wait for scanner trigger or manual trigger
-    wait_trigger(debugConfig.manualTrigger);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % MAIN EXPERIMENT LOOP
@@ -59,9 +67,6 @@ try
     % Setup KbQueue once for efficient button detection throughout experiment
     KbQueueCreate();
     KbQueueStart();
-
-    % Main time-based loop
-    experimentEndTime = experimentStartTime + pa.totalDuration;
 
     % Display input method
     if debugConfig.enabled
@@ -77,31 +82,20 @@ try
         fprintf('  Press ESC = Abort experiment\n\n');
     end
 
-while GetSecs < experimentEndTime
+% Main trial-based loop - run exactly pa.nTrials trials
+for trialIdx = 1:pa.nTrials
     pa.trialCounter = pa.trialCounter + 1;
     trialStartTime = GetSecs;
 
-    % Check for ESC key to abort experiment
-    [~, ~, keyCode] = KbCheck(-1);
-    if keyCode(KbName('ESCAPE'))
+    % Check for ESC key to abort experiment using KbQueue
+    [pressed, firstPress] = KbQueueCheck();
+    if pressed && firstPress(kb.escKey)
         fprintf('\n*** Experiment terminated by user (ESC pressed) ***\n');
         break;
     end
 
-    % Calculate remaining time
-    remainingTime = experimentEndTime - GetSecs;
-    if remainingTime <= 0
-        break; % Exit if time is up
-    end
-    
-    % Choose target color from predefined sequence
-    if pa.trialCounter <= pa.nTrials
-        targetColor = pa.colorSequence{pa.trialCounter};
-    else
-        % If we exceed planned trials, cycle through colors
-        colorIdx = mod(pa.trialCounter - 1, length(pa.colors)) + 1;
-        targetColor = pa.colors{colorIdx};
-    end
+    % Get target color from predefined sequence
+    targetColor = pa.colorSequence{trialIdx};
     
     % Store trial data (use direct indexing with pre-allocated arrays)
     pa.data.trialNumber(pa.trialCounter) = pa.trialCounter;
@@ -109,8 +103,8 @@ while GetSecs < experimentEndTime
     pa.data.trialStartTime(pa.trialCounter) = trialStartTime - experimentStartTime;
     pa.data.cumulativeTime(pa.trialCounter) = trialStartTime - experimentStartTime;
     pa.data.fixationAngle(pa.trialCounter) = currentFixationAngle;
-    
-    fprintf('Trial %d: Target = %s (%.1fs remaining)\n', pa.trialCounter, targetColor, remainingTime);
+
+    fprintf('Trial %d/%d: Target = %s\n', pa.trialCounter, pa.nTrials, targetColor);
     
     % Phase 1: Show single dot + moving fixation (1 second)
     targetIdx = find(strcmp(targetColor, pa.colors));
@@ -118,23 +112,18 @@ while GetSecs < experimentEndTime
     stimulusEndTime = stimulusStartTime + pa.stimulusDuration;
     vbl = stimulusStartTime;
 
-    while GetSecs < stimulusEndTime && GetSecs < experimentEndTime
-        % Update fixation position continuously
+    while GetSecs < stimulusEndTime
+        % Update traveling dot position continuously
         currentTime = GetSecs;
         currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
 
-        % Draw stimulus with current fixation position
-        drawSingleDotStimulus(VP.window, pa.dotCenter, pa.colorRGB(targetIdx,:), pa.dotRadiusPix, ...
-                             VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
-                             pa.fixationSize, pa.fixationThickness, pa.fixColor, VP.backGroundColor);
+        % Draw stimulus: circular path (cued color) + traveling dot (white)
+        drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
+                         pa.travelingDotRadiusPix, pa.dotColor, pa.colorRGB(targetIdx,:), ...
+                         pa.circleLineWidth, VP.backGroundColor);
 
         % Use optimized flip timing for smooth animation
         vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
-    end
-    
-    % Check if experiment should end
-    if GetSecs >= experimentEndTime
-        break;
     end
     
     % Phase 2: Wait for response
@@ -147,57 +136,35 @@ while GetSecs < experimentEndTime
     % Flush KbQueue to ignore any previous button presses
     KbQueueFlush();
 
-    while (GetSecs - responseStartTime) < pa.responseWindow && GetSecs < experimentEndTime
-        % Update fixation position
+    while (GetSecs - responseStartTime) < pa.responseWindow
+        % Update traveling dot position
         currentTime = GetSecs;
         currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
 
-        % Draw only fixation during response phase (no dots)
-        drawFixationOnly(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
-                        pa.fixationSize, pa.fixationThickness, pa.fixColor, VP.backGroundColor);
+        % Draw circular path (black) + traveling dot (white) during response phase
+        drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
+                         pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
+                         pa.circleLineWidth, VP.backGroundColor);
 
         % Use optimized flip timing for smooth animation
         vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
 
-        % Check for button press using KbQueue
-        [pressed, firstPress] = KbQueueCheck();
-        if pressed
-            if debugConfig.enabled
-                % DEBUG MODE: Check keyboard keys 1-5 for colors using KbQueue
-                % 1=white, 2=red, 3=yellow, 4=green, 5=blue
-                if firstPress(KbName('1!'))
-                    responseButton = 'white';
-                    responseReceived = true;
-                    responseTime = firstPress(KbName('1!')) - responseStartTime;
-                elseif firstPress(KbName('2@'))
-                    responseButton = 'red';
-                    responseReceived = true;
-                    responseTime = firstPress(KbName('2@')) - responseStartTime;
-                elseif firstPress(KbName('3#'))
-                    responseButton = 'yellow';
-                    responseReceived = true;
-                    responseTime = firstPress(KbName('3#')) - responseStartTime;
-                elseif firstPress(KbName('4$'))
-                    responseButton = 'green';
-                    responseReceived = true;
-                    responseTime = firstPress(KbName('4$')) - responseStartTime;
-                elseif firstPress(KbName('5%'))
-                    responseButton = 'blue';
-                    responseReceived = true;
-                    responseTime = firstPress(KbName('5%')) - responseStartTime;
-                end
-
-                if responseReceived
-                    break;
-                end
-            else
-                % SCANNER MODE: Use VPixx button box
-                pair = getButtonColor(pa.buttonSelection, false);
-                if ~isempty(pair)
-                    responseReceived = true;
-                    responseTime = GetSecs - responseStartTime;
-                    responseButton = pair{2}; % Get color from response
-                    break;
+        % Check for button press using KbQueue (only record first response)
+        if ~responseReceived
+            [pressed, firstPress] = KbQueueCheck();
+            if pressed
+                if debugConfig.enabled
+                    % DEBUG MODE: Check keyboard keys 1-5 for colors
+                    [responseReceived, responseButton, responseTime] = ...
+                        check_response(kb, firstPress, responseStartTime);
+                else
+                    % SCANNER MODE: Use VPixx button box
+                    pair = getButtonColor(pa.buttonSelection, false);
+                    if ~isempty(pair)
+                        responseReceived = true;
+                        responseTime = GetSecs - responseStartTime;
+                        responseButton = pair{2}; % Get color from response
+                    end
                 end
             end
         end
@@ -213,61 +180,51 @@ while GetSecs < experimentEndTime
         pa.data.reactionTime(pa.trialCounter) = NaN;
         pa.data.correct(pa.trialCounter) = 0;
     end
-    
-    % Check if experiment should end
-    if GetSecs >= experimentEndTime
-        break;
-    end
-    
+
     % Phase 3: Feedback
     feedbackStartTime = GetSecs;
     feedbackEndTime = feedbackStartTime + pa.feedbackDuration;
     vbl = feedbackStartTime;
 
-    while GetSecs < feedbackEndTime && GetSecs < experimentEndTime
-        % Update fixation position
+    while GetSecs < feedbackEndTime
+        % Update traveling dot position
         currentTime = GetSecs;
         currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
 
-        % Choose fixation color based on correctness
+        % Choose traveling dot color based on correctness
         if responseReceived
-            if pa.data.correct(end)
-                fixColor = pa.fixColorCorrect;
+            if pa.data.correct(pa.trialCounter)
+                feedbackDotColor = pa.dotColorCorrect; % Green for correct
             else
-                fixColor = pa.fixColorIncorrect;
+                feedbackDotColor = pa.dotColorIncorrect; % Red for incorrect
             end
         else
-            fixColor = pa.fixColorIncorrect; % No response = incorrect
+            feedbackDotColor = pa.dotColorIncorrect; % Red for no response
         end
 
-        % Draw only fixation during feedback phase (no dots, colored fixation)
-        drawFixationOnly(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
-                        pa.fixationSize, pa.fixationThickness, fixColor, VP.backGroundColor);
+        % Draw circular path (black) + traveling dot (colored for feedback)
+        drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
+                         pa.travelingDotRadiusPix, feedbackDotColor, pa.circleColorDefault, ...
+                         pa.circleLineWidth, VP.backGroundColor);
 
         % Use optimized flip timing for smooth animation
         vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
     end
-    
-    % Check if experiment should end
-    if GetSecs >= experimentEndTime
-        break;
-    end
-    
+
     % Phase 4: Inter-trial interval
     itiStartTime = GetSecs;
     itiEndTime = itiStartTime + pa.itiDuration;
     vbl = itiStartTime;
 
-    while GetSecs < itiEndTime && GetSecs < experimentEndTime
-        % Update fixation position
+    while GetSecs < itiEndTime
+        % Update traveling dot position
         currentTime = GetSecs;
         currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
 
-        % Draw only moving fixation (no dot)
-        fixationX = VP.windowCenter(1) + pa.fixationRadiusPix * cos(currentFixationAngle);
-        fixationY = VP.windowCenter(2) + pa.fixationRadiusPix * sin(currentFixationAngle);
-        Screen('FillRect', VP.window, VP.backGroundColor);
-        drawFixation(VP.window, fixationX, fixationY, pa.fixationSize, pa.fixationThickness, pa.fixColor);
+        % Draw circular path (black) + traveling dot (white) during ITI
+        drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
+                         pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
+                         pa.circleLineWidth, VP.backGroundColor);
 
         % Use optimized flip timing for smooth animation
         vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
@@ -276,7 +233,7 @@ while GetSecs < experimentEndTime
     % Print trial result
     if responseReceived
         fprintf('  Response: %s, RT: %.3fs, Correct: %d\n', ...
-                responseButton, responseTime, pa.data.correct(end));
+                responseButton, responseTime, pa.data.correct(pa.trialCounter));
     else
         fprintf('  No response received\n');
     end
@@ -296,11 +253,24 @@ end
     pa.data.cumulativeTime = pa.data.cumulativeTime(1:nCompleted);
     pa.data.fixationAngle = pa.data.fixationAngle(1:nCompleted);
 
-    % End screen - static fixation
-    Screen('FillRect', VP.window, VP.backGroundColor);
-    drawFixation(VP.window, VP.windowCenter(1), VP.windowCenter(2), pa.fixationSize, pa.fixationThickness, pa.fixColor);
-    Screen('Flip', VP.window);
-    WaitSecs(pa.endScreenDuration);
+    % End screen - show circular path with moving traveling dot (no stimulus)
+    endScreenStartTime = GetSecs;
+    endScreenEndTime = endScreenStartTime + pa.endScreenDuration;
+    vbl = endScreenStartTime;
+
+    while GetSecs < endScreenEndTime
+        % Update traveling dot position
+        currentTime = GetSecs;
+        currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
+
+        % Draw circular path (black) + traveling dot (white)
+        drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
+                         pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
+                         pa.circleLineWidth, VP.backGroundColor);
+
+        % Use optimized flip timing for smooth animation
+        vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
+    end
 
 catch ME
     % Error occurred - display detailed message
@@ -351,13 +321,15 @@ fprintf('Cleanup complete.\n');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % CALCULATE AND DISPLAY RESULTS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Calculate final metrics
+totalExperimentTime = GetSecs - experimentStartTime;
 nTrials = pa.trialCounter;
 nCorrect = sum(pa.data.correct);
 accuracy = nCorrect / nTrials * 100;
 
 fprintf('\n=== EXPERIMENT COMPLETE ===\n');
 fprintf('Total trials completed: %d\n', nTrials);
-fprintf('Total experiment time: %.1f seconds\n', GetSecs - experimentStartTime);
+fprintf('Total experiment time: %.2f seconds (%.2f minutes)\n', totalExperimentTime, totalExperimentTime/60);
 fprintf('Results Summary:\n');
 fprintf('Target Color\tResponse\n');
 fprintf('------------\t--------\n');
@@ -368,85 +340,45 @@ end
 
 fprintf('\nOverall Accuracy: %d out of %d (%.1f%%)\n', nCorrect, nTrials, accuracy);
 
+% Store total experiment time in data structure
+pa.totalExperimentTime = totalExperimentTime;
+
 % Save data
 save(pa.dataFileName, 'pa');
 fprintf('Data saved to %s\n', pa.dataFileName);
 
 end
 
-% Helper function to draw single dot with moving fixation
-function drawFixationOnly(window, screenCenter, fixationRadiusPix, fixationAngle, fixSize, fixThickness, fixColor, backGroundColor)
-% DRAW_FIXATION_ONLY - Draw only the moving fixation cross without any dots
+% Helper function to draw circular path with traveling dot (no stimulus)
+function drawCircleWithDot(window, screenCenter, circleRadiusPix, dotAngle, dotSize, dotColor, circleColor, circleLineWidth, backGroundColor)
+% DRAW_CIRCLE_WITH_DOT - Draw circular path outline with traveling dot
 %
 % Inputs:
 %   window - Psychtoolbox window pointer
 %   screenCenter - [x, y] center of screen
-%   fixationRadiusPix - radius of fixation movement in pixels
-%   fixationAngle - current angle of fixation in radians
-%   fixSize - size of fixation cross
-%   fixThickness - thickness of fixation lines
-%   fixColor - color of fixation cross [R, G, B]
+%   circleRadiusPix - radius of circular path in pixels
+%   dotAngle - current angle of traveling dot in radians
+%   dotSize - size of traveling dot in pixels
+%   dotColor - color of traveling dot [R, G, B]
+%   circleColor - color of circular path outline [R, G, B]
+%   circleLineWidth - thickness of circular path outline
 %   backGroundColor - background color
 
 % Clear screen
 Screen('FillRect', window, backGroundColor);
 
-% Calculate fixation position
-fixationX = screenCenter(1) + fixationRadiusPix * cos(fixationAngle);
-fixationY = screenCenter(2) + fixationRadiusPix * sin(fixationAngle);
+% Draw circular path outline
+Screen('FrameOval', window, circleColor * 255, ...
+       [screenCenter(1)-circleRadiusPix, screenCenter(2)-circleRadiusPix, ...
+        screenCenter(1)+circleRadiusPix, screenCenter(2)+circleRadiusPix], ...
+       circleLineWidth);
 
-% Draw fixation cross
-Screen('DrawLine', window, fixColor, ...
-       fixationX - fixSize/2, fixationY, fixationX + fixSize/2, fixationY, fixThickness);
-Screen('DrawLine', window, fixColor, ...
-       fixationX, fixationY - fixSize/2, fixationX, fixationY + fixSize/2, fixThickness);
+% Calculate traveling dot position on circular path
+dotX = screenCenter(1) + circleRadiusPix * cos(dotAngle);
+dotY = screenCenter(2) + circleRadiusPix * sin(dotAngle);
+
+% Draw traveling dot
+Screen('FillOval', window, dotColor * 255, ...
+       [dotX-dotSize, dotY-dotSize, dotX+dotSize, dotY+dotSize]);
 end
 
-% Helper function to draw single dot with moving fixation
-function drawSingleDotStimulus(window, dotCenter, dotColor, dotRadiusPix, screenCenter, fixationRadiusPix, fixationAngle, fixSize, fixThickness, fixColor, backGroundColor)
-% DRAW_SINGLE_DOT_STIMULUS - Draw single dot with moving fixation cross
-%
-% Inputs:
-%   window - Psychtoolbox window pointer
-%   dotCenter - [x, y] center of dot
-%   dotColor - color of dot [R, G, B]
-%   dotRadiusPix - radius of dot in pixels
-%   screenCenter - [x, y] center of screen
-%   fixationRadiusPix - radius of fixation movement in pixels
-%   fixationAngle - current angle of fixation in radians
-%   fixSize - size of fixation cross
-%   fixThickness - thickness of fixation lines
-%   fixColor - color of fixation cross [R, G, B]
-%   backGroundColor - background color
-
-% Clear screen with background color
-Screen('FillRect', window, backGroundColor);
-
-% Draw single dot at center
-Screen('FillOval', window, dotColor, ...
-       [dotCenter(1)-dotRadiusPix, dotCenter(2)-dotRadiusPix, ...
-        dotCenter(1)+dotRadiusPix, dotCenter(2)+dotRadiusPix]);
-
-% Calculate fixation position on circular path
-fixationX = screenCenter(1) + fixationRadiusPix * cos(fixationAngle);
-fixationY = screenCenter(2) + fixationRadiusPix * sin(fixationAngle);
-
-% Draw fixation cross at calculated position
-Screen('DrawLine', window, fixColor, ...
-       fixationX - fixSize/2, fixationY, fixationX + fixSize/2, fixationY, fixThickness);
-Screen('DrawLine', window, fixColor, ...
-       fixationX, fixationY - fixSize/2, fixationX, fixationY + fixSize/2, fixThickness);
-end
-
-
-% Helper function to draw fixation cross
-function drawFixation(window, centerX, centerY, fixSize, fixThickness, color)
-    % Horizontal line
-    Screen('FillRect', window, color, ...
-           [centerX-fixSize, centerY-fixThickness/2, ...
-            centerX+fixSize, centerY+fixThickness/2]);
-    % Vertical line
-    Screen('FillRect', window, color, ...
-           [centerX-fixThickness/2, centerY-fixSize, ...
-            centerX+fixThickness/2, centerY+fixSize]);
-end
