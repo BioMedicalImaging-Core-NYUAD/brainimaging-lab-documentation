@@ -3,7 +3,7 @@ function main()
 % 
 % This experiment presents 10 trials where participants see 5 colored dots
 % (white, red, yellow, green, blue) and must press the corresponding button
-% on the VPixx response box.
+% on the VPixx response box.5
 %
 % Trial structure:
 % 1. Fixation cross + 5 colored dots (1 second)
