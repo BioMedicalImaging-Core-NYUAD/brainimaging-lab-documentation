@@ -1,8 +1,7 @@
-# .github/workflows/meg-workstation-self-runner-test.yml
 name: [MRI-stimulus computer] Self-runner dispatch test
 
 on:
-  workflow_dispatch:  # 💡 Enables the "Run workflow" button in the UI
+  workflow_dispatch:
 
 jobs:
   run-on-self-hosted:
