@@ -5,7 +5,7 @@ on:
 
 jobs:
   run-on-self-hosted:
-    runs-on: self-hosted
+    runs-on: mri-stimulus-computer
     steps:
       - name: Print Message
         run: echo "Running on self-hosted by manual trigger"
