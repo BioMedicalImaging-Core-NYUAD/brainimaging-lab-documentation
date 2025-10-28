@@ -1,5 +1,4 @@
 function main()
-<<<<<<< HEAD
 % MAIN - Button-pressing experiment with circular path and traveling dot
 %
 % Participants view a circular path with a continuously traveling dot. During
@@ -10,13 +9,7 @@ function main()
 % Visual elements:
 % - Circular path: Black during non-stimulus phases, changes to target color during stimulus
 % - Traveling dot: Continuously moves along path; changes to green/red for feedback
-=======
-% MAIN - Simple button-pressing experiment with colored dots
-% 
-% This experiment presents 10 trials where participants see 5 colored dots
-% (white, red, yellow, green, blue) and must press the corresponding button
-% on the VPixx response box.5
->>>>>>> 439fe1326df38bd088f39007f5477b2301ad1fc4
+
 %
 % Trial structure:
 % 1. Stimulus: Circular path displays target color
