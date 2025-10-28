@@ -44,7 +44,7 @@ Screen('Flip', VP.window);
 
 if manualTrigger
     % DEBUG MODE: Manual trigger via keyboard (5 or t)
-    fprintf('DEBUG MODE: Press 5 or t to start experiment\n');
+    fprintf('DEBUG MODE: Press t to start experiment\n');
     
     % Clear any existing key presses
     while KbCheck(-1); end
@@ -53,7 +53,7 @@ if manualTrigger
     while true
         [keyIsDown, ~, keyCode] = KbCheck(-1);
         if keyIsDown
-            if keyCode(KbName('5')) || keyCode(KbName('t'))
+            if keyCode(KbName('5%')) || keyCode(KbName('t'))
                 fprintf('Manual trigger received!\n');
                 break;
             elseif keyCode(KbName('escape'))

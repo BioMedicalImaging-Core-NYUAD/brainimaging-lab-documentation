@@ -74,7 +74,7 @@ pa.fixationRotationPeriod = 36; % seconds - time for one full circle
 pa.fixationSpeed = 2*pi / pa.fixationRotationPeriod; % radians per second (rotation speed)
 
 % Traveling dot appearance
-pa.travelingDotRadiusDeg = 0.25; % degrees - radius of traveling dot
+pa.travelingDotRadiusDeg = 0.125; % degrees - radius of traveling dot
 pa.travelingDotRadiusPix = pa.travelingDotRadiusDeg * VP.pixelsPerDegree; % pixels
 pa.dotColor = [0 0 0];         % White dot color (default)
 pa.dotColorCorrect = [0 1 0];  % Green for correct responses
@@ -91,10 +91,7 @@ pa.circleColorDefault = [0 0 0]; % Black circle color (default for all non-stimu
 pa.leftBoxColors = pa.colors(1:3);   % white, red, yellow
 pa.rightBoxColors = pa.colors(4:5);  % green, blue
 
-% Create button selection structure
-pa.buttonSelection = struct();
-pa.buttonSelection.left_box = pa.leftBoxColors;
-pa.buttonSelection.right_box = pa.rightBoxColors;
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TRIAL STRUCTURE PARAMETERS

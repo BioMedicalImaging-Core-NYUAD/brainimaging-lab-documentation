@@ -14,7 +14,7 @@ function main()
 % Trial structure:
 % 1. Stimulus: Circular path displays target color
 % 2. Response: Participant responds while path returns to black
-% 3. Feedback: Traveling dot changes color to indicate correctness
+% 3. Feedback: Traveling dot changes color to  indicate correctness
 % 4. Inter-trial interval: Brief pause before next trial
 %
 % All timing and visual parameters are configurable in setup_param.m
@@ -23,7 +23,7 @@ function main()
 clear all; close all; sca;
 
 % Add general experiments folder to path for utility functions
-addpath('~/Documents/GitHub/brainimaging-lab-documentation/experiments/general/test-vpixx-utilities/');
+addpath('/Users/stimulus/PycharmProjects/brainimaging-lab-documentation/experiments/general/vpixx-utilities/');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEBUG CONFIGURATION
@@ -31,11 +31,12 @@ addpath('~/Documents/GitHub/brainimaging-lab-documentation/experiments/general/t
 % Centralized debug settings - modify these to control experiment behavior
 debugConfig = struct();
 debugConfig.enabled = 1;              % 1 = debug mode, 0 = production mode
-debugConfig.useVPixx = 0;             % 1 = use VPixx hardware, 0 = use keyboard
-debugConfig.fullscreen = 0;            % 1 = fullscreen, 0 = windowed mode
+debugConfig.useVPixx = 1;             % 1 = use VPixx hardware, 0 = use keyboard
+debugConfig.fullscreen = 1;            % 1 = fullscreen, 0 = windowed mode
 debugConfig.skipSyncTests = 1;       % 1 = skip sync tests, 0 = run sync tests
-debugConfig.displayMode = 2;          % 1 = NYUAD lab, 2 = laptop/development
+debugConfig.displayMode = 1;          % 1 = NYUAD lab, 2 = laptop/development
 debugConfig.manualTrigger = 1;        % 1 = manual trigger (5 or t), 0 = scanner trigger
+debugConfig.buttonbox = 1;        % 1 = button box, 0 = keyboard
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SETUP DISPLAY AND EXPERIMENT PARAMETERS
@@ -70,7 +71,7 @@ try
     KbQueueStart();
 
     % Display input method
-    if debugConfig.enabled
+    if ~debugConfig.buttonbox
         fprintf('\nDEBUG MODE - Keyboard Controls:\n');
         fprintf('  Press 1 = White\n');
         fprintf('  Press 2 = Red\n');
@@ -147,27 +148,26 @@ for trialIdx = 1:pa.nTrials
                          pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
                          pa.circleLineWidth, VP.backGroundColor);
 
-        % Use optimized flip timing for smooth animation
         vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
 
         % Check for button press using KbQueue (only record first response)
         if ~responseReceived
-            [pressed, firstPress] = KbQueueCheck();
-            if pressed
-                if debugConfig.enabled
-                    % DEBUG MODE: Check keyboard keys 1-5 for colors
+                if ~debugConfig.buttonbox
+                    % Check keyboard keys 1-5 for colors
+                    [pressed, firstPress] = KbQueueCheck();
+                    if pressed
                     [responseReceived, responseButton, responseTime] = ...
                         check_response(kb, firstPress, responseStartTime);
+                    end
                 else
-                    % SCANNER MODE: Use VPixx button box
-                    pair = getButtonColor(pa.buttonSelection, false);
+                    % Use VPixx button box
+                    pair = getButtonColor([], false);
                     if ~isempty(pair)
                         responseReceived = true;
                         responseTime = GetSecs - responseStartTime;
                         responseButton = pair{2}; % Get color from response
                     end
-                end
-            end
+                end         
         end
     end
 
