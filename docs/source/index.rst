@@ -79,6 +79,11 @@ Lab Address
 
 
 
+Automated Testing Badges
+------------------------
+
+
+
 
 .. *********************
 .. Documentation content
