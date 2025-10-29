@@ -23,14 +23,20 @@ jobs:
 
       - name: Load runner settings
         id: load-settings
+        shell: bash
         run: |
-          echo "Loading environment from mri-stimulus-computer_settings.env..."
-          cat mri-stimulus-computer_settings.env
+          SETTINGS_FILE=".github/workflows/mri-stimulus-computer_settings.env"
+          echo "Loading environment from $SETTINGS_FILE ..."
+          test -f "$SETTINGS_FILE" || { echo "Missing $SETTINGS_FILE"; exit 1; }
+          cat "$SETTINGS_FILE"
           # Export variables so next steps can access them
           set -a
-          source mri-stimulus-computer_settings.env
+          source "$SETTINGS_FILE"
           set +a
-          cat mri-stimulus-computer_settings.env >> $GITHUB_ENV
+          # Persist for later steps
+          cat "$SETTINGS_FILE" >> "$GITHUB_ENV"
+          # Sanity check
+          : "${MATLAB_PATH:?MATLAB_PATH not set in $SETTINGS_FILE}"
 
       - name: Verify MATLAB availability
         run: |
@@ -47,4 +53,3 @@ jobs:
           MATLAB_BIN: ${{ env.MATLAB_PATH }}
         run: |
           pytest -q tests/test_eyelink_init.py
-
