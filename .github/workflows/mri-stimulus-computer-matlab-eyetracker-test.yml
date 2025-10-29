@@ -44,10 +44,13 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install pytest
 
-      - name: Run MRI-stimulus computer tests (single test file)
+      - name: Run MRI-stimulus computer tests (single file, verbose live output)
         env:
           MATLAB_BIN: ${{ env.MATLAB_PATH }}
           ARCH_BIN: ${{ env.ARCH_BIN }}
           ARCH_ARGS: ${{ env.ARCH_ARGS }}
+          PYTEST_ADDOPTS: "-vv -s -ra --durations=10"
+          PYTHONUNBUFFERED: "1"
+          FORCE_COLOR: "1"
         run: |
-          pytest -q tests/test_mri_stimulus_computer_config.py
+          python3 -u -m pytest tests/test_mri_stimulus_computer_config.py
