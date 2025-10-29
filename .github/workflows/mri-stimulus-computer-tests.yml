@@ -1,4 +1,4 @@
-name: "[MRI-stimulus computer] MATLAB 2025, Eyelink Dummy Mode Test"
+name: "[MRI-Stimulus Computer] Automated Testing"
 
 on:
   workflow_dispatch:
@@ -9,13 +9,14 @@ on:
   pull_request:
     branches: [ main ]
     paths:
-      - ".github/workflows/mri-stimulus-computer-eyelink-matlab-test.yml"
+      - ".github/workflows/mri-stimulus-computer-tests.yml"
 
 jobs:
-  matlab-test:
-    name: MATLAB headless path test
-    runs-on: [self-hosted, mri-stimulus-computer]
-    timeout-minutes: 15
+  test-mri-stimulus-computer:
+    name: MRI-Stimulus Computer Automated Testing
+    runs-on: mri-stimulus-computer
+    timeout-minutes: 20
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -44,7 +45,7 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install pytest
 
-      - name: Run pytest (test_matlab_runs_from_env)
+      - name: Run all MATLAB & Eyelink tests (verbose live output)
         env:
           MATLAB_BIN: ${{ env.MATLAB_PATH }}
           ARCH_BIN: ${{ env.ARCH_BIN }}
@@ -53,47 +54,5 @@ jobs:
           PYTHONUNBUFFERED: "1"
           FORCE_COLOR: "1"
         run: |
-          python3 -u -m pytest -k test_matlab_runs_from_env tests/test_mri_stimulus_computer_config.py
-
-  eyelink-test:
-    name: EyelinkInit dummy mode test
-    runs-on: [self-hosted, mri-stimulus-computer]
-    timeout-minutes: 15
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Load runner settings
-        id: load-settings
-        shell: bash
-        run: |
-          SETTINGS_FILE=".github/workflows/mri-stimulus-computer_settings.env"
-          echo "Loading environment from $SETTINGS_FILE ..."
-          test -f "$SETTINGS_FILE" || { echo "Missing $SETTINGS_FILE"; exit 1; }
-          cat "$SETTINGS_FILE"
-          set -a
-          source "$SETTINGS_FILE"
-          set +a
-          cat "$SETTINGS_FILE" >> "$GITHUB_ENV"
-          : "${MATLAB_PATH:?MATLAB_PATH not set in $SETTINGS_FILE}"
-
-      - name: Verify MATLAB availability (headless)
-        run: |
-          echo "Using MATLAB at: $MATLAB_PATH"
-          "$MATLAB_PATH" -batch "disp('MATLAB detected successfully'); exit"
-
-      - name: Install pytest
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install pytest
-
-      - name: Run pytest (test_eyelink_init_dummy)
-        env:
-          MATLAB_BIN: ${{ env.MATLAB_PATH }}
-          ARCH_BIN: ${{ env.ARCH_BIN }}
-          ARCH_ARGS: ${{ env.ARCH_ARGS }}
-          PYTEST_ADDOPTS: "-vv -s -ra --durations=10"
-          PYTHONUNBUFFERED: "1"
-          FORCE_COLOR: "1"
-        run: |
-          python3 -u -m pytest -k test_eyelink_init_dummy tests/test_mri_stimulus_computer_config.py
+          echo "Starting pytest run for all MRI-stimulus computer tests..."
+          python3 -u -m pytest tests/test_mri_stimulus_computer_config.py
