@@ -1,0 +1,24 @@
+name: "[MRI-stimulus computer] MATLAB running test"
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  schedule:
+    # 02:00 Asia/Dubai = 22:00 UTC (no DST)
+    - cron: "0 22 * * *"
+
+jobs:
+  matlab-test:
+    runs-on: mri-stimulus-computer
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run MATLAB headlessly
+        shell: bash
+        run: |
+          set -e
+          matlab -batch "disp('MATLAB is running headlessly'); exit"
+
