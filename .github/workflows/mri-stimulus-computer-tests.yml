@@ -14,7 +14,7 @@ on:
 jobs:
   test-mri-stimulus-computer:
     name: Run MATLAB & Eyelink tests
-    runs-on: [self-hosted, mri-stimulus-computer]
+    runs-on: mri-stimulus-computer
     timeout-minutes: 20
 
     steps:
