@@ -20,5 +20,5 @@ jobs:
         shell: bash
         run: |
           set -e
-          matlab -batch "disp('MATLAB is running headlessly'); exit"
+          /Applications/MATLAB_R2025b.app/bin/matlab -batch "disp('MATLAB is running headlessly'); exit"
 
