@@ -1,24 +1,35 @@
 name: "[MRI-stimulus computer] MATLAB Eyelink Test"
 
 on:
-  workflow_dispatch:     # allow manual runs
+  workflow_dispatch:
   schedule:
-    # 2:00 AM Dubai (UTC+4) → 22:00 UTC
+    # 2:00 AM Dubai (UTC+4) = 22:00 UTC
     - cron: "0 22 * * *"
 
 jobs:
   test-eyelink:
-    runs-on: mri-stimulus-computer
+    runs-on: [self-hosted, mri-stimulus-computer]
     timeout-minutes: 15
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Load runner settings
+        id: load-settings
+        run: |
+          echo "Loading environment from mri-stimulus-computer_settings.env..."
+          cat mri-stimulus-computer_settings.env
+          # Export variables so next steps can access them
+          set -a
+          source mri-stimulus-computer_settings.env
+          set +a
+          cat mri-stimulus-computer_settings.env >> $GITHUB_ENV
+
       - name: Verify MATLAB availability
         run: |
-          which matlab || echo "MATLAB not found on PATH"
-          matlab -batch "disp('MATLAB detected successfully'); exit"
+          echo "Using MATLAB at: $MATLAB_PATH"
+          "$MATLAB_PATH" -batch "disp('MATLAB detected successfully'); exit"
 
       - name: Install pytest
         run: |
@@ -26,6 +37,8 @@ jobs:
           python3 -m pip install pytest
 
       - name: Run EyelinkInit pytest
+        env:
+          MATLAB_BIN: ${{ env.MATLAB_PATH }}
         run: |
           pytest -q tests/test_eyelink_init.py
 
