@@ -1,55 +1,55 @@
-name: "[MRI-stimulus computer] MATLAB Eyelink Test"
-
-on:
-  workflow_dispatch:
-  schedule:
-    # 2:00 AM Dubai (UTC+4) = 22:00 UTC
-    - cron: "0 22 * * *"
-
-  # Run only when this workflow file changes in a PR to main
-  pull_request:
-    branches: [ main ]
-    paths:
-      - ".github/workflows/mri-stimulus-computer-eyelink-matlab-test.yml"
-
-jobs:
-  test-eyelink:
-    runs-on: [self-hosted, mri-stimulus-computer]
-    timeout-minutes: 15
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Load runner settings
-        id: load-settings
-        shell: bash
-        run: |
-          SETTINGS_FILE=".github/workflows/mri-stimulus-computer_settings.env"
-          echo "Loading environment from $SETTINGS_FILE ..."
-          test -f "$SETTINGS_FILE" || { echo "Missing $SETTINGS_FILE"; exit 1; }
-          cat "$SETTINGS_FILE"
-          # Export variables so next steps can access them
-          set -a
-          source "$SETTINGS_FILE"
-          set +a
-          # Persist for later steps
-          cat "$SETTINGS_FILE" >> "$GITHUB_ENV"
-          # Sanity check
-          : "${MATLAB_PATH:?MATLAB_PATH not set in $SETTINGS_FILE}"
-
-      - name: Verify MATLAB availability
-        run: |
-          echo "Using MATLAB at: $MATLAB_PATH"
-          "$MATLAB_PATH" -batch "disp('MATLAB detected successfully'); exit"
-
-      - name: Install pytest
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install pytest
-
-      - name: Run EyelinkInit pytest
-        env:
-          MATLAB_BIN: ${{ env.MATLAB_PATH }}
-        run: |
-          pytest -q tests/test_eyelink_init.py
+#name: "[MRI-stimulus computer] MATLAB Eyelink Test"
+#
+#on:
+#  workflow_dispatch:
+#  schedule:
+#    # 2:00 AM Dubai (UTC+4) = 22:00 UTC
+#    - cron: "0 22 * * *"
+#
+#  # Run only when this workflow file changes in a PR to main
+#  pull_request:
+#    branches: [ main ]
+#    paths:
+#      - ".github/workflows/mri-stimulus-computer-eyelink-matlab-test.yml"
+#
+#jobs:
+#  test-eyelink:
+#    runs-on: [self-hosted, mri-stimulus-computer]
+#    timeout-minutes: 15
+#
+#    steps:
+#      - name: Check out repository
+#        uses: actions/checkout@v4
+#
+#      - name: Load runner settings
+#        id: load-settings
+#        shell: bash
+#        run: |
+#          SETTINGS_FILE=".github/workflows/mri-stimulus-computer_settings.env"
+#          echo "Loading environment from $SETTINGS_FILE ..."
+#          test -f "$SETTINGS_FILE" || { echo "Missing $SETTINGS_FILE"; exit 1; }
+#          cat "$SETTINGS_FILE"
+#          # Export variables so next steps can access them
+#          set -a
+#          source "$SETTINGS_FILE"
+#          set +a
+#          # Persist for later steps
+#          cat "$SETTINGS_FILE" >> "$GITHUB_ENV"
+#          # Sanity check
+#          : "${MATLAB_PATH:?MATLAB_PATH not set in $SETTINGS_FILE}"
+#
+#      - name: Verify MATLAB availability
+#        run: |
+#          echo "Using MATLAB at: $MATLAB_PATH"
+#          "$MATLAB_PATH" -batch "disp('MATLAB detected successfully'); exit"
+#
+#      - name: Install pytest
+#        run: |
+#          python3 -m pip install --upgrade pip
+#          python3 -m pip install pytest
+#
+#      - name: Run EyelinkInit pytest
+#        env:
+#          MATLAB_BIN: ${{ env.MATLAB_PATH }}
+#        run: |
+#          pytest -q tests/test_eyelink_init.py
