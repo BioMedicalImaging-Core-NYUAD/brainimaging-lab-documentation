@@ -1,14 +1,18 @@
+import os
 import subprocess
 import sys
 
 def test_eyelink_init():
     """Run MATLAB headlessly to check EyelinkInit can execute."""
+    matlab_bin = os.environ.get("MATLAB_BIN")
+    assert matlab_bin, "MATLAB_BIN must be set (workflow should export it from the env file)."
+
     cmd = [
-        "matlab",
+        matlab_bin,
         "-nodisplay", "-nosplash", "-nojvm",
         "-r", (
             "try; "
-            "EyelinkInit(1); "  # use dummy mode so it doesn't need hardware
+            "EyelinkInit(1); "  # dummy mode so hardware is not required
             "Eyelink('Shutdown'); "
             "disp('EyelinkInit completed successfully'); "
             "exit(0); "
