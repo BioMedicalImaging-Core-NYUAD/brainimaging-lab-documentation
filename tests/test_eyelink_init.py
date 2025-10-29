@@ -1,19 +1,20 @@
-import os, shlex, subprocess, sys
+import os
+import subprocess
+import sys
 
 def test_eyelink_init():
     matlab_bin = os.environ.get("MATLAB_BIN") or os.environ.get("MATLAB_PATH")
     assert matlab_bin, "MATLAB_BIN or MATLAB_PATH must be set"
 
-    arch_prefix = os.environ.get("ARCH_PREFIX", "").strip()
-    # Parse ARCH_PREFIX safely into a list
-    prefix = shlex.split(arch_prefix) if arch_prefix else []
-    print("ARCH_PREFIX split to:", prefix, file=sys.stderr)
+    arch_bin = os.environ.get("ARCH_BIN", "").strip()
+    arch_args = os.environ.get("ARCH_ARGS", "").strip()
+    prefix = [arch_bin] + arch_args.split() if arch_bin else []
 
-    # Build final command
     cmd = prefix + [
         matlab_bin,
         "-nodisplay", "-nosplash", "-nojvm",
-        "-r", (
+        "-r",
+        (
             "try; "
             "EyelinkInit(1); "
             "Eyelink('Shutdown'); "
@@ -23,10 +24,8 @@ def test_eyelink_init():
             "disp(getReport(ME,'extended')); "
             "exit(1); "
             "end"
-        )
+        ),
     ]
-
-    print("Command:", cmd, file=sys.stderr)
 
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
     sys.stdout.write(result.stdout)
