@@ -1,4 +1,4 @@
-name: "[MRI-stimulus computer] MATLAB 2025, Eyelink Dummy Mode Test"
+name: "[MRI-stimulus computer] Automated Testing"
 
 on:
   workflow_dispatch:
