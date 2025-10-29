@@ -6,6 +6,12 @@ on:
     # 2:00 AM Dubai (UTC+4) = 22:00 UTC
     - cron: "0 22 * * *"
 
+  # Run only when this workflow file changes in a PR to main
+  pull_request:
+    branches: [ main ]
+    paths:
+      - ".github/workflows/mri-stimulus-computer-eyelink-matlab-test.yml"
+
 jobs:
   test-eyelink:
     runs-on: [self-hosted, mri-stimulus-computer]

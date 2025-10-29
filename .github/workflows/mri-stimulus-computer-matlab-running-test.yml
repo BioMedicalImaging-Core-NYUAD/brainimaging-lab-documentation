@@ -8,6 +8,11 @@ on:
     # 02:00 Asia/Dubai = 22:00 UTC (no DST)
     - cron: "0 22 * * *"
 
+  pull_request:
+    branches: [ main ]
+    paths:
+      - ".github/workflows/mri-stimulus-computer-matlab-running-test.yml"
+
 jobs:
   matlab-test:
     runs-on: mri-stimulus-computer
