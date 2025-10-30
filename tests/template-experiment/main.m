@@ -37,6 +37,7 @@ debugConfig.skipSyncTests = 1;       % 1 = skip sync tests, 0 = run sync tests
 debugConfig.displayMode = 1;          % 1 = NYUAD lab, 2 = laptop/development
 debugConfig.manualTrigger = 1;        % 1 = manual trigger (5 or t), 0 = scanner trigger
 debugConfig.buttonbox = 1;        % 1 = button box, 0 = keyboard
+debugConfig.eyetracking = 1;       % 1 = enable Eyelink, 0 = disable
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SETUP DISPLAY AND EXPERIMENT PARAMETERS
@@ -50,12 +51,24 @@ VP = setup_display(debugConfig);
 % Setup keyboard mappings
 kb = setup_keyboard();
 
+% Eyelink init (guarded, minimal)
+[pa, el] = eyelink_init(VP, pa, debugConfig.eyetracking);
+if exist('el','var') && ~isempty(el)
+    try
+        EyelinkDoTrackerSetup(el);
+    catch
+    end
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % START EXPERIMENT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 try
     % Wait for scanner trigger or manual trigger (displays message on screen)
     wait_trigger(VP, debugConfig.manualTrigger);
+    if exist('el','var') && ~isempty(el)
+        eyelink_start(el);
+    end
 
     experimentStartTime = GetSecs;
     fprintf('\n=== %s ===\n', pa.experimentName);
@@ -113,6 +126,12 @@ for trialIdx = 1:pa.nTrials
     stimulusStartTime = GetSecs;
     stimulusEndTime = stimulusStartTime + pa.stimulusDuration;
     vbl = stimulusStartTime;
+    if exist('el','var') && ~isempty(el)
+        try
+            Eyelink('Message', sprintf('TRIAL_%d_STIMULUS_ONSET_%s', pa.trialCounter, upper(targetColor)));
+        catch
+        end
+    end
 
     while GetSecs < stimulusEndTime
         % Update traveling dot position continuously
@@ -271,6 +290,11 @@ end
 
         % Use optimized flip timing for smooth animation
         vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
+    end
+
+    % Stop and save Eyelink data (guarded)
+    if exist('el','var') && ~isempty(el)
+        eyelink_stopAndSave(el, pa);
     end
 
 catch ME
