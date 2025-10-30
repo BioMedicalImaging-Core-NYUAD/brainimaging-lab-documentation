@@ -1,0 +1,11 @@
+name: "[MRI-stimulus computer] Self-runner dispatch test"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-on-self-hosted:
+    runs-on: mri-stimulus-computer
+    steps:
+      - name: Print Message
+        run: echo "Running on self-hosted by manual trigger"

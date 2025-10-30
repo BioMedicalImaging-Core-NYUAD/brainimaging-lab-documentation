@@ -79,6 +79,14 @@ Lab Address
 
 
 
+Automated Testing Badges
+------------------------
+
+.. image:: https://github.com/BioMedicalImaging-Core-NYUAD/brainimaging-lab-documentation/actions/workflows/mri-stimulus-computer-tests.yml/badge.svg
+   :target: https://github.com/BioMedicalImaging-Core-NYUAD/brainimaging-lab-documentation/actions/workflows/mri-stimulus-computer-tests.yml
+   :alt: [MRI-Stimulus Computer] Automated Testing
+
+
 
 .. *********************
 .. Documentation content
