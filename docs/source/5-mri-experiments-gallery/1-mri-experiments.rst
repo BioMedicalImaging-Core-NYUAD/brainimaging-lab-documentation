@@ -12,7 +12,6 @@ fMRI
     :glob:
 
     experiments/fmri/*
-    ../../../experiments/FMRI/finger-tapping/finger-tapping
 
 
 EEG-fMRI
