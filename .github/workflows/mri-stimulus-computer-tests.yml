@@ -10,7 +10,7 @@ on:
     branches: [ main ]
     paths:
       - ".github/workflows/mri-stimulus-computer-tests.yml"
-
+      - "tests/test_mri_stimulus_computer_config.py"
 jobs:
   test-mri-stimulus-computer:
     name: MRI-Stimulus Computer Automated Testing
