@@ -124,6 +124,8 @@ pa.data.reactionTime = nan(1, pa.maxTrials);
 pa.data.trialStartTime = zeros(1, pa.maxTrials);
 pa.data.cumulativeTime = zeros(1, pa.maxTrials);
 pa.data.fixationAngle = zeros(1, pa.maxTrials);
+pa.data.gazeX = nan(1, pa.maxTrials);
+pa.data.gazeY = nan(1, pa.maxTrials);
 pa.trialCounter = 0; % Track actual number of trials completed
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

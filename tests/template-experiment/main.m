@@ -129,6 +129,20 @@ for trialIdx = 1:pa.nTrials
     if exist('el','var') && ~isempty(el)
         try
             Eyelink('Message', sprintf('TRIAL_%d_STIMULUS_ONSET_%s', pa.trialCounter, upper(targetColor)));
+            % Record one gaze sample at stimulus onset
+            s = Eyelink('newestfloatsample');
+            gx = NaN; gy = NaN;
+            if ~isempty(s)
+                lx = s.gx(1); ly = s.gy(1);
+                rx = s.gx(2); ry = s.gy(2);
+                if ~isnan(lx) && ~isnan(ly)
+                    gx = lx; gy = ly;
+                elseif ~isnan(rx) && ~isnan(ry)
+                    gx = rx; gy = ry;
+                end
+            end
+            pa.data.gazeX(pa.trialCounter) = gx;
+            pa.data.gazeY(pa.trialCounter) = gy;
         catch
         end
     end
@@ -272,6 +286,8 @@ end
     pa.data.trialStartTime = pa.data.trialStartTime(1:nCompleted);
     pa.data.cumulativeTime = pa.data.cumulativeTime(1:nCompleted);
     pa.data.fixationAngle = pa.data.fixationAngle(1:nCompleted);
+    pa.data.gazeX = pa.data.gazeX(1:nCompleted);
+    pa.data.gazeY = pa.data.gazeY(1:nCompleted);
 
     % End screen - show circular path with moving traveling dot (no stimulus)
     endScreenStartTime = GetSecs;
@@ -371,6 +387,16 @@ pa.totalExperimentTime = totalExperimentTime;
 % Save data
 save(pa.dataFileName, 'pa');
 fprintf('Data saved to %s\n', pa.dataFileName);
+
+% Optional: visualize eye tracking if enabled
+if isfield(pa, 'eyeTrackingEnabled') && pa.eyeTrackingEnabled
+    fprintf('Generating eye tracking visualization...\n');
+    try
+        visualize_eyetracking(pa.dataFileName);
+    catch ME
+        warning(ME.identifier, '%s', ME.message);
+    end
+end
 
 end
 
