@@ -77,6 +77,34 @@ def test_matlab_runs_from_env():
 
     assert rc == 0, "MATLAB did not run successfully"
 
+def test_psychtoolbox_version():
+    """
+    Test 3: Verify that Psychtoolbox is installed and MATLAB can report its version.
+    Pass criteria: MATLAB exits with status 0 and prints a PsychtoolboxVersion line.
+    """
+    matlab_bin = os.environ.get("MATLAB_BIN") or os.environ.get("MATLAB_PATH")
+    assert matlab_bin, "MATLAB_BIN or MATLAB_PATH must be set in the CI environment"
+
+    prefix = _prefix_from_env()
+    cmd = prefix + [
+        matlab_bin,
+        "-nodisplay", "-nosplash", "-nojvm",
+        "-r",
+        (
+            "try;"
+            "v = PsychtoolboxVersion; "
+            "fprintf('PsychtoolboxVersion: %s\\n', v); "
+            "exit(0); "
+            "catch ME; "
+            "disp(getReport(ME,'extended')); "
+            "exit(1); "
+            "end"
+        ),
+    ]
+
+    print("TEST: Verify Psychtoolbox is installed and accessible via PsychtoolboxVersion.")
+    rc, _ = _run_streaming(cmd)
+    assert rc == 0, "PsychtoolboxVersion failed — Psychtoolbox may not be installed correctly"
 
 def test_eyelink_init_dummy():
     """
