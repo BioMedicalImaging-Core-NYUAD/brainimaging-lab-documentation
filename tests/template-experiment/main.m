@@ -55,13 +55,25 @@ VP = setup_display(debugConfig);
 % Setup keyboard mappings
 kb = setup_keyboard();
 
-% Eyelink init (guarded, minimal)
-[pa, el] = eyelink_init(VP, pa, debugConfig.eyetracking);
-if exist('el','var') && ~isempty(el)
-    try
-        EyelinkDoTrackerSetup(el);
-    catch
+% Add Eyetracking directory to path
+eyetrackingDir = fullfile(fileparts(mfilename('fullpath')), 'Eyetracking');
+addpath(eyetrackingDir);
+
+% Eyelink init (using reference implementation)
+if debugConfig.eyetracking
+    [pa, el] = eyelink_init(VP, pa, debugConfig.eyetracking);
+    if ~isempty(el)
+        % Calibration with proper error handling
+        [~, exitFlag] = initEyelinkStates('calibrate', VP.window, el);
+        if exitFlag
+            fprintf('\nCalibration failed or was cancelled. Disabling eye tracking.\n');
+            el = [];
+            pa.eyeTrackingEnabled = 0;
+        end
     end
+else
+    el = [];
+    pa.eyeTrackingEnabled = 0;
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -71,7 +83,11 @@ try
     % Wait for scanner trigger or manual trigger (displays message on screen)
     wait_trigger(VP, debugConfig.manualTrigger);
     if exist('el','var') && ~isempty(el)
-        eyelink_start(el);
+        err = Eyelink('CheckRecording');
+        if err ~= 0
+            initEyelinkStates('startrecording', VP.window, el);
+            fprintf('Eyelink now recording ..\n');
+        end
     end
 
     experimentStartTime = GetSecs;
@@ -314,7 +330,7 @@ end
 
     % Stop and save Eyelink data (guarded)
     if exist('el','var') && ~isempty(el)
-        eyelink_stopAndSave(el, pa);
+        initEyelinkStates('eyestop', VP.window, {pa.eyeFileBase, pa.eyeDataDir});
     end
 
 catch ME
