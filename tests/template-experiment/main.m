@@ -23,7 +23,11 @@ function main()
 clear all; close all; sca;
 
 % Add general experiments folder to path for utility functions
-addpath('/Users/stimulus/PycharmProjects/brainimaging-lab-documentation/experiments/general/vpixx-utilities/');
+% Use relative path from current file location
+scriptDir = fileparts(mfilename('fullpath'));
+projectRoot = fullfile(scriptDir, '..', '..');
+vpixxPath = fullfile(projectRoot, 'experiments', 'general', 'vpixx-utilities');
+addpath(vpixxPath);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEBUG CONFIGURATION
