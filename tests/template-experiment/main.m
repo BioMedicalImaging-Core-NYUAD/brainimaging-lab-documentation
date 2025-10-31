@@ -59,17 +59,13 @@ kb = setup_keyboard();
 eyetrackingDir = fullfile(fileparts(mfilename('fullpath')), 'Eyetracking');
 addpath(eyetrackingDir);
 
-% Eyelink init (using reference implementation)
+% Initialize eyetracking (following reference pattern exactly)
 if debugConfig.eyetracking
-    [pa, el] = eyelink_init(VP, pa, debugConfig.eyetracking);
-    if ~isempty(el)
-        % Calibration with proper error handling
-        [~, exitFlag] = initEyelinkStates('calibrate', VP.window, el);
-        if exitFlag
-            fprintf('\nCalibration failed or was cancelled. Disabling eye tracking.\n');
-            el = [];
-            pa.eyeTrackingEnabled = 0;
-        end
+    el = initEyetracking(VP, pa);
+    if isempty(el)
+        pa.eyeTrackingEnabled = 0;
+    else
+        pa.eyeTrackingEnabled = 1;
     end
 else
     el = [];
@@ -80,6 +76,16 @@ end
 % START EXPERIMENT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 try
+    % Calibration (following reference pattern - called before experiment starts)
+    if exist('el','var') && ~isempty(el)
+        [~, exitFlag] = initEyelinkStates('calibrate', VP.window, el);
+        if exitFlag
+            fprintf('\nCalibration failed or was cancelled. Disabling eye tracking.\n');
+            el = [];
+            pa.eyeTrackingEnabled = 0;
+        end
+    end
+    
     % Wait for scanner trigger or manual trigger (displays message on screen)
     wait_trigger(VP, debugConfig.manualTrigger);
     if exist('el','var') && ~isempty(el)
