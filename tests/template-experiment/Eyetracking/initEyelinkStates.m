@@ -54,10 +54,20 @@ switch command
             fprintf('\nCouldn''t initialize connection with eyetracker! Exiting ...\n');
             return
         end
+        fprintf('EyelinkInit succeeded. Link established.\n');
         
         % Set up the eyetracker
         %EL = initEyelinkDefaultVars(window, screen); % do not unify the keyboard!!
         EL = EyelinkInitDefaults(window); % trying this instead 09/05/2025
+        fprintf('EyelinkInitDefaults: window ptr %d\n', window);
+
+        % This ensures calibration targets appear on the correct display
+        rect = Screen(window, 'Rect');
+        if Eyelink('IsConnected') ~= EL.notconnected
+            Eyelink('Command', 'screen_pixel_coords = %d %d %d %d', rect(1), rect(2), rect(3)-1, rect(4)-1);
+            fprintf('Screen pixel coordinates sent to Eyelink: [%d %d %d %d]\n', rect(1), rect(2), rect(3)-1, rect(4)-1);
+        end
+        fprintf('PTB window rect: [%d %d %d %d]\n', rect(1), rect(2), rect(3), rect(4));
 
         % never used these values below, but if DVA in eyelink need
         % adjustments, these are the values required:
@@ -71,11 +81,15 @@ switch command
 
         
         Eyelink('Command', 'file_sample_data = LEFT,RIGHT,GAZE,AREA');
+        fprintf('Eyelink command set: file_sample_data = LEFT,RIGHT,GAZE,AREA\n');
         Eyelink('Command', 'calibration_type = HV5');
+        fprintf('Eyelink command set: calibration_type = HV5\n');
         
         %Eyelink('Command', 'enable_automatic_calibration = YES');
         Eyelink('Command', 'calibration_area_proportion = 0.8 0.4');
         Eyelink('Command', 'validation_area_proportion = 0.8 0.4');
+        fprintf('Eyelink command set: calibration_area_proportion = 0.8 0.4\n');
+        fprintf('Eyelink command set: validation_area_proportion = 0.8 0.4\n');
         
         [~, vs] = Eyelink('GetTrackerVersion');
         fprintf('\nRunning experiment on a %s tracker.\n', vs );
@@ -83,6 +97,7 @@ switch command
         % Start the eye file
         edfFile = sprintf('%s.edf', eyeFile);
         edfFileStatus = Eyelink('OpenFile', edfFile);
+        fprintf('Eyelink OpenFile("%s") status = %d\n', edfFile, edfFileStatus);
         if edfFileStatus == 0
             fprintf('\nEye file opened in:\n\n')
             fprintf('%s\n\n', pwd)
@@ -134,7 +149,9 @@ switch command
 %         end
 %         Screen('Flip', window, 0, 1);
         
+        fprintf('Entering EyelinkDoTrackerSetup...\n');
         cali = EyelinkDoTrackerSetup(EL);    % this fails --
+        fprintf('EyelinkDoTrackerSetup returned: %d\n', cali);
         if cali == EL.TERMINATE_KEY, exitFlag = 1;return, end
         
         output = cali
@@ -152,8 +169,8 @@ switch command
             
             
             err = Eyelink('CheckRecording'); 	% check recording status
-            if err == 0, record = 1; Eyelink('Message', 'RECORD_START');
-            else, record = 0; Eyelink('Message', 'RECORD_FAILURE');% results in repetition of fixation check
+            if err == 0, record = 1; Eyelink('Message', 'RECORD_START'); fprintf('Eyelink recording started successfully.\n');
+            else, record = 0; Eyelink('Message', 'RECORD_FAILURE'); fprintf('Eyelink CheckRecording error code: %d\n', err); % results in repetition of fixation check
             end
         end
         
