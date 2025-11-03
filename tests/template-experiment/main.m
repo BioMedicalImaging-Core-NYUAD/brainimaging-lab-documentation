@@ -61,14 +61,14 @@ addpath(eyetrackingDir);
 
 % Initialize eyetracking (following reference pattern exactly)
 if debugConfig.eyetracking
-    el = initEyetracking(VP, pa);
-    if isempty(el)
+    pa.EL = initEyetracking(VP, pa);
+    if isempty(pa.EL)
         pa.eyeTrackingEnabled = 0;
     else
         pa.eyeTrackingEnabled = 1;
     end
 else
-    el = [];
+    pa.EL = [];
     pa.eyeTrackingEnabled = 0;
 end
 
@@ -77,21 +77,21 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 try
     % Calibration (following reference pattern - called before experiment starts)
-    if exist('el','var') && ~isempty(el)
-        [~, exitFlag] = initEyelinkStates('calibrate', VP.window, el);
+    if pa.eyeTrackingEnabled
+        [~, exitFlag] = initEyelinkStates('calibrate', VP.window, pa.EL);
         if exitFlag
             fprintf('\nCalibration failed or was cancelled. Disabling eye tracking.\n');
-            el = [];
+            pa.EL = [];
             pa.eyeTrackingEnabled = 0;
         end
     end
-    
+
     % Wait for scanner trigger or manual trigger (displays message on screen)
     wait_trigger(VP, debugConfig.manualTrigger);
-    if exist('el','var') && ~isempty(el)
+    if pa.eyeTrackingEnabled
         err = Eyelink('CheckRecording');
         if err ~= 0
-            initEyelinkStates('startrecording', VP.window, el);
+            initEyelinkStates('startrecording', VP.window, pa.EL);
             fprintf('Eyelink now recording ..\n');
         end
     end
@@ -104,6 +104,12 @@ try
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Initialize fixation angle (starts at 0 radians)
     currentFixationAngle = 0;
+
+    % Initialize blink detection (following vri_restingstate pattern)
+    blinkCounter = 0;
+    if pa.eyeTrackingEnabled
+        blinkFrameThresh = (1/VP.ifi) * pa.blinkSecThresh;
+    end
 
     % Setup KbQueue once for efficient button detection throughout experiment
     KbQueueCreate();
@@ -152,7 +158,7 @@ for trialIdx = 1:pa.nTrials
     stimulusStartTime = GetSecs;
     stimulusEndTime = stimulusStartTime + pa.stimulusDuration;
     vbl = stimulusStartTime;
-    if exist('el','var') && ~isempty(el)
+    if pa.eyeTrackingEnabled
         try
             Eyelink('Message', sprintf('TRIAL_%d_STIMULUS_ONSET_%s', pa.trialCounter, upper(targetColor)));
             % Record one gaze sample at stimulus onset
@@ -185,6 +191,21 @@ for trialIdx = 1:pa.nTrials
 
         % Use optimized flip timing for smooth animation
         vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
+
+        % Continuous eye tracking monitoring (following vri_restingstate pattern)
+        if pa.eyeTrackingEnabled
+            evt = Eyelink('newestfloatsample');
+            xPos = evt.gx;
+            yPos = evt.gy;
+            if isequal(xPos(1), xPos(2), yPos(1), yPos(2))
+                blinkCounter = blinkCounter + 1;
+                if blinkCounter >= blinkFrameThresh
+                    % play alarm: Beeper(400, 0.8, 1);
+                end
+            else
+                blinkCounter = 0;
+            end
+        end
     end
     
     % Phase 2: Wait for response
@@ -209,6 +230,21 @@ for trialIdx = 1:pa.nTrials
 
         vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
 
+        % Continuous eye tracking monitoring (following vri_restingstate pattern)
+        if pa.eyeTrackingEnabled
+            evt = Eyelink('newestfloatsample');
+            xPos = evt.gx;
+            yPos = evt.gy;
+            if isequal(xPos(1), xPos(2), yPos(1), yPos(2))
+                blinkCounter = blinkCounter + 1;
+                if blinkCounter >= blinkFrameThresh
+                    % play alarm: Beeper(400, 0.8, 1);
+                end
+            else
+                blinkCounter = 0;
+            end
+        end
+
         % Check for button press using KbQueue (only record first response)
         if ~responseReceived
                 if ~debugConfig.buttonbox
@@ -226,7 +262,7 @@ for trialIdx = 1:pa.nTrials
                         responseTime = GetSecs - responseStartTime;
                         responseButton = pair{2}; % Get color from response
                     end
-                end         
+                end
         end
     end
 
@@ -269,6 +305,21 @@ for trialIdx = 1:pa.nTrials
 
         % Use optimized flip timing for smooth animation
         vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
+
+        % Continuous eye tracking monitoring (following vri_restingstate pattern)
+        if pa.eyeTrackingEnabled
+            evt = Eyelink('newestfloatsample');
+            xPos = evt.gx;
+            yPos = evt.gy;
+            if isequal(xPos(1), xPos(2), yPos(1), yPos(2))
+                blinkCounter = blinkCounter + 1;
+                if blinkCounter >= blinkFrameThresh
+                    % play alarm: Beeper(400, 0.8, 1);
+                end
+            else
+                blinkCounter = 0;
+            end
+        end
     end
 
     % Phase 4: Inter-trial interval
@@ -288,6 +339,21 @@ for trialIdx = 1:pa.nTrials
 
         % Use optimized flip timing for smooth animation
         vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
+
+        % Continuous eye tracking monitoring (following vri_restingstate pattern)
+        if pa.eyeTrackingEnabled
+            evt = Eyelink('newestfloatsample');
+            xPos = evt.gx;
+            yPos = evt.gy;
+            if isequal(xPos(1), xPos(2), yPos(1), yPos(2))
+                blinkCounter = blinkCounter + 1;
+                if blinkCounter >= blinkFrameThresh
+                    % play alarm: Beeper(400, 0.8, 1);
+                end
+            else
+                blinkCounter = 0;
+            end
+        end
     end
     
     % Print trial result
@@ -332,10 +398,25 @@ end
 
         % Use optimized flip timing for smooth animation
         vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
+
+        % Continuous eye tracking monitoring (following vri_restingstate pattern)
+        if pa.eyeTrackingEnabled
+            evt = Eyelink('newestfloatsample');
+            xPos = evt.gx;
+            yPos = evt.gy;
+            if isequal(xPos(1), xPos(2), yPos(1), yPos(2))
+                blinkCounter = blinkCounter + 1;
+                if blinkCounter >= blinkFrameThresh
+                    % play alarm: Beeper(400, 0.8, 1);
+                end
+            else
+                blinkCounter = 0;
+            end
+        end
     end
 
     % Stop and save Eyelink data (guarded)
-    if exist('el','var') && ~isempty(el)
+    if pa.eyeTrackingEnabled
         initEyelinkStates('eyestop', VP.window, {pa.eyeFileBase, pa.eyeDataDir});
     end
 

@@ -157,7 +157,7 @@ pa.experimentName = 'Circular Path Button Pressing Experiment';
 pa.dataFileName = 'circular_path_data.mat';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% EYE TRACKING PARAMETERS (minimal)
+% EYE TRACKING PARAMETERS (following vri_restingstate pattern)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if isfield(debugConfig, 'eyetracking')
     pa.eyeTrackingEnabled = debugConfig.eyetracking;
@@ -169,6 +169,7 @@ if ~exist(pa.eyeDataDir, 'dir'), mkdir(pa.eyeDataDir); end
 base = datestr(now,'mmddHHMM');
 pa.eyeFileBase = base(1:min(end,8));
 pa.eyeFileName = [pa.eyeFileBase '.edf'];
+pa.blinkSecThresh = 5;  % seconds allowed for blink before alarm (following vri_restingstate)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEBUG AND TRIGGER PARAMETERS
