@@ -48,13 +48,21 @@ switch command
         %% start eyetracker
         eyeFile = input{1};
         screen = input{2};
-        
-        % First check if we can get a connection
-        if EyelinkInit() ~= 1
-            fprintf('\nCouldn''t initialize connection with eyetracker! Exiting ...\n');
-            return
+
+        % First check if we can get a connection (try real, fallback to dummy)
+        status = EyelinkInit();
+        if status ~= 1
+            % Try dummy mode for testing without hardware
+            fprintf('\nReal EyeLink not available, trying dummy mode...\n');
+            status = EyelinkInit(1);  % 1 = dummy mode
+            if status ~= 1
+                fprintf('\nCouldn''t initialize connection with eyetracker! Exiting ...\n');
+                return
+            end
+            fprintf('EyelinkInit succeeded in DUMMY mode.\n');
+        else
+            fprintf('EyelinkInit succeeded. Link established.\n');
         end
-        fprintf('EyelinkInit succeeded. Link established.\n');
         
         % Set up the eyetracker
         %EL = initEyelinkDefaultVars(window, screen); % do not unify the keyboard!!
@@ -79,7 +87,9 @@ switch command
         EL.targetbeep=0;  % sound a beep when a target is presented
         EL.feedbackbeep=0; % RE added
 
-        
+        % Update EyeLink with our custom settings (important for callback)
+        EyelinkUpdateDefaults(EL);
+
         Eyelink('Command', 'file_sample_data = LEFT,RIGHT,GAZE,AREA');
         fprintf('Eyelink command set: file_sample_data = LEFT,RIGHT,GAZE,AREA\n');
         Eyelink('Command', 'calibration_type = HV5');
@@ -114,46 +124,18 @@ switch command
     case 'calibrate'
         %% calibrate eyetracker
         EL = input;
-        
+
         cali_string = sprintf('Eye tracker calibration:\n\nPlease fixate on the markers.');
-        %\n\nPress ''space'' to start or ''q'' to quit');
         DrawFormattedText(window, cali_string, 'center', 'center', 1, []);
-        Screen('Flip', window, 0, 1); 
-        
+        Screen('Flip', window);
+
         pause(2)
 
-%         % eyetracker instructions until space/q is pressed
-%         contKey = '';
-%         while isempty(find(strcmp(contKey,'space'), 1))
-%             keyIsDown = 0;
-%             while ~keyIsDown
-%                 [keyIsDown, ~, keyCode] = KbCheck(-1); %% listen to all keyboards
-%                 disp(find(keyCode))
-%             end
-%             contKey = KbName(find(keyCode));
-%         end
-%         
-%         % clear keyBoard events
-%         while KbCheck; end
-%         FlushEvents('KeyDown');
-%         clear KbCheck;
-%         
-%         if strcmp(contKey,'q')
-%             ListenChar(0);
-%             ShowCursor;
-%             Screen('CloseAll')
-%             fclose('all');
-%             fprintf('User ended program');
-%             exitFlag = 1;
-%             return
-%         end
-%         Screen('Flip', window, 0, 1);
-        
         fprintf('Entering EyelinkDoTrackerSetup...\n');
-        cali = EyelinkDoTrackerSetup(EL);    % this fails --
+        cali = EyelinkDoTrackerSetup(EL);
         fprintf('EyelinkDoTrackerSetup returned: %d\n', cali);
         if cali == EL.TERMINATE_KEY, exitFlag = 1;return, end
-        
+
         output = cali
         
     case 'startrecording'
