@@ -30,10 +30,14 @@ end % End skip sync tests block
 VP.debugTrigger = debugConfig.enabled; % Enable debug trigger flag
 global GL; % Use OpenGL constants
 
-% VRI method - use PsychDefaultSetup instead of InitializeMatlabOpenGL
-% This asserts OpenGL, setup unified keys and unit color range (0-1)
+% VRI method: PsychDefaultSetup asserts OpenGL, unified keys, and 0-1 color range
 PsychDefaultSetup(2);
 PsychImaging('PrepareConfiguration'); % Start imaging pipeline configuration
+PsychImaging('AddTask', 'General', 'FloatingPoint32BitIfPossible'); % VRI method
+
+% Initialize PsychSound (VRI method - added 09/05/2025 to VRI)
+InitializePsychSound(1); % 1 = request low-latency mode
+PsychPortAudio('Open');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEFINE DISPLAY SPECIFIC VIEWING CONDITIONS
@@ -45,8 +49,6 @@ switch(debugConfig.displayMode) % Select hardware profile
         VP.screenWidthMm = 711;    % mm physical screen width
         VP.screenHeightMm = VP.screenWidthMm*9/16; % mm height from 16:9
         VP.whiteValue = 255; % Max luminance value
-        VP.stereoMode = 0; % Mono rendering
-        VP.multiSample = 32; % Anti-aliasing samples
         if debugConfig.fullscreen == 1 % Fullscreen toggle
             VP.fullscreen = []; % Fullscreen
         else
@@ -59,8 +61,6 @@ switch(debugConfig.displayMode) % Select hardware profile
         VP.screenWidthMm = 345;    % mm physical screen width
         VP.screenHeightMm = 215.4; % mm physical screen height
         VP.whiteValue = 255; % Max luminance value
-        VP.stereoMode = 0; % Mono rendering
-        VP.multiSample = 32; % Anti-aliasing samples
         if debugConfig.fullscreen == 1 % Fullscreen toggle
             VP.fullscreen = []; % Fullscreen
         else
@@ -81,29 +81,18 @@ Screen('Preference','VisualDebugLevel', 3); % Show startup splash/debug
 VP.screenID = max(Screen('Screens')); % Use external screen if present
 VP.centerPatch = 0.75; % Fractional center patch size
 
-% Setup VPixx if needed (VRI method - DON'T add to imaging pipeline)
+% Setup VPixx if needed - CRITICAL: Don't add to imaging pipeline (conflicts with EyeLink)
 switch VP.Display % Only for lab hardware
-    case 1 % VIEWPixx/Datapixx path
+    case 1 % VIEWPixx/Datapixx path (matching VRI method)
         if ~Datapixx('IsReady') % Ensure device open
             Datapixx('Open'); % Open connection
         end
         Datapixx('StopAllSchedules'); % Stop any running schedules
-        Datapixx('RegWrRd'); % Synchronize registers
+        Datapixx('RegWrRd'); % Synchronize DATAPixx registers to local register cache
 end % End VPixx setup
 
-% Add FloatingPoint task for better precision (VRI method)
-PsychImaging('AddTask', 'General', 'FloatingPoint32BitIfPossible');
-
-% Initialize PsychSound BEFORE opening window (VRI method)
-try
-    InitializePsychSound(1); % 1 = request low-latency mode
-catch
-    fprintf('Warning: Could not initialize PsychSound\n');
-end
-
-VP.backGroundColor = [0.5 0.5 0.5]; % Mid-gray background (0-1 range, VRI method)
-% Use simpler OpenWindow call matching VRI (no stereoMode, no multiSample)
-[VP.window, VP.Rect] = PsychImaging('OpenWindow', VP.screenID, VP.backGroundColor, VP.fullscreen, [], [], [], [], []); % Create window
+VP.backGroundColor = [.5 .5 .5]; % Mid-gray background (0-1 range, VRI method)
+[VP.window, VP.Rect] = PsychImaging('OpenWindow', VP.screenID, VP.backGroundColor, VP.fullscreen, [], [], [], [], []); % Create window (VRI method)
 
 [VP.windowCenter(1), VP.windowCenter(2)] = RectCenter(VP.Rect); % Compute window center
 VP.windowWidthPix = VP.Rect(3) - VP.Rect(1); % Window width in pixels
@@ -111,19 +100,11 @@ VP.windowHeightPix = VP.Rect(4) - VP.Rect(2); % Window height in pixels
 VP.screenWidthPix = VP.windowWidthPix; % Effective screen width
 VP.screenHeightPix = VP.windowHeightPix; % Effective screen height
 
-% Flip to clear (VRI method)
-VP.vbl = Screen('Flip', VP.window);
-
-% Query the frame duration (VRI method)
-VP.ifi = Screen('GetFlipInterval', VP.window); % Inter-frame interval (s)
-VP.frameRate = 1/VP.ifi; % Refresh rate (Hz)
-
-% Enable alpha-blending (VRI method)
-Screen('BlendFunction', VP.window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEFINE STRUCTURE HOLDING ALL VIEWING PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+VP.ifi = Screen('GetFlipInterval', VP.window); % Inter-frame interval (s)
+VP.frameRate = 1/Screen('GetFlipInterval', VP.window); % Refresh rate (Hz)
 
 % Calculate visual angle parameters
 VP.screenWidthDeg = 2*atand(0.5*VP.screenWidthMm/VP.screenDistance); % Screen width in degrees
@@ -141,29 +122,23 @@ if round(VP.gray) == VP.white % Avoid white if rounding up
 end % End gray correction
 VP.inc = VP.white - VP.gray; % Contrast increment
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% DEFINE FRUSTUM AND FIXATION PARAMETERS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-ar = RectHeight(VP.Rect) / RectWidth(VP.Rect); % Aspect ratio
-VP.halfWidth = VP.screenWidthMm/2; % Half screen width (mm)
-VP.halfHeight = ar * VP.halfWidth; % Half screen height (mm)
-VP.viewingAngle = atan(VP.halfWidth/VP.screenDistance); % Half FOV (rad)
+% Set up alpha-blending
+Screen('BlendFunction', VP.window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % PTB blend function
 
-VP.near = 250; % Near clipping plane (mm)
-VP.far = 2500; % Far clipping plane (mm)
-VP.halfFrustumWidth = VP.near * tan(VP.viewingAngle); % Frustum half-width
-VP.halfFrustumHeight = ar * VP.halfFrustumWidth; % Frustum half-height
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DEFINE FIXATION PARAMETERS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Fixation cross parameters
 VP.fixationSquareHalfSize = 0.5 * VP.pixelsPerDegree; % Half-size in pixels
 VP.fixationLineWidth = 1; % Line width in pixels
 VP.fixationDotDiameter = 3; % Dot diameter in pixels
 
-% Set timestamps
-VP.tstart = VP.vbl; % Set start time (using vbl from earlier flip)
+% Initial flip to sync to VBL
+VP.vbl = Screen('Flip', VP.window); % Get first VBL timestamp
+VP.tstart = VP.vbl; % Set start time
 VP.telapsed = 0; % Reset elapsed time
 
-% Set high priority (VRI method)
+% Set high priority
 priorityLevel = MaxPriority(VP.window); % Determine max priority
 Priority(priorityLevel); % Apply process priority
 
