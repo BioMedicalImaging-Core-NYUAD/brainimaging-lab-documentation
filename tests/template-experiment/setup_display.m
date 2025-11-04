@@ -75,9 +75,11 @@ switch VP.Display % Only for lab hardware
         Datapixx('RegWrRd'); % Synchronize DATAPixx registers to local register cache
 end % End VPixx setup
 
-% VRI method: PsychDefaultSetup asserts OpenGL, unified keys, and 0-1 color range
-PsychDefaultSetup(2);
-ListenChar(0); % Listen for keyboard input (VRI method)
+% WORKAROUND: Use PsychDefaultSetup(1) instead of (2)
+% PsychDefaultSetup(2) enables imaging pipeline which breaks EyeLink on Apple Silicon + external display
+% (1) = unified key names only, no imaging pipeline
+PsychDefaultSetup(1);
+ListenChar(0); % Listen for keyboard input
 
 % Initialize PsychSound (VRI method - added 09/05/2025 to VRI)
 InitializePsychSound(1); % 1 = request low-latency mode
@@ -85,7 +87,7 @@ PsychPortAudio('Open');
 
 % WORKAROUND: Use plain Screen('OpenWindow') instead of PsychImaging
 % PsychImaging pipeline breaks EyeLink callbacks in fullscreen on Apple Silicon + external display
-VP.backGroundColor = [.5 .5 .5]; % Mid-gray background (0-1 range)
+VP.backGroundColor = [128 128 128]; % Mid-gray background (0-255 range with PsychDefaultSetup(1))
 [VP.window, VP.Rect] = Screen('OpenWindow', VP.screenID, VP.backGroundColor, VP.fullscreen); % Plain window without imaging pipeline
 
 [VP.windowCenter(1), VP.windowCenter(2)] = RectCenter(VP.Rect); % Compute window center
