@@ -39,9 +39,10 @@ switch(debugConfig.displayMode) % Select hardware profile
         if debugConfig.fullscreen == 1 % Fullscreen toggle
             VP.fullscreen = []; % Fullscreen
         else
-            % Large windowed mode on projector screen (nearly fullscreen)
-            % Leave small margins for window decorations
-            VP.fullscreen = [10 10 1910 1070]; % Nearly fullscreen windowed on 1920x1080 projector
+            % Large windowed mode on projector screen (screen 1)
+            % Screen 0 is 1920 wide, so screen 1 starts at x=1920
+            % Position window on screen 1 with small margins
+            VP.fullscreen = [1930 10 3830 1070]; % Nearly fullscreen windowed on projector (screen 1)
         end
         
     case 2 % Laptop/Development
