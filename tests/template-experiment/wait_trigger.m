@@ -8,12 +8,6 @@ function wait_trigger(VP, manualTrigger)
 % Output:
 %   none (function blocks until trigger received)
 %
-
-% CRITICAL FIX: Declare as global to avoid MATLAB static workspace limitation
-global IMAGINGPIPE_FLIPTWHEN;
-global IMAGINGPIPE_FLIPVBLSYNCLEVEL;
-IMAGINGPIPE_FLIPTWHEN=[];
-IMAGINGPIPE_FLIPVBLSYNCLEVEL=[];
 % Usage:
 %   wait_trigger(VP, true);   % Debug mode (press t)
 %   wait_trigger(VP, false);  % Scanner mode

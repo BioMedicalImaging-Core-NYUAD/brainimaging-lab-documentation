@@ -7,12 +7,6 @@ function VP = setup_display(debugConfig) % Initialize display and return viewing
 % Output:
 %   VP - Viewing Parameters structure with all display settings
 
-% CRITICAL FIX: Declare as global to avoid MATLAB static workspace limitation
-global IMAGINGPIPE_FLIPTWHEN;
-global IMAGINGPIPE_FLIPVBLSYNCLEVEL;
-IMAGINGPIPE_FLIPTWHEN=[];
-IMAGINGPIPE_FLIPVBLSYNCLEVEL=[];
-
 % Input validation
 if ~isstruct(debugConfig) % Ensure input is a struct
     error('setup_display:invalidInput', 'debugConfig must be a structure'); % Throw error if not
@@ -45,7 +39,9 @@ switch(debugConfig.displayMode) % Select hardware profile
         if debugConfig.fullscreen == 1 % Fullscreen toggle
             VP.fullscreen = []; % Fullscreen
         else
-            VP.fullscreen = [0 0 1024 768]; % Windowed rectangle
+            % Large windowed mode on projector screen (nearly fullscreen)
+            % Leave small margins for window decorations
+            VP.fullscreen = [10 10 1910 1070]; % Nearly fullscreen windowed on 1920x1080 projector
         end
         
     case 2 % Laptop/Development

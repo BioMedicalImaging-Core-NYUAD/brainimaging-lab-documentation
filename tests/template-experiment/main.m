@@ -19,18 +19,8 @@ function main()
 %
 % All timing and visual parameters are configurable in setup_param.m
 
-% CRITICAL FIX: Declare as global BEFORE clear all
-global IMAGINGPIPE_FLIPTWHEN;
-global IMAGINGPIPE_FLIPVBLSYNCLEVEL;
-
 % Clear workspace and close any open windows
 clear all; close all; sca;
-
-% CRITICAL FIX: Re-initialize after clear
-global IMAGINGPIPE_FLIPTWHEN;
-global IMAGINGPIPE_FLIPVBLSYNCLEVEL;
-IMAGINGPIPE_FLIPTWHEN=[];
-IMAGINGPIPE_FLIPVBLSYNCLEVEL=[];
 
 % Add general experiments folder to path for utility functions
 % Use relative path from current file location
@@ -46,7 +36,7 @@ addpath(vpixxPath);
 debugConfig = struct();
 debugConfig.enabled = 1;              % 1 = debug mode, 0 = production mode
 debugConfig.useVPixx = 1;             % 1 = use VPixx hardware, 0 = use keyboard
-debugConfig.fullscreen = 1;            % 1 = fullscreen, 0 = windowed mode
+debugConfig.fullscreen = 0;            % 1 = fullscreen, 0 = windowed mode (large window on projector)
 debugConfig.skipSyncTests = 1;       % 1 = skip sync tests, 0 = run sync tests
 debugConfig.displayMode = 1;          % 1 = NYUAD lab, 2 = laptop/development
 debugConfig.manualTrigger = 1;        % 1 = manual trigger (5 or t), 0 = scanner trigger
