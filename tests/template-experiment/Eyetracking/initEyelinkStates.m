@@ -103,7 +103,7 @@ switch command
         cali_string = sprintf('Eye tracker calibration:\n\nPlease fixate on the markers.');
         %\n\nPress ''space'' to start or ''q'' to quit');
         DrawFormattedText(window, cali_string, 'center', 'center', 1, []);
-        Screen('Flip', window, 0, 1);
+        Screen('Flip', window); % Removed incompatible parameters for imaging pipeline
 
         pause(2)
 
