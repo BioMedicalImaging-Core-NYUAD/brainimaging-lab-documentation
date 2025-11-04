@@ -78,7 +78,8 @@ end % End VPixx setup
 % VRI method: PsychDefaultSetup asserts OpenGL, unified keys, and 0-1 color range
 PsychDefaultSetup(2);
 PsychImaging('PrepareConfiguration'); % First step in starting pipeline
-PsychImaging('AddTask', 'General', 'FloatingPoint32BitIfPossible');
+% NOTE: FloatingPoint32BitIfPossible removed - causes framebuffer errors on Apple Silicon + external display
+% PsychImaging('AddTask', 'General', 'FloatingPoint32BitIfPossible');
 ListenChar(0); % Listen for keyboard input (VRI method)
 
 % Initialize PsychSound (VRI method - added 09/05/2025 to VRI)
