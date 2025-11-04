@@ -29,8 +29,10 @@ end % End skip sync tests block
 
 VP.debugTrigger = debugConfig.enabled; % Enable debug trigger flag
 global GL; % Use OpenGL constants
-AssertOpenGL; % Ensure PTB is using OpenGL
-InitializeMatlabOpenGL(0,3); % Initialize OpenGL (no debug, 3D)
+
+% VRI method - use PsychDefaultSetup instead of InitializeMatlabOpenGL
+% This asserts OpenGL, setup unified keys and unit color range (0-1)
+PsychDefaultSetup(2);
 PsychImaging('PrepareConfiguration'); % Start imaging pipeline configuration
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -79,25 +81,29 @@ Screen('Preference','VisualDebugLevel', 3); % Show startup splash/debug
 VP.screenID = max(Screen('Screens')); % Use external screen if present
 VP.centerPatch = 0.75; % Fractional center patch size
 
-% Setup VPixx if needed
+% Setup VPixx if needed (VRI method - DON'T add to imaging pipeline)
 switch VP.Display % Only for lab hardware
     case 1 % VIEWPixx/Datapixx path
-        PsychImaging('AddTask','General','UseDataPixx'); % Route via DataPixx
-        
         if ~Datapixx('IsReady') % Ensure device open
             Datapixx('Open'); % Open connection
         end
-        
-        if (Datapixx('IsVIEWPixx')) % VIEWPixx specific
-            Datapixx('EnableVideoScanningBacklight'); % Enable scanning backlight
-        end
-        Datapixx('EnableVideoStereoBlueline'); % Enable blue-line stereo sync
-        Datapixx('SetVideoStereoVesaWaveform', 2); % Set VESA waveform type
-        Datapixx('RegWrRd'); % Commit settings
+        Datapixx('StopAllSchedules'); % Stop any running schedules
+        Datapixx('RegWrRd'); % Synchronize registers
 end % End VPixx setup
 
-VP.backGroundColor = [255/2 255/2 255/2]; % Mid-gray background
-[VP.window, VP.Rect] = PsychImaging('OpenWindow', VP.screenID, VP.backGroundColor, VP.fullscreen, [], [], VP.stereoMode, VP.multiSample); % Create window
+% Add FloatingPoint task for better precision (VRI method)
+PsychImaging('AddTask', 'General', 'FloatingPoint32BitIfPossible');
+
+% Initialize PsychSound BEFORE opening window (VRI method)
+try
+    InitializePsychSound(1); % 1 = request low-latency mode
+catch
+    fprintf('Warning: Could not initialize PsychSound\n');
+end
+
+VP.backGroundColor = [0.5 0.5 0.5]; % Mid-gray background (0-1 range, VRI method)
+% Use simpler OpenWindow call matching VRI (no stereoMode, no multiSample)
+[VP.window, VP.Rect] = PsychImaging('OpenWindow', VP.screenID, VP.backGroundColor, VP.fullscreen, [], [], [], [], []); % Create window
 
 [VP.windowCenter(1), VP.windowCenter(2)] = RectCenter(VP.Rect); % Compute window center
 VP.windowWidthPix = VP.Rect(3) - VP.Rect(1); % Window width in pixels
@@ -105,21 +111,19 @@ VP.windowHeightPix = VP.Rect(4) - VP.Rect(2); % Window height in pixels
 VP.screenWidthPix = VP.windowWidthPix; % Effective screen width
 VP.screenHeightPix = VP.windowHeightPix; % Effective screen height
 
-% Setup OpenGL context
-glBlendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA); % Set blending parameters
-Screen('BeginOpenGL', VP.window); % Enter OpenGL mode
-glViewport(0, 0, VP.windowWidthPix, VP.windowHeightPix); % Set viewport
-glDisable(GL.LIGHTING); % Disable fixed-function lighting
-glEnable(GL.DEPTH_TEST); % Enable depth testing
-glEnable(GL.BLEND); % Enable alpha blending
-glBlendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA); % Configure blend function
-Screen('EndOpenGL', VP.window); % Exit OpenGL mode
+% Flip to clear (VRI method)
+VP.vbl = Screen('Flip', VP.window);
+
+% Query the frame duration (VRI method)
+VP.ifi = Screen('GetFlipInterval', VP.window); % Inter-frame interval (s)
+VP.frameRate = 1/VP.ifi; % Refresh rate (Hz)
+
+% Enable alpha-blending (VRI method)
+Screen('BlendFunction', VP.window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEFINE STRUCTURE HOLDING ALL VIEWING PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-VP.ifi = Screen('GetFlipInterval', VP.window); % Inter-frame interval (s)
-VP.frameRate = 1/Screen('GetFlipInterval', VP.window); % Refresh rate (Hz)
 
 % Calculate visual angle parameters
 VP.screenWidthDeg = 2*atand(0.5*VP.screenWidthMm/VP.screenDistance); % Screen width in degrees
@@ -136,9 +140,6 @@ if round(VP.gray) == VP.white % Avoid white if rounding up
     VP.gray = VP.black; % Use black instead
 end % End gray correction
 VP.inc = VP.white - VP.gray; % Contrast increment
-
-% Set up alpha-blending
-Screen('BlendFunction', VP.window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % PTB blend function
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEFINE FRUSTUM AND FIXATION PARAMETERS
@@ -158,12 +159,11 @@ VP.fixationSquareHalfSize = 0.5 * VP.pixelsPerDegree; % Half-size in pixels
 VP.fixationLineWidth = 1; % Line width in pixels
 VP.fixationDotDiameter = 3; % Dot diameter in pixels
 
-% Initial flip to sync to VBL
-VP.vbl = Screen('Flip', VP.window); % Get first VBL timestamp
-VP.tstart = VP.vbl; % Set start time
+% Set timestamps
+VP.tstart = VP.vbl; % Set start time (using vbl from earlier flip)
 VP.telapsed = 0; % Reset elapsed time
 
-% Set high priority
+% Set high priority (VRI method)
 priorityLevel = MaxPriority(VP.window); % Determine max priority
 Priority(priorityLevel); % Apply process priority
 
