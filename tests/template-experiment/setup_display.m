@@ -23,21 +23,8 @@ if ~ismember(debugConfig.displayMode, [1, 2]) % Validate display mode
     error('setup_display:invalidDisplayMode', 'debugConfig.displayMode must be 1 (NYUAD Lab) or 2 (Laptop)'); % Error if invalid
 end % End display mode validation
 
-if debugConfig.skipSyncTests == 1 % Optionally skip sync tests for dev
-    Screen('Preference','SkipSyncTests',1); % Insecure but useful for debugging
-end % End skip sync tests block
-
 VP.debugTrigger = debugConfig.enabled; % Enable debug trigger flag
 global GL; % Use OpenGL constants
-
-% VRI method: PsychDefaultSetup asserts OpenGL, unified keys, and 0-1 color range
-PsychDefaultSetup(2);
-PsychImaging('PrepareConfiguration'); % Start imaging pipeline configuration
-PsychImaging('AddTask', 'General', 'FloatingPoint32BitIfPossible'); % VRI method
-
-% Initialize PsychSound (VRI method - added 09/05/2025 to VRI)
-InitializePsychSound(1); % 1 = request low-latency mode
-PsychPortAudio('Open');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEFINE DISPLAY SPECIFIC VIEWING CONDITIONS
@@ -73,15 +60,12 @@ end % End display profile switch
 VP.Display = debugConfig.displayMode; % Store selected display profile
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SETUP PSYCHTOOLBOX WITH OPENGL
+% SETUP PSYCHTOOLBOX WITH OPENGL (VRI METHOD - EXACT ORDER MATTERS)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Screen('Preference', 'Verbosity', 3); % Verbose logging
-Screen('Preference','VisualDebugLevel', 3); % Show startup splash/debug
-
 VP.screenID = max(Screen('Screens')); % Use external screen if present
 VP.centerPatch = 0.75; % Fractional center patch size
 
-% Setup VPixx if needed - CRITICAL: Don't add to imaging pipeline (conflicts with EyeLink)
+% Setup VPixx FIRST if needed (VRI order - BEFORE PsychDefaultSetup)
 switch VP.Display % Only for lab hardware
     case 1 % VIEWPixx/Datapixx path (matching VRI method)
         if ~Datapixx('IsReady') % Ensure device open
@@ -91,6 +75,17 @@ switch VP.Display % Only for lab hardware
         Datapixx('RegWrRd'); % Synchronize DATAPixx registers to local register cache
 end % End VPixx setup
 
+% VRI method: PsychDefaultSetup asserts OpenGL, unified keys, and 0-1 color range
+PsychDefaultSetup(2);
+PsychImaging('PrepareConfiguration'); % First step in starting pipeline
+PsychImaging('AddTask', 'General', 'FloatingPoint32BitIfPossible');
+ListenChar(0); % Listen for keyboard input (VRI method)
+
+% Initialize PsychSound (VRI method - added 09/05/2025 to VRI)
+InitializePsychSound(1); % 1 = request low-latency mode
+PsychPortAudio('Open');
+
+% Open a grey window (VRI method)
 VP.backGroundColor = [.5 .5 .5]; % Mid-gray background (0-1 range, VRI method)
 [VP.window, VP.Rect] = PsychImaging('OpenWindow', VP.screenID, VP.backGroundColor, VP.fullscreen, [], [], [], [], []); % Create window (VRI method)
 
@@ -100,11 +95,16 @@ VP.windowHeightPix = VP.Rect(4) - VP.Rect(2); % Window height in pixels
 VP.screenWidthPix = VP.windowWidthPix; % Effective screen width
 VP.screenHeightPix = VP.windowHeightPix; % Effective screen height
 
+% Flip to clear (VRI method - do this early)
+VP.vbl = Screen('Flip', VP.window);
+
+% Query the frame duration (VRI method)
+VP.ifi = Screen('GetFlipInterval', VP.window); % Inter-frame interval (s)
+VP.frameRate = 1/VP.ifi; % Refresh rate (Hz)
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEFINE STRUCTURE HOLDING ALL VIEWING PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-VP.ifi = Screen('GetFlipInterval', VP.window); % Inter-frame interval (s)
-VP.frameRate = 1/Screen('GetFlipInterval', VP.window); % Refresh rate (Hz)
 
 % Calculate visual angle parameters
 VP.screenWidthDeg = 2*atand(0.5*VP.screenWidthMm/VP.screenDistance); % Screen width in degrees
@@ -122,8 +122,19 @@ if round(VP.gray) == VP.white % Avoid white if rounding up
 end % End gray correction
 VP.inc = VP.white - VP.gray; % Contrast increment
 
-% Set up alpha-blending
-Screen('BlendFunction', VP.window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % PTB blend function
+% Set up alpha-blending (VRI method)
+Screen('BlendFunction', VP.window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+% Set drawing to maximum priority level (VRI method)
+priorityLevel = MaxPriority(VP.window);
+Priority(priorityLevel);
+
+% Set sync test preference AFTER window is open (VRI method)
+if debugConfig.skipSyncTests == 1
+    Screen('Preference', 'SkipSyncTests', 1);
+else
+    Screen('Preference', 'SkipSyncTests', 0);
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEFINE FIXATION PARAMETERS
@@ -133,13 +144,8 @@ VP.fixationSquareHalfSize = 0.5 * VP.pixelsPerDegree; % Half-size in pixels
 VP.fixationLineWidth = 1; % Line width in pixels
 VP.fixationDotDiameter = 3; % Dot diameter in pixels
 
-% Initial flip to sync to VBL
-VP.vbl = Screen('Flip', VP.window); % Get first VBL timestamp
-VP.tstart = VP.vbl; % Set start time
+% Set timestamps
+VP.tstart = VP.vbl; % Set start time (from earlier flip)
 VP.telapsed = 0; % Reset elapsed time
-
-% Set high priority
-priorityLevel = MaxPriority(VP.window); % Determine max priority
-Priority(priorityLevel); % Apply process priority
 
 end % End setup_display
