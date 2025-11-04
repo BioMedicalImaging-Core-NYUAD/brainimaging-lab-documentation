@@ -6,7 +6,11 @@ function VP = setup_display(debugConfig) % Initialize display and return viewing
 %
 % Output:
 %   VP - Viewing Parameters structure with all display settings
- 
+
+% CRITICAL FIX: Pre-define variables to avoid MATLAB static workspace limitation
+IMAGINGPIPE_FLIPTWHEN=[];
+IMAGINGPIPE_FLIPVBLSYNCLEVEL=[];
+
 % Input validation
 if ~isstruct(debugConfig) % Ensure input is a struct
     error('setup_display:invalidInput', 'debugConfig must be a structure'); % Throw error if not
