@@ -7,7 +7,9 @@ function VP = setup_display(debugConfig) % Initialize display and return viewing
 % Output:
 %   VP - Viewing Parameters structure with all display settings
 
-% CRITICAL FIX: Pre-define variables to avoid MATLAB static workspace limitation
+% CRITICAL FIX: Declare as global to avoid MATLAB static workspace limitation
+global IMAGINGPIPE_FLIPTWHEN;
+global IMAGINGPIPE_FLIPVBLSYNCLEVEL;
 IMAGINGPIPE_FLIPTWHEN=[];
 IMAGINGPIPE_FLIPVBLSYNCLEVEL=[];
 

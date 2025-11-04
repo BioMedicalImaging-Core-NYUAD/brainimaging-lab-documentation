@@ -1,7 +1,8 @@
 function [output, exitFlag] = initEyelinkStates(command, window, input)
 
-% CRITICAL FIX: Pre-define variables to avoid MATLAB static workspace limitation
-% See: https://psychtoolbox.discourse.group/t/ptb-error-imagingpipe-fliptwhen-variable-assignment-failed-on-macos-works-on-windows/5685
+% CRITICAL FIX: Declare as global to avoid MATLAB static workspace limitation
+global IMAGINGPIPE_FLIPTWHEN;
+global IMAGINGPIPE_FLIPVBLSYNCLEVEL;
 IMAGINGPIPE_FLIPTWHEN=[];
 IMAGINGPIPE_FLIPVBLSYNCLEVEL=[];
 
@@ -74,6 +75,12 @@ switch command
         EL.targetbeep=0;  % sound a beep when a target is presented
         EL.feedbackbeep=0; % RE added
 
+        % CRITICAL FIX: Explicitly set screen coordinates for EyeLink (uncertainty method)
+        % This is essential for multi-monitor setups and fullscreen mode
+        [width, height] = Screen('WindowSize', window);
+        Eyelink('Command', 'screen_pixel_coords = %ld %ld %ld %ld', 0, 0, width-1, height-1);
+        Eyelink('Message', 'DISPLAY_COORDS %ld %ld %ld %ld', 0, 0, width-1, height-1);
+        fprintf('EyeLink screen coordinates set: [0 0 %d %d]\n', width-1, height-1);
 
         Eyelink('Command', 'file_sample_data = LEFT,RIGHT,GAZE,AREA');
         Eyelink('Command', 'calibration_type = HV5');

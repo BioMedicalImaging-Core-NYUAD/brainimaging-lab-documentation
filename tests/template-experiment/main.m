@@ -19,12 +19,16 @@ function main()
 %
 % All timing and visual parameters are configurable in setup_param.m
 
+% CRITICAL FIX: Declare as global BEFORE clear all
+global IMAGINGPIPE_FLIPTWHEN;
+global IMAGINGPIPE_FLIPVBLSYNCLEVEL;
+
 % Clear workspace and close any open windows
 clear all; close all; sca;
 
-% CRITICAL FIX: Pre-define variables to avoid MATLAB static workspace limitation
-% MUST be AFTER clear all, otherwise they get deleted immediately!
-% See: https://psychtoolbox.discourse.group/t/ptb-error-imagingpipe-fliptwhen-variable-assignment-failed-on-macos-works-on-windows/5685
+% CRITICAL FIX: Re-initialize after clear
+global IMAGINGPIPE_FLIPTWHEN;
+global IMAGINGPIPE_FLIPVBLSYNCLEVEL;
 IMAGINGPIPE_FLIPTWHEN=[];
 IMAGINGPIPE_FLIPVBLSYNCLEVEL=[];
 

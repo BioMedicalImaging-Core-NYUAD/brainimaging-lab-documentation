@@ -9,7 +9,9 @@ function wait_trigger(VP, manualTrigger)
 %   none (function blocks until trigger received)
 %
 
-% CRITICAL FIX: Pre-define variables to avoid MATLAB static workspace limitation
+% CRITICAL FIX: Declare as global to avoid MATLAB static workspace limitation
+global IMAGINGPIPE_FLIPTWHEN;
+global IMAGINGPIPE_FLIPVBLSYNCLEVEL;
 IMAGINGPIPE_FLIPTWHEN=[];
 IMAGINGPIPE_FLIPVBLSYNCLEVEL=[];
 % Usage:
