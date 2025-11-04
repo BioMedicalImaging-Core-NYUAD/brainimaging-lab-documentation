@@ -1,4 +1,10 @@
 function main()
+% CRITICAL FIX: Declare as global at function start to allow EyeLink callback to work
+% These must be global because PsychEyelinkDispatchCallback calls Screen('Flip')
+% from within nested function calls, creating static workspace issues
+global IMAGINGPIPE_FLIPTWHEN;
+global IMAGINGPIPE_FLIPVBLSYNCLEVEL;
+
 % MAIN - Button-pressing experiment with circular path and traveling dot
 %
 % Participants view a circular path with a continuously traveling dot. During
@@ -21,6 +27,12 @@ function main()
 
 % Clear workspace and close any open windows
 clear all; close all; sca;
+
+% CRITICAL FIX: Re-declare and initialize after clear all
+global IMAGINGPIPE_FLIPTWHEN;
+global IMAGINGPIPE_FLIPVBLSYNCLEVEL;
+IMAGINGPIPE_FLIPTWHEN=[];
+IMAGINGPIPE_FLIPVBLSYNCLEVEL=[];
 
 % Add general experiments folder to path for utility functions
 % Use relative path from current file location
