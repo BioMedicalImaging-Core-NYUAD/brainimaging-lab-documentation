@@ -1,5 +1,10 @@
 function [output, exitFlag] = initEyelinkStates(command, window, input)
 
+% CRITICAL FIX: Pre-define variables to avoid MATLAB static workspace limitation
+% See: https://psychtoolbox.discourse.group/t/ptb-error-imagingpipe-fliptwhen-variable-assignment-failed-on-macos-works-on-windows/5685
+IMAGINGPIPE_FLIPTWHEN=[];
+IMAGINGPIPE_FLIPVBLSYNCLEVEL=[];
+
 % adapted from rd_eyeLink
 
 % Possible commands and their ins & outs:
@@ -103,7 +108,7 @@ switch command
         cali_string = sprintf('Eye tracker calibration:\n\nPlease fixate on the markers.');
         %\n\nPress ''space'' to start or ''q'' to quit');
         DrawFormattedText(window, cali_string, 'center', 'center', 1, []);
-        Screen('Flip', window); % Removed incompatible parameters for imaging pipeline
+        Screen('Flip', window, 0, 1);
 
         pause(2)
 
