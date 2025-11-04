@@ -37,7 +37,7 @@ switch(debugConfig.displayMode) % Select hardware profile
         VP.screenHeightMm = VP.screenWidthMm*9/16; % mm height from 16:9
         VP.whiteValue = 255; % Max luminance value
         if debugConfig.fullscreen == 1 % Fullscreen toggle
-            VP.fullscreen = []; % Fullscreen
+            VP.fullscreen = []; % Fullscreen on screen 1 (projector)
         else
             % Large windowed mode on projector screen (screen 1)
             % Screen 0 is 1920 wide, so screen 1 starts at x=1920
@@ -78,20 +78,21 @@ switch VP.Display % Only for lab hardware
         Datapixx('RegWrRd'); % Synchronize DATAPixx registers to local register cache
 end % End VPixx setup
 
-% VRI method: PsychDefaultSetup asserts OpenGL, unified keys, and 0-1 color range
-PsychDefaultSetup(2);
-PsychImaging('PrepareConfiguration'); % First step in starting pipeline
-% NOTE: FloatingPoint32BitIfPossible causes framebuffer errors on Apple Silicon + external display in fullscreen
-% PsychImaging('AddTask', 'General', 'FloatingPoint32BitIfPossible');
-ListenChar(0); % Listen for keyboard input (VRI method)
+% CRITICAL FIX: Use PsychDefaultSetup(1) to avoid imaging pipeline
+% (0) = only OpenGL assertion
+% (1) = OpenGL + unified key names (no color range normalization, no imaging)
+% (2) = (1) + color range 0-1 + ENABLES IMAGING PIPELINE (breaks EyeLink fullscreen on Apple Silicon)
+PsychDefaultSetup(1);
+ListenChar(0); % Listen for keyboard input
 
-% Initialize PsychSound (VRI method - added 09/05/2025 to VRI)
+% Initialize PsychSound
 InitializePsychSound(1); % 1 = request low-latency mode
 PsychPortAudio('Open');
 
-% Open a grey window (VRI method)
-VP.backGroundColor = [.5 .5 .5]; % Mid-gray background (0-1 range, VRI method)
-[VP.window, VP.Rect] = PsychImaging('OpenWindow', VP.screenID, VP.backGroundColor, VP.fullscreen, [], [], [], [], []); % Create window (VRI method)
+% CRITICAL FIX: Use plain Screen('OpenWindow') instead of PsychImaging
+% PsychImaging pipeline interferes with EyeLink calibration callbacks in fullscreen on Apple Silicon
+VP.backGroundColor = [128 128 128]; % Mid-gray background (0-255 range)
+[VP.window, VP.Rect] = Screen('OpenWindow', VP.screenID, VP.backGroundColor, VP.fullscreen);
 
 [VP.windowCenter(1), VP.windowCenter(2)] = RectCenter(VP.Rect); % Compute window center
 VP.windowWidthPix = VP.Rect(3) - VP.Rect(1); % Window width in pixels
