@@ -44,7 +44,7 @@ switch(debugConfig.displayMode) % Select hardware profile
             % Screen 1 dimensions: 1920 x 1080
             % Rect format: [left top right bottom]
             % [1920 0 3840 1080] = screen 1 start + full 1920x1080 dimensions
-            VP.fullscreen = [1920 0 3840 1080]; % Fullscreen windowed on projector (screen 1), no gaps
+            VP.fullscreen = [1921 1 3839 1079]; % Fullscreen windowed on projector (screen 1), no gaps
         end
         
     case 2 % Laptop/Development

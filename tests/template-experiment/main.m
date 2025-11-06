@@ -36,7 +36,7 @@ addpath(vpixxPath);
 debugConfig = struct();
 debugConfig.enabled = 1;              % 1 = debug mode, 0 = production mode
 debugConfig.useVPixx = 1;             % 1 = use VPixx hardware, 0 = use keyboard
-debugConfig.fullscreen = 1;            % 1 = fullscreen, 0 = windowed mode
+debugConfig.fullscreen = 0;            % 1 = fullscreen, 0 = windowed mode
 debugConfig.skipSyncTests = 1;       % 1 = skip sync tests, 0 = run sync tests
 debugConfig.displayMode = 1;          % 1 = NYUAD lab, 2 = laptop/development
 debugConfig.manualTrigger = 1;        % 1 = manual trigger (5 or t), 0 = scanner trigger
@@ -494,18 +494,18 @@ pa.totalExperimentTime = totalExperimentTime;
 % Save data
 save(pa.dataFileName, 'pa');
 fprintf('Data saved to %s\n', pa.dataFileName);
-
-% Optional: visualize eye tracking if enabled
-if isfield(pa, 'eyeTrackingEnabled') && pa.eyeTrackingEnabled
-    fprintf('Generating eye tracking visualization...\n');
-    try
-        visualize_eyetracking(pa.dataFileName);
-    catch ME
-        warning(ME.identifier, '%s', ME.message);
-    end
-end
-
-end
+% 
+% % Optional: visualize eye tracking if enabled
+% if isfield(pa, 'eyeTrackingEnabled') && pa.eyeTrackingEnabled
+%     fprintf('Generating eye tracking visualization...\n');
+%     try
+%         visualize_eyetracking(pa.dataFileName);
+%     catch ME
+%         warning(ME.identifier, '%s', ME.message);
+%     end
+% end
+% 
+% end
 
 % Helper function to draw circular path with traveling dot (no stimulus)
 function drawCircleWithDot(window, screenCenter, circleRadiusPix, dotAngle, dotSize, dotColor, circleColor, circleLineWidth, backGroundColor)

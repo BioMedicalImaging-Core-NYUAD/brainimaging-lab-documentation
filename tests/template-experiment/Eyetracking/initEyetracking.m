@@ -4,9 +4,9 @@ function EL = initEyetracking(VP, pa)
 % Adapted from vri_restingstate to work with VP and pa structure instead of const
 
 % Create a screen struct compatible with reference implementation
-screen.gray = VP.gray;
 
-[EL, exitFlag] = initEyelinkStates('eyestart', VP.window, {pa.eyeFileBase, screen});
+
+[EL, exitFlag] = initEyelinkStates('eyestart', VP.window, {pa.eyeFileBase, []});
 if exitFlag, EL = []; return, end
 
 EL.eyeDataDir = pa.eyeDataDir;
