@@ -94,9 +94,6 @@ function main_ME(meNumberOfBlocks)
             [startTime, endTime] = showImageBlockWindow(fixationPath,'rest');
             duration = endTime - startTime;
 
-
-
-
           
 %             % Append timing
             timingsReport(end+1) = struct( ...
