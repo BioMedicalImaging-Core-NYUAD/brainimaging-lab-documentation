@@ -124,6 +124,8 @@ pa.data.reactionTime = nan(1, pa.maxTrials);
 pa.data.trialStartTime = zeros(1, pa.maxTrials);
 pa.data.cumulativeTime = zeros(1, pa.maxTrials);
 pa.data.fixationAngle = zeros(1, pa.maxTrials);
+pa.data.gazeX = nan(1, pa.maxTrials);
+pa.data.gazeY = nan(1, pa.maxTrials);
 pa.trialCounter = 0; % Track actual number of trials completed
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -138,7 +140,7 @@ if debugConfig.useVPixx
             Datapixx('RegWr');
             fprintf('VPixx initialized successfully for button detection\n');
         catch ME
-            warning('Failed to initialize VPixx: %s', ME.message);
+            warning(ME.identifier, '%s', ME.message);
             fprintf('Falling back to keyboard input\n');
         end
     else
@@ -153,6 +155,21 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 pa.experimentName = 'Circular Path Button Pressing Experiment';
 pa.dataFileName = 'circular_path_data.mat';
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EYE TRACKING PARAMETERS (following vri_restingstate pattern)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if isfield(debugConfig, 'eyetracking')
+    pa.eyeTrackingEnabled = debugConfig.eyetracking;
+else
+    pa.eyeTrackingEnabled = 0;
+end
+pa.eyeDataDir = fullfile(pwd, 'eyetracking_data');
+if ~exist(pa.eyeDataDir, 'dir'), mkdir(pa.eyeDataDir); end
+base = datestr(now,'mmddHHMM');
+pa.eyeFileBase = base(1:min(end,8));
+pa.eyeFileName = [pa.eyeFileBase '.edf'];
+pa.blinkSecThresh = 5;  % seconds allowed for blink before alarm (following vri_restingstate)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEBUG AND TRIGGER PARAMETERS

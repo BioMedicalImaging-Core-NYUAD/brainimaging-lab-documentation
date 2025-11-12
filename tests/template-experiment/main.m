@@ -23,7 +23,11 @@ function main()
 clear all; close all; sca;
 
 % Add general experiments folder to path for utility functions
-addpath('/Users/stimulus/PycharmProjects/brainimaging-lab-documentation/experiments/general/vpixx-utilities/');
+% Use relative path from current file location
+scriptDir = fileparts(mfilename('fullpath'));
+projectRoot = fullfile(scriptDir, '..', '..');
+vpixxPath = fullfile(projectRoot, 'experiments', 'general', 'vpixx-utilities');
+addpath(vpixxPath);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEBUG CONFIGURATION
@@ -37,6 +41,7 @@ debugConfig.skipSyncTests = 1;       % 1 = skip sync tests, 0 = run sync tests
 debugConfig.displayMode = 1;          % 1 = NYUAD lab, 2 = laptop/development
 debugConfig.manualTrigger = 1;        % 1 = manual trigger (5 or t), 0 = scanner trigger
 debugConfig.buttonbox = 1;        % 1 = button box, 0 = keyboard
+debugConfig.eyetracking = 1;       % 1 = enable Eyelink, 0 = disable
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SETUP DISPLAY AND EXPERIMENT PARAMETERS
@@ -50,21 +55,61 @@ VP = setup_display(debugConfig);
 % Setup keyboard mappings
 kb = setup_keyboard();
 
+% Add Eyetracking directory to path
+eyetrackingDir = fullfile(fileparts(mfilename('fullpath')), 'Eyetracking');
+addpath(eyetrackingDir);
+
+% Initialize eyetracking (following reference pattern exactly)
+if debugConfig.eyetracking
+    pa.EL = initEyetracking(VP, pa);
+    if isempty(pa.EL)
+        pa.eyeTrackingEnabled = 0;
+    else
+        pa.eyeTrackingEnabled = 1;
+    end
+else
+    pa.EL = [];
+    pa.eyeTrackingEnabled = 0;
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % START EXPERIMENT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 try
+    % Calibration (following reference pattern - called before experiment starts)
+    if pa.eyeTrackingEnabled
+        [~, exitFlag] = initEyelinkStates('calibrate', VP.window, pa.EL);
+        if exitFlag
+            fprintf('\nCalibration failed or was cancelled. Disabling eye tracking.\n');
+            pa.EL = [];
+            pa.eyeTrackingEnabled = 0;
+        end
+    end
+
     % Wait for scanner trigger or manual trigger (displays message on screen)
     wait_trigger(VP, debugConfig.manualTrigger);
+    if pa.eyeTrackingEnabled
+        err = Eyelink('CheckRecording');
+        if err ~= 0
+            initEyelinkStates('startrecording', VP.window, pa.EL);
+            fprintf('Eyelink now recording ..\n');
+        end
+    end
 
     experimentStartTime = GetSecs;
     fprintf('\n=== %s ===\n', pa.experimentName);
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% MAIN EXPERIMENT LOOP
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % MAIN EXPERIMENT LOOP
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Initialize fixation angle (starts at 0 radians)
     currentFixationAngle = 0;
+
+    % Initialize blink detection (following vri_restingstate pattern)
+    blinkCounter = 0;
+    if pa.eyeTrackingEnabled
+        blinkFrameThresh = (1/VP.ifi) * pa.blinkSecThresh;
+    end
 
     % Setup KbQueue once for efficient button detection throughout experiment
     KbQueueCreate();
@@ -84,80 +129,130 @@ try
         fprintf('  Press ESC = Abort experiment\n\n');
     end
 
-% Main trial-based loop - run exactly pa.nTrials trials
-for trialIdx = 1:pa.nTrials
-    pa.trialCounter = pa.trialCounter + 1;
-    trialStartTime = GetSecs;
+    % Main trial-based loop - run exactly pa.nTrials trials
+    for trialIdx = 1:pa.nTrials
+        pa.trialCounter = pa.trialCounter + 1;
+        trialStartTime = GetSecs;
 
-    % Check for ESC key to abort experiment using KbQueue
-    [pressed, firstPress] = KbQueueCheck();
-    if pressed && firstPress(kb.escKey)
-        fprintf('\n*** Experiment terminated by user (ESC pressed) ***\n');
-        break;
-    end
+        % Check for ESC key to abort experiment using KbQueue
+        [pressed, firstPress] = KbQueueCheck();
+        if pressed && firstPress(kb.escKey)
+            fprintf('\n*** Experiment terminated by user (ESC pressed) ***\n');
+            break;
+        end
 
-    % Get target color from predefined sequence
-    targetColor = pa.colorSequence{trialIdx};
-    
-    % Store trial data (use direct indexing with pre-allocated arrays)
-    pa.data.trialNumber(pa.trialCounter) = pa.trialCounter;
-    pa.data.targetColor{pa.trialCounter} = targetColor;
-    pa.data.trialStartTime(pa.trialCounter) = trialStartTime - experimentStartTime;
-    pa.data.cumulativeTime(pa.trialCounter) = trialStartTime - experimentStartTime;
-    pa.data.fixationAngle(pa.trialCounter) = currentFixationAngle;
+        % Get target color from predefined sequence
+        targetColor = pa.colorSequence{trialIdx};
 
-    fprintf('Trial %d/%d: Target = %s\n', pa.trialCounter, pa.nTrials, targetColor);
-    
-    % Phase 1: Show single dot + moving fixation (1 second)
-    targetIdx = find(strcmp(targetColor, pa.colors));
-    stimulusStartTime = GetSecs;
-    stimulusEndTime = stimulusStartTime + pa.stimulusDuration;
-    vbl = stimulusStartTime;
+        % Store trial data (use direct indexing with pre-allocated arrays)
+        pa.data.trialNumber(pa.trialCounter) = pa.trialCounter;
+        pa.data.targetColor{pa.trialCounter} = targetColor;
+        pa.data.trialStartTime(pa.trialCounter) = trialStartTime - experimentStartTime;
+        pa.data.cumulativeTime(pa.trialCounter) = trialStartTime - experimentStartTime;
+        pa.data.fixationAngle(pa.trialCounter) = currentFixationAngle;
 
-    while GetSecs < stimulusEndTime
-        % Update traveling dot position continuously
-        currentTime = GetSecs;
-        currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
+        fprintf('Trial %d/%d: Target = %s\n', pa.trialCounter, pa.nTrials, targetColor);
 
-        % Draw stimulus: circular path (cued color) + traveling dot (white)
-        drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
-                         pa.travelingDotRadiusPix, pa.dotColor, pa.colorRGB(targetIdx,:), ...
-                         pa.circleLineWidth, VP.backGroundColor);
+        % Phase 1: Show single dot + moving fixation (1 second)
+        targetIdx = find(strcmp(targetColor, pa.colors));
+        stimulusStartTime = GetSecs;
+        stimulusEndTime = stimulusStartTime + pa.stimulusDuration;
+        vbl = stimulusStartTime;
+        if pa.eyeTrackingEnabled
+            try
+                Eyelink('Message', sprintf('TRIAL_%d_STIMULUS_ONSET_%s', pa.trialCounter, upper(targetColor)));
+                % Record one gaze sample at stimulus onset
+                s = Eyelink('newestfloatsample');
+                gx = NaN; gy = NaN;
+                if ~isempty(s)
+                    lx = s.gx(1); ly = s.gy(1);
+                    rx = s.gx(2); ry = s.gy(2);
+                    if ~isnan(lx) && ~isnan(ly)
+                        gx = lx; gy = ly;
+                    elseif ~isnan(rx) && ~isnan(ry)
+                        gx = rx; gy = ry;
+                    end
+                end
+                pa.data.gazeX(pa.trialCounter) = gx;
+                pa.data.gazeY(pa.trialCounter) = gy;
+            catch
+            end
+        end
 
-        % Use optimized flip timing for smooth animation
-        vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
-    end
-    
-    % Phase 2: Wait for response
-    responseStartTime = GetSecs;
-    responseReceived = false;
-    responseTime = NaN;
-    responseButton = '';
-    vbl = responseStartTime;
+        while GetSecs < stimulusEndTime
+            % Update traveling dot position continuously
+            currentTime = GetSecs;
+            currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
 
-    % Flush KbQueue to ignore any previous button presses
-    KbQueueFlush();
+            % Draw stimulus: circular path (cued color) + traveling dot (white)
+            drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
+                pa.travelingDotRadiusPix, pa.dotColor, pa.colorRGB(targetIdx,:), ...
+                pa.circleLineWidth, VP.backGroundColor);
 
-    while (GetSecs - responseStartTime) < pa.responseWindow
-        % Update traveling dot position
-        currentTime = GetSecs;
-        currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
+            % Use optimized flip timing for smooth animation
+            vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
 
-        % Draw circular path (black) + traveling dot (white) during response phase
-        drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
-                         pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
-                         pa.circleLineWidth, VP.backGroundColor);
+            % Continuous eye tracking monitoring (following vri_restingstate pattern)
+            if pa.eyeTrackingEnabled
+                evt = Eyelink('newestfloatsample');
+                xPos = evt.gx;
+                yPos = evt.gy;
+                if isequal(xPos(1), xPos(2), yPos(1), yPos(2))
+                    blinkCounter = blinkCounter + 1;
+                    if blinkCounter >= blinkFrameThresh
+                        % play alarm: Beeper(400, 0.8, 1);
+                    end
+                else
+                    blinkCounter = 0;
+                end
+            end
+        end
 
-        vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
+        % Phase 2: Wait for response
+        responseStartTime = GetSecs;
+        responseReceived = false;
+        responseTime = NaN;
+        responseButton = '';
+        vbl = responseStartTime;
 
-        % Check for button press using KbQueue (only record first response)
-        if ~responseReceived
+        % Flush KbQueue to ignore any previous button presses
+        KbQueueFlush();
+
+        while (GetSecs - responseStartTime) < pa.responseWindow
+            % Update traveling dot position
+            currentTime = GetSecs;
+            currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
+
+            % Draw circular path (black) + traveling dot (white) during response phase
+            drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
+                pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
+                pa.circleLineWidth, VP.backGroundColor);
+
+            vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
+
+            % Continuous eye tracking monitoring (following vri_restingstate pattern)
+            if pa.eyeTrackingEnabled
+                evt = Eyelink('newestfloatsample');
+                xPos = evt.gx;
+                yPos = evt.gy;
+                if isequal(xPos(1), xPos(2), yPos(1), yPos(2))
+                    blinkCounter = blinkCounter + 1;
+                    if blinkCounter >= blinkFrameThresh
+                        % play alarm: Beeper(400, 0.8, 1);
+                    end
+                else
+                    blinkCounter = 0;
+                end
+            end
+
+            % Check for button press using KbQueue (only record first response)
+            if ~responseReceived
                 if ~debugConfig.buttonbox
                     % Check keyboard keys 1-5 for colors
                     [pressed, firstPress] = KbQueueCheck();
                     if pressed
-                    [responseReceived, responseButton, responseTime] = ...
-                        check_response(kb, firstPress, responseStartTime);
+                        [responseReceived, responseButton, responseTime] = ...
+                            check_response(kb, firstPress, responseStartTime);
                     end
                 else
                     % Use VPixx button box
@@ -167,82 +262,112 @@ for trialIdx = 1:pa.nTrials
                         responseTime = GetSecs - responseStartTime;
                         responseButton = pair{2}; % Get color from response
                     end
-                end         
-        end
-    end
-
-    % Record response data (use direct indexing with pre-allocated arrays)
-    if responseReceived
-        pa.data.response{pa.trialCounter} = responseButton;
-        pa.data.reactionTime(pa.trialCounter) = responseTime;
-        pa.data.correct(pa.trialCounter) = strcmp(responseButton, targetColor);
-    else
-        pa.data.response{pa.trialCounter} = 'no_response';
-        pa.data.reactionTime(pa.trialCounter) = NaN;
-        pa.data.correct(pa.trialCounter) = 0;
-    end
-
-    % Phase 3: Feedback
-    feedbackStartTime = GetSecs;
-    feedbackEndTime = feedbackStartTime + pa.feedbackDuration;
-    vbl = feedbackStartTime;
-
-    while GetSecs < feedbackEndTime
-        % Update traveling dot position
-        currentTime = GetSecs;
-        currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
-
-        % Choose traveling dot color based on correctness
-        if responseReceived
-            if pa.data.correct(pa.trialCounter)
-                feedbackDotColor = pa.dotColorCorrect; % Green for correct
-            else
-                feedbackDotColor = pa.dotColorIncorrect; % Red for incorrect
+                end
             end
-        else
-            feedbackDotColor = pa.dotColorIncorrect; % Red for no response
         end
 
-        % Draw circular path (black) + traveling dot (colored for feedback)
-        drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
-                         pa.travelingDotRadiusPix, feedbackDotColor, pa.circleColorDefault, ...
-                         pa.circleLineWidth, VP.backGroundColor);
+        % Record response data (use direct indexing with pre-allocated arrays)
+        if responseReceived
+            pa.data.response{pa.trialCounter} = responseButton;
+            pa.data.reactionTime(pa.trialCounter) = responseTime;
+            pa.data.correct(pa.trialCounter) = strcmp(responseButton, targetColor);
+        else
+            pa.data.response{pa.trialCounter} = 'no_response';
+            pa.data.reactionTime(pa.trialCounter) = NaN;
+            pa.data.correct(pa.trialCounter) = 0;
+        end
 
-        % Use optimized flip timing for smooth animation
-        vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
-    end
+        % Phase 3: Feedback
+        feedbackStartTime = GetSecs;
+        feedbackEndTime = feedbackStartTime + pa.feedbackDuration;
+        vbl = feedbackStartTime;
 
-    % Phase 4: Inter-trial interval
-    itiStartTime = GetSecs;
-    itiEndTime = itiStartTime + pa.itiDuration;
-    vbl = itiStartTime;
+        while GetSecs < feedbackEndTime
+            % Update traveling dot position
+            currentTime = GetSecs;
+            currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
 
-    while GetSecs < itiEndTime
-        % Update traveling dot position
-        currentTime = GetSecs;
-        currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
+            % Choose traveling dot color based on correctness
+            if responseReceived
+                if pa.data.correct(pa.trialCounter)
+                    feedbackDotColor = pa.dotColorCorrect; % Green for correct
+                else
+                    feedbackDotColor = pa.dotColorIncorrect; % Red for incorrect
+                end
+            else
+                feedbackDotColor = pa.dotColorIncorrect; % Red for no response
+            end
 
-        % Draw circular path (black) + traveling dot (white) during ITI
-        drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
-                         pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
-                         pa.circleLineWidth, VP.backGroundColor);
+            % Draw circular path (black) + traveling dot (colored for feedback)
+            drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
+                pa.travelingDotRadiusPix, feedbackDotColor, pa.circleColorDefault, ...
+                pa.circleLineWidth, VP.backGroundColor);
 
-        % Use optimized flip timing for smooth animation
-        vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
-    end
-    
-    % Print trial result
-    if responseReceived
-        fprintf('  Response: %s, RT: %.3fs, Correct: %d\n', ...
+            % Use optimized flip timing for smooth animation
+            vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
+
+            % Continuous eye tracking monitoring (following vri_restingstate pattern)
+            if pa.eyeTrackingEnabled
+                evt = Eyelink('newestfloatsample');
+                xPos = evt.gx;
+                yPos = evt.gy;
+                if isequal(xPos(1), xPos(2), yPos(1), yPos(2))
+                    blinkCounter = blinkCounter + 1;
+                    if blinkCounter >= blinkFrameThresh
+                        % play alarm: Beeper(400, 0.8, 1);
+                    end
+                else
+                    blinkCounter = 0;
+                end
+            end
+        end
+
+        % Phase 4: Inter-trial interval
+        itiStartTime = GetSecs;
+        itiEndTime = itiStartTime + pa.itiDuration;
+        vbl = itiStartTime;
+
+        while GetSecs < itiEndTime
+            % Update traveling dot position
+            currentTime = GetSecs;
+            currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
+
+            % Draw circular path (black) + traveling dot (white) during ITI
+            drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
+                pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
+                pa.circleLineWidth, VP.backGroundColor);
+
+            % Use optimized flip timing for smooth animation
+            vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
+
+            % Continuous eye tracking monitoring (following vri_restingstate pattern)
+            if pa.eyeTrackingEnabled
+                evt = Eyelink('newestfloatsample');
+                xPos = evt.gx;
+                yPos = evt.gy;
+                if isequal(xPos(1), xPos(2), yPos(1), yPos(2))
+                    blinkCounter = blinkCounter + 1;
+                    if blinkCounter >= blinkFrameThresh
+                        % play alarm: Beeper(400, 0.8, 1);
+                    end
+                else
+                    blinkCounter = 0;
+                end
+            end
+        end
+
+        % Print trial result
+        if responseReceived
+            fprintf('  Response: %s, RT: %.3fs, Correct: %d\n', ...
                 responseButton, responseTime, pa.data.correct(pa.trialCounter));
-    else
-        fprintf('  No response received\n');
+        else
+            fprintf('  No response received\n');
+        end
     end
-end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% END EXPERIMENT
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % END EXPERIMENT
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Trim pre-allocated arrays to actual number of trials completed
     nCompleted = pa.trialCounter;
     pa.data.trialNumber = pa.data.trialNumber(1:nCompleted);
@@ -253,6 +378,8 @@ end
     pa.data.trialStartTime = pa.data.trialStartTime(1:nCompleted);
     pa.data.cumulativeTime = pa.data.cumulativeTime(1:nCompleted);
     pa.data.fixationAngle = pa.data.fixationAngle(1:nCompleted);
+    pa.data.gazeX = pa.data.gazeX(1:nCompleted);
+    pa.data.gazeY = pa.data.gazeY(1:nCompleted);
 
     % End screen - show circular path with moving traveling dot (no stimulus)
     endScreenStartTime = GetSecs;
@@ -266,11 +393,31 @@ end
 
         % Draw circular path (black) + traveling dot (white)
         drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
-                         pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
-                         pa.circleLineWidth, VP.backGroundColor);
+            pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
+            pa.circleLineWidth, VP.backGroundColor);
 
         % Use optimized flip timing for smooth animation
         vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
+
+        % Continuous eye tracking monitoring (following vri_restingstate pattern)
+        if pa.eyeTrackingEnabled
+            evt = Eyelink('newestfloatsample');
+            xPos = evt.gx;
+            yPos = evt.gy;
+            if isequal(xPos(1), xPos(2), yPos(1), yPos(2))
+                blinkCounter = blinkCounter + 1;
+                if blinkCounter >= blinkFrameThresh
+                    % play alarm: Beeper(400, 0.8, 1);
+                end
+            else
+                blinkCounter = 0;
+            end
+        end
+    end
+
+    % Stop and save Eyelink data (guarded)
+    if pa.eyeTrackingEnabled
+        initEyelinkStates('eyestop', VP.window, {pa.eyeFileBase, pa.eyeDataDir});
     end
 
 catch ME
@@ -347,39 +494,50 @@ pa.totalExperimentTime = totalExperimentTime;
 % Save data
 save(pa.dataFileName, 'pa');
 fprintf('Data saved to %s\n', pa.dataFileName);
-
-end
+%
+% % Optional: visualize eye tracking if enabled
+% if isfield(pa, 'eyeTrackingEnabled') && pa.eyeTrackingEnabled
+%     fprintf('Generating eye tracking visualization...\n');
+%     try
+%         visualize_eyetracking(pa.dataFileName);
+%     catch ME
+%         warning(ME.identifier, '%s', ME.message);
+%     end
+% end
+%
+% end
 
 % Helper function to draw circular path with traveling dot (no stimulus)
-function drawCircleWithDot(window, screenCenter, circleRadiusPix, dotAngle, dotSize, dotColor, circleColor, circleLineWidth, backGroundColor)
-% DRAW_CIRCLE_WITH_DOT - Draw circular path outline with traveling dot
-%
-% Inputs:
-%   window - Psychtoolbox window pointer
-%   screenCenter - [x, y] center of screen
-%   circleRadiusPix - radius of circular path in pixels
-%   dotAngle - current angle of traveling dot in radians
-%   dotSize - size of traveling dot in pixels
-%   dotColor - color of traveling dot [R, G, B]
-%   circleColor - color of circular path outline [R, G, B]
-%   circleLineWidth - thickness of circular path outline
-%   backGroundColor - background color
+    function drawCircleWithDot(window, screenCenter, circleRadiusPix, dotAngle, dotSize, dotColor, circleColor, circleLineWidth, backGroundColor)
+        % DRAW_CIRCLE_WITH_DOT - Draw circular path outline with traveling dot
+        %
+        % Inputs:
+        %   window - Psychtoolbox window pointer
+        %   screenCenter - [x, y] center of screen
+        %   circleRadiusPix - radius of circular path in pixels
+        %   dotAngle - current angle of traveling dot in radians
+        %   dotSize - size of traveling dot in pixels
+        %   dotColor - color of traveling dot [R, G, B]
+        %   circleColor - color of circular path outline [R, G, B]
+        %   circleLineWidth - thickness of circular path outline
+        %   backGroundColor - background color
 
-% Clear screen
-Screen('FillRect', window, backGroundColor);
+        % Clear screen
+        Screen('FillRect', window, backGroundColor);
 
-% Draw circular path outline
-Screen('FrameOval', window, circleColor * 255, ...
-       [screenCenter(1)-circleRadiusPix, screenCenter(2)-circleRadiusPix, ...
-        screenCenter(1)+circleRadiusPix, screenCenter(2)+circleRadiusPix], ...
-       circleLineWidth);
+        % Draw circular path outline
+        Screen('FrameOval', window, circleColor * 255, ...
+            [screenCenter(1)-circleRadiusPix, screenCenter(2)-circleRadiusPix, ...
+            screenCenter(1)+circleRadiusPix, screenCenter(2)+circleRadiusPix], ...
+            circleLineWidth);
 
-% Calculate traveling dot position on circular path
-dotX = screenCenter(1) + circleRadiusPix * cos(dotAngle);
-dotY = screenCenter(2) + circleRadiusPix * sin(dotAngle);
+        % Calculate traveling dot position on circular path
+        dotX = screenCenter(1) + circleRadiusPix * cos(dotAngle);
+        dotY = screenCenter(2) + circleRadiusPix * sin(dotAngle);
 
-% Draw traveling dot
-Screen('FillOval', window, dotColor * 255, ...
-       [dotX-dotSize, dotY-dotSize, dotX+dotSize, dotY+dotSize]);
+        % Draw traveling dot
+        Screen('FillOval', window, dotColor * 255, ...
+            [dotX-dotSize, dotY-dotSize, dotX+dotSize, dotY+dotSize]);
+    end
+
 end
-
