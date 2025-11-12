@@ -41,7 +41,7 @@ debugConfig.skipSyncTests = 1;       % 1 = skip sync tests, 0 = run sync tests
 debugConfig.displayMode = 1;          % 1 = NYUAD lab, 2 = laptop/development
 debugConfig.manualTrigger = 1;        % 1 = manual trigger (5 or t), 0 = scanner trigger
 debugConfig.buttonbox = 1;        % 1 = button box, 0 = keyboard
-debugConfig.eyetracking = 1;       % 1 = enable Eyelink, 0 = disable
+debugConfig.eyetracking = 0;       % 1 = enable Eyelink, 0 = disable
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SETUP DISPLAY AND EXPERIMENT PARAMETERS
@@ -507,7 +507,8 @@ fprintf('Data saved to %s\n', pa.dataFileName);
 %
 % end
 
-% Helper function to draw circular path with traveling dot (no stimulus)
+end
+
     function drawCircleWithDot(window, screenCenter, circleRadiusPix, dotAngle, dotSize, dotColor, circleColor, circleLineWidth, backGroundColor)
         % DRAW_CIRCLE_WITH_DOT - Draw circular path outline with traveling dot
         %
@@ -539,5 +540,3 @@ fprintf('Data saved to %s\n', pa.dataFileName);
         Screen('FillOval', window, dotColor * 255, ...
             [dotX-dotSize, dotY-dotSize, dotX+dotSize, dotY+dotSize]);
     end
-
-end
