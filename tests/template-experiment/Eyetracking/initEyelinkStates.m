@@ -135,7 +135,7 @@ switch command
 
         cali = EyelinkDoTrackerSetup(EL);    % this fails --
         if cali == EL.TERMINATE_KEY, exitFlag = 1;return, end
-
+        
         output = cali
         
     case 'startrecording'

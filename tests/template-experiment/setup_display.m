@@ -80,12 +80,17 @@ switch VP.Display % Only for lab hardware
         Datapixx('RegWrRd'); % Synchronize DATAPixx registers to local register cache
 end % End VPixx setup
 
-% CRITICAL FIX: Use PsychDefaultSetup(1) to avoid imaging pipeline
 % (0) = only OpenGL assertion
 % (1) = OpenGL + unified key names (no color range normalization, no imaging)
 % (2) = (1) + color range 0-1 + ENABLES IMAGING PIPELINE (breaks EyeLink fullscreen on Apple Silicon)
 PsychDefaultSetup(1);
 ListenChar(0); % Listen for keyboard input
+
+if debugConfig.skipSyncTests == 1
+    Screen('Preference', 'SkipSyncTests', 1);
+else
+    Screen('Preference', 'SkipSyncTests', 0);
+end
 
 % Initialize PsychSound
 InitializePsychSound(1); % 1 = request low-latency mode
@@ -136,12 +141,7 @@ Screen('BlendFunction', VP.window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 priorityLevel = MaxPriority(VP.window);
 Priority(priorityLevel);
 
-% Set sync test preference AFTER window is open (VRI method)
-if debugConfig.skipSyncTests == 1
-    Screen('Preference', 'SkipSyncTests', 1);
-else
-    Screen('Preference', 'SkipSyncTests', 0);
-end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEFINE FIXATION PARAMETERS
