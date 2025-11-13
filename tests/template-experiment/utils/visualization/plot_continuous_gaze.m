@@ -1,6 +1,6 @@
-function plot_continuous_gaze(dataFile)
+function plot_continuous_gaze(dataFileOrPa)
 % PLOT_CONTINUOUS_GAZE - Plot continuous gaze trajectory as connected dots
-% Usage: plot_continuous_gaze('circular_path_data.mat')
+% Usage: plot_continuous_gaze('circular_path_data.mat') or plot_continuous_gaze(pa)
 %
 % This function plots the continuous gaze tracking data recorded during
 % the experiment. It shows:
@@ -9,18 +9,29 @@ function plot_continuous_gaze(dataFile)
 % 3. Y position over time
 % 4. Distance from center over time
 
-if nargin < 1 || isempty(dataFile)
+if nargin < 1 || isempty(dataFileOrPa)
     % Default to data folder
     scriptDir = fileparts(mfilename('fullpath'));
     experimentDir = fullfile(scriptDir, '..', '..');
     dataFile = fullfile(experimentDir, 'data', 'circular_path_data.mat');
+    S = load(dataFile, 'pa');
+    if ~isfield(S, 'pa')
+        error('plot_continuous_gaze:invalidData', 'File does not contain pa struct');
+    end
+    pa = S.pa;
+elseif ischar(dataFileOrPa) || isstring(dataFileOrPa)
+    % Input is a file path
+    S = load(dataFileOrPa, 'pa');
+    if ~isfield(S, 'pa')
+        error('plot_continuous_gaze:invalidData', 'File does not contain pa struct');
+    end
+    pa = S.pa;
+elseif isstruct(dataFileOrPa)
+    % Input is the pa structure directly
+    pa = dataFileOrPa;
+else
+    error('plot_continuous_gaze:invalidInput', 'Input must be a file path (string) or pa structure');
 end
-
-S = load(dataFile, 'pa');
-if ~isfield(S, 'pa')
-    error('plot_continuous_gaze:invalidData', 'File does not contain pa struct');
-end
-pa = S.pa;
 
 % Check if continuous gaze data exists
 if ~isfield(pa.data, 'continuousGazeX') || ~isfield(pa.data, 'continuousGazeY')

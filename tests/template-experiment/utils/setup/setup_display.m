@@ -1,4 +1,4 @@
-function VP = setup_display(debugConfig) % Initialize display and return viewing parameters
+function [VP, debugConfig] = setup_display(debugConfig) % Initialize display and return viewing parameters
 % SETUP_DISPLAY - Configure display parameters and initialize Psychtoolbox
 %
 % Input:
@@ -6,6 +6,7 @@ function VP = setup_display(debugConfig) % Initialize display and return viewing
 %
 % Output:
 %   VP - Viewing Parameters structure with all display settings
+%   debugConfig - Updated debug configuration (buttonbox may be modified if VPixx unavailable)
 
 % Input validation
 if ~isstruct(debugConfig) % Ensure input is a struct
@@ -79,6 +80,21 @@ switch VP.Display % Only for lab hardware
         Datapixx('StopAllSchedules'); % Stop any running schedules
         Datapixx('RegWrRd'); % Synchronize DATAPixx registers to local register cache
 end % End VPixx setup
+
+% Check VPixx availability and adjust buttonbox setting if needed
+vpixxAvailable = false;
+if debugConfig.useVPixx
+    try
+        vpixxAvailable = Datapixx('IsReady');
+    catch
+        vpixxAvailable = false;
+    end
+end
+
+if debugConfig.buttonbox && ~vpixxAvailable
+    fprintf('\nWARNING: Button box requested but VPixx not available. Switching to keyboard input.\n');
+    debugConfig.buttonbox = 0;
+end
 
 % (0) = only OpenGL assertion
 % (1) = OpenGL + unified key names (no color range normalization, no imaging)

@@ -50,11 +50,12 @@ pa.colors = {'white', 'red', 'yellow', 'green', 'blue'};
 pa.nRepeats = 2;               % Number of times to repeat each color
 pa.nTrials = numel(pa.colors) * pa.nRepeats; % 5 colors × 2 repeats = 10 trials
 
-% End screen duration
+% Baseline and end screen durations
+pa.baselineDuration = 5.0;    % seconds - baseline period before first trial
 pa.endScreenDuration = 5.0;    % seconds - final fixation display
 
 % Calculate total experiment duration based on planned trials
-pa.totalDuration = (pa.nTrials * pa.trialCycleDuration) + pa.endScreenDuration;
+pa.totalDuration = pa.baselineDuration + (pa.nTrials * pa.trialCycleDuration) + pa.endScreenDuration;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % STIMULUS PARAMETERS
@@ -111,21 +112,18 @@ fprintf('Color sequence: %s\n', strjoin(pa.colorSequence, ', '));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DATA COLLECTION PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Pre-allocate data storage arrays for performance
-% Allocate 50% extra space in case trials complete faster than expected
-pa.maxTrials = ceil(pa.nTrials * 1.5);
-
+% Pre-allocate data storage arrays
 pa.data = struct();
-pa.data.trialNumber = zeros(1, pa.maxTrials);
-pa.data.targetColor = cell(1, pa.maxTrials);
-pa.data.response = cell(1, pa.maxTrials);
-pa.data.correct = zeros(1, pa.maxTrials);
-pa.data.reactionTime = nan(1, pa.maxTrials);
-pa.data.trialStartTime = zeros(1, pa.maxTrials);
-pa.data.cumulativeTime = zeros(1, pa.maxTrials);
-pa.data.fixationAngle = zeros(1, pa.maxTrials);
-pa.data.gazeX = nan(1, pa.maxTrials);
-pa.data.gazeY = nan(1, pa.maxTrials);
+pa.data.trialNumber = zeros(1, pa.nTrials);
+pa.data.targetColor = cell(1, pa.nTrials);
+pa.data.response = cell(1, pa.nTrials);
+pa.data.correct = zeros(1, pa.nTrials);
+pa.data.reactionTime = nan(1, pa.nTrials);
+pa.data.trialStartTime = zeros(1, pa.nTrials);
+pa.data.cumulativeTime = zeros(1, pa.nTrials);
+pa.data.fixationAngle = zeros(1, pa.nTrials);
+pa.data.gazeX = nan(1, pa.nTrials);
+pa.data.gazeY = nan(1, pa.nTrials);
 pa.trialCounter = 0; % Track actual number of trials completed
 
 % Continuous gaze tracking arrays (for every 0.5 seconds)
@@ -168,11 +166,19 @@ pa.experimentName = 'Circular Path Button Pressing Experiment';
 % Set up data directory and filename
 scriptDir = fileparts(mfilename('fullpath'));
 experimentDir = fullfile(scriptDir, '..', '..');
-dataDir = fullfile(experimentDir, 'data');
-if ~exist(dataDir, 'dir')
-    mkdir(dataDir);
+
+if isfield(debugConfig, 'bidsInfo') && ~isempty(debugConfig.bidsInfo)
+    pa.dataDir = debugConfig.bidsInfo.dataDir;
+    pa.dataFileName = debugConfig.bidsInfo.fullPath;
+    pa.bidsInfo = debugConfig.bidsInfo;
+else
+    dataDir = fullfile(experimentDir, 'data');
+    if ~exist(dataDir, 'dir')
+        mkdir(dataDir);
+    end
+    pa.dataFileName = fullfile(dataDir, 'circular_path_data.mat');
+    pa.bidsInfo = [];
 end
-pa.dataFileName = fullfile(dataDir, 'circular_path_data.mat');
 
 % Store screen center for plotting functions
 pa.screenCenter = VP.windowCenter;
