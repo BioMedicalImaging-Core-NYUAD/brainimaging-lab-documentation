@@ -17,7 +17,8 @@ prompt = {'Subject ID (e.g., 0201):', ...
           'Session ID (e.g., 01):', ...
           'Run ID (e.g., 01):', ...
           'Task Name (optional):'};
-answer = inputdlg(prompt, 'BIDS Information', [1 50], {'', '', '', taskName});
+definput = {'9999', '01', '01', taskName};
+answer = inputdlg(prompt, 'BIDS Information', [1 50], definput);
 
 if isempty(answer)
     error('User cancelled');

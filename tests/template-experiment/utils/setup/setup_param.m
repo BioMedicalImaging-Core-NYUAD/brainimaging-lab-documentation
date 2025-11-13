@@ -165,7 +165,7 @@ pa.experimentName = 'Circular Path Button Pressing Experiment';
 
 % Set up data directory and filename
 scriptDir = fileparts(mfilename('fullpath'));
-experimentDir = fullfile(scriptDir, '..', '..');
+experimentDir = fullfile(scriptDir, '..', '..');  % Go from utils/setup/ to template-experiment/
 
 if isfield(debugConfig, 'bidsInfo') && ~isempty(debugConfig.bidsInfo)
     pa.dataDir = debugConfig.bidsInfo.dataDir;

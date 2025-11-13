@@ -49,7 +49,7 @@ debugConfig.eyetracking = 0;       % 1 = enable Eyelink, 0 = disable
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % GET BIDS INFORMATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-experimentDir = fullfile(scriptDir, '..', '..');
+experimentDir = scriptDir;
 try
     debugConfig.bidsInfo = get_info(experimentDir, 'circularpath');
 catch ME
