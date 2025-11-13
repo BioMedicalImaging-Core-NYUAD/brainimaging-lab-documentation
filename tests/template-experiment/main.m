@@ -117,20 +117,14 @@ try
     % Initialize fixation angle (starts at 0 radians)
     currentFixationAngle = 0;
 
-    % Initialize blink detection (following vri_restingstate pattern)
-    blinkCounter = 0;
-    if pa.eyeTrackingEnabled
-        blinkFrameThresh = (1/VP.ifi) * pa.blinkSecThresh;
-    end
-
     % Setup KbQueue once for efficient button detection throughout experiment
     KbQueueCreate();
     KbQueueStart();
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % BASELINE PERIOD (moving dot only, before first trial)
+    % START EXPERIMENT (moving dot only, before first trial)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    [pa, exitFlag, currentFixationAngle, blinkCounter] = run_baseline(VP, pa, kb, experimentStartTime, currentFixationAngle, blinkCounter, blinkFrameThresh);
+    [pa, exitFlag, currentFixationAngle] = s1_startExp(VP, pa, kb, experimentStartTime, currentFixationAngle);
     if exitFlag, return; end
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -163,11 +157,11 @@ try
 
         % Phase 1: Stimulus
         targetIdx = find(strcmp(targetColor, pa.colors));
-        [pa, exitFlag, currentFixationAngle, blinkCounter] = run_stimulus(VP, pa, kb, experimentStartTime, currentFixationAngle, blinkCounter, blinkFrameThresh, targetColor, targetIdx);
+        [pa, exitFlag, currentFixationAngle] = s2_stimulus(VP, pa, kb, experimentStartTime, currentFixationAngle, targetColor, targetIdx);
         if exitFlag, break; end
 
         % Phase 2: Response
-        [pa, exitFlag, currentFixationAngle, blinkCounter, responseReceived, responseButton, responseTime] = run_response(VP, pa, kb, experimentStartTime, currentFixationAngle, blinkCounter, blinkFrameThresh, debugConfig);
+        [pa, exitFlag, currentFixationAngle, responseReceived, responseButton, responseTime] = s3_response(VP, pa, kb, experimentStartTime, currentFixationAngle, debugConfig);
         if exitFlag, break; end
 
         % Record response data
@@ -182,11 +176,11 @@ try
         end
 
         % Phase 3: Feedback
-        [pa, exitFlag, currentFixationAngle, blinkCounter] = run_feedback(VP, pa, kb, experimentStartTime, currentFixationAngle, blinkCounter, blinkFrameThresh, responseReceived, pa.data.correct(pa.trialCounter));
+        [pa, exitFlag, currentFixationAngle] = s4_feedback(VP, pa, kb, experimentStartTime, currentFixationAngle, responseReceived, pa.data.correct(pa.trialCounter));
         if exitFlag, break; end
 
         % Phase 4: ITI
-        [pa, exitFlag, currentFixationAngle, blinkCounter] = run_iti(VP, pa, kb, experimentStartTime, currentFixationAngle, blinkCounter, blinkFrameThresh);
+        [pa, exitFlag, currentFixationAngle] = s5_iti(VP, pa, kb, experimentStartTime, currentFixationAngle);
         if exitFlag, break; end
 
         % Print trial result
@@ -203,7 +197,7 @@ try
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % End screen
-    [pa, ~, ~, ~] = run_end_screen(VP, pa, kb, experimentStartTime, currentFixationAngle, blinkCounter, blinkFrameThresh);
+    [pa, ~, ~] = s6_endScreen(VP, pa, kb, experimentStartTime, currentFixationAngle);
 
 catch ME
     % Error occurred - display detailed message

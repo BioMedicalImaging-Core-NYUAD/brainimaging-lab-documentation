@@ -50,12 +50,12 @@ pa.colors = {'white', 'red', 'yellow', 'green', 'blue'};
 pa.nRepeats = 2;               % Number of times to repeat each color
 pa.nTrials = numel(pa.colors) * pa.nRepeats; % 5 colors × 2 repeats = 10 trials
 
-% Baseline and end screen durations
-pa.baselineDuration = 5.0;    % seconds - baseline period before first trial
+% Start experiment and end screen durations
+pa.startExpDuration = 5.0;    % seconds - start period before first trial
 pa.endScreenDuration = 5.0;    % seconds - final fixation display
 
 % Calculate total experiment duration based on planned trials
-pa.totalDuration = pa.baselineDuration + (pa.nTrials * pa.trialCycleDuration) + pa.endScreenDuration;
+pa.totalDuration = pa.startExpDuration + (pa.nTrials * pa.trialCycleDuration) + pa.endScreenDuration;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % STIMULUS PARAMETERS
@@ -199,7 +199,6 @@ if ~exist(pa.eyeDataDir, 'dir'), mkdir(pa.eyeDataDir); end
 base = datestr(now,'mmddHHMM');
 pa.eyeFileBase = base(1:min(end,8));
 pa.eyeFileName = [pa.eyeFileBase '.edf'];
-pa.blinkSecThresh = 5;  % seconds allowed for blink before alarm (following vri_restingstate)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEBUG AND TRIGGER PARAMETERS
