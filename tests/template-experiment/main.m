@@ -6,9 +6,9 @@ function main()
 % red, yellow, green, or blue). Participants press the corresponding button
 % for the color they see.
 %
-% Visual elements:
+% What do you see:
 % - Circular path: Black during non-stimulus phases, changes to target color during stimulus
-% - Traveling dot: Continuously moves along path; changes to green/red for feedback
+% - Traveling dot: Continuously moves along path; changes color for feedback
 
 %
 % Trial structure:
@@ -32,7 +32,6 @@ addpath(vpixxPath);
 % Add local utility folders to path
 addpath(genpath(fullfile(scriptDir, 'utils')));
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEBUG CONFIGURATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -48,10 +47,24 @@ debugConfig.buttonbox = 1;        % 1 = button box, 0 = keyboard
 debugConfig.eyetracking = 0;       % 1 = enable Eyelink, 0 = disable
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% GET BIDS INFORMATION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+experimentDir = fullfile(scriptDir, '..', '..');
+try
+    debugConfig.bidsInfo = get_info(experimentDir, 'circularpath');
+catch ME
+    if contains(ME.message, 'cancelled') || contains(ME.message, 'not to overwrite')
+        fprintf('Exiting.\n');
+        return;
+    end
+    rethrow(ME);
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SETUP DISPLAY AND EXPERIMENT PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Setup display with debug configuration
-VP = setup_display(debugConfig);
+[VP, debugConfig] = setup_display(debugConfig);
 
 % Setup experiment parameters
 [VP, pa] = setup_param(VP, debugConfig);
@@ -101,9 +114,6 @@ try
     pa.lastGazeSampleTime = experimentStartTime - pa.gazeSampleInterval;
     fprintf('\n=== %s ===\n', pa.experimentName);
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % MAIN EXPERIMENT LOOP
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Initialize fixation angle (starts at 0 radians)
     currentFixationAngle = 0;
 
@@ -117,34 +127,15 @@ try
     KbQueueCreate();
     KbQueueStart();
 
-    % Check if VPixx is actually available (buttonbox requires VPixx)
-    vpixxAvailable = false;
-    if debugConfig.useVPixx
-        try
-            vpixxAvailable = Datapixx('IsReady');
-        catch
-            vpixxAvailable = false;
-        end
-    end
-    
-    if debugConfig.buttonbox && ~vpixxAvailable
-        fprintf('\nWARNING: Button box requested but VPixx not available. Switching to keyboard input.\n');
-        debugConfig.buttonbox = 0;
-    end
-    
-    % Display input method
-    if ~debugConfig.buttonbox
-        fprintf('\nDEBUG MODE - Keyboard Controls:\n');
-        fprintf('  Press 1 = White\n');
-        fprintf('  Press 2 = Red\n');
-        fprintf('  Press 3 = Yellow\n');
-        fprintf('  Press 4 = Green\n');
-        fprintf('  Press 5 = Blue\n');
-        fprintf('  Press ESC = Abort experiment\n\n');
-    else
-        fprintf('\nSCANNER MODE - Use VPixx button box\n');
-        fprintf('  Press ESC = Abort experiment\n\n');
-    end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % BASELINE PERIOD (moving dot only, before first trial)
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    [pa, exitFlag, currentFixationAngle, blinkCounter] = run_baseline(VP, pa, kb, experimentStartTime, currentFixationAngle, blinkCounter, blinkFrameThresh);
+    if exitFlag, return; end
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % MAIN EXPERIMENT LOOP
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Main trial-based loop - run exactly pa.nTrials trials
     for trialIdx = 1:pa.nTrials
@@ -170,166 +161,16 @@ try
 
         fprintf('Trial %d/%d: Target = %s\n', pa.trialCounter, pa.nTrials, targetColor);
 
-        % Phase 1: Show single dot + moving fixation (1 second)
+        % Phase 1: Stimulus
         targetIdx = find(strcmp(targetColor, pa.colors));
-        stimulusStartTime = GetSecs;
-        stimulusEndTime = stimulusStartTime + pa.stimulusDuration;
-        vbl = stimulusStartTime;
-        if pa.eyeTrackingEnabled
-            try
-                Eyelink('Message', sprintf('TRIAL_%d_STIMULUS_ONSET_%s', pa.trialCounter, upper(targetColor)));
-                % Record one gaze sample at stimulus onset
-                s = Eyelink('newestfloatsample');
-                gx = NaN; gy = NaN;
-                if ~isempty(s)
-                    lx = s.gx(1); ly = s.gy(1);
-                    rx = s.gx(2); ry = s.gy(2);
-                    if ~isnan(lx) && ~isnan(ly)
-                        gx = lx; gy = ly;
-                    elseif ~isnan(rx) && ~isnan(ry)
-                        gx = rx; gy = ry;
-                    end
-                end
-                pa.data.gazeX(pa.trialCounter) = gx;
-                pa.data.gazeY(pa.trialCounter) = gy;
-            catch
-            end
-        end
+        [pa, exitFlag, currentFixationAngle, blinkCounter] = run_stimulus(VP, pa, kb, experimentStartTime, currentFixationAngle, blinkCounter, blinkFrameThresh, targetColor, targetIdx);
+        if exitFlag, break; end
 
-        while GetSecs < stimulusEndTime
-            % Update traveling dot position continuously
-            currentTime = GetSecs;
-            currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
+        % Phase 2: Response
+        [pa, exitFlag, currentFixationAngle, blinkCounter, responseReceived, responseButton, responseTime] = run_response(VP, pa, kb, experimentStartTime, currentFixationAngle, blinkCounter, blinkFrameThresh, debugConfig);
+        if exitFlag, break; end
 
-            % Draw stimulus: circular path (cued color) + traveling dot (white)
-            drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
-                pa.travelingDotRadiusPix, pa.dotColor, pa.colorRGB(targetIdx,:), ...
-                pa.circleLineWidth, VP.backGroundColor);
-
-            % Use optimized flip timing for smooth animation
-            vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
-
-            % Check for ESC key to abort experiment
-            [pressed, firstPress] = KbQueueCheck();
-            if pressed && firstPress(kb.escKey)
-                fprintf('\n*** Experiment terminated by user (ESC pressed during stimulus) ***\n');
-                break;
-            end
-
-            % Continuous eye tracking monitoring (following vri_restingstate pattern)
-            if pa.eyeTrackingEnabled
-                evt = Eyelink('newestfloatsample');
-                xPos = evt.gx;
-                yPos = evt.gy;
-                if isequal(xPos(1), xPos(2), yPos(1), yPos(2))
-                    blinkCounter = blinkCounter + 1;
-                    if blinkCounter >= blinkFrameThresh
-                        % play alarm: Beeper(400, 0.8, 1);
-                    end
-                else
-                    blinkCounter = 0;
-                end
-                
-                % Record continuous gaze sample (every 0.5 seconds)
-                pa = record_continuous_gaze(pa, experimentStartTime);
-            end
-        end
-
-        % Check if ESC was pressed to exit trial loop
-        [pressed, firstPress] = KbQueueCheck();
-        if pressed && firstPress(kb.escKey)
-            break;
-        end
-
-        % Phase 2: Wait for response
-        responseStartTime = GetSecs;
-        responseReceived = false;
-        responseTime = NaN;
-        responseButton = '';
-        vbl = responseStartTime;
-
-        % Flush KbQueue to ignore any previous button presses
-        KbQueueFlush();
-
-        while (GetSecs - responseStartTime) < pa.responseWindow
-            % Update traveling dot position
-            currentTime = GetSecs;
-            currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
-
-            % Draw circular path (black) + traveling dot (white) during response phase
-            drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
-                pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
-                pa.circleLineWidth, VP.backGroundColor);
-
-            vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
-
-            % Check for ESC key to abort experiment
-            [pressed, firstPress] = KbQueueCheck();
-            if pressed && firstPress(kb.escKey)
-                fprintf('\n*** Experiment terminated by user (ESC pressed during response) ***\n');
-                break;
-            end
-
-            % Continuous eye tracking monitoring (following vri_restingstate pattern)
-            if pa.eyeTrackingEnabled
-                evt = Eyelink('newestfloatsample');
-                xPos = evt.gx;
-                yPos = evt.gy;
-                if isequal(xPos(1), xPos(2), yPos(1), yPos(2))
-                    blinkCounter = blinkCounter + 1;
-                    if blinkCounter >= blinkFrameThresh
-                        % play alarm: Beeper(400, 0.8, 1);
-                    end
-                else
-                    blinkCounter = 0;
-                end
-                
-                % Record continuous gaze sample (every 0.5 seconds)
-                pa = record_continuous_gaze(pa, experimentStartTime);
-            end
-
-            % Check for button press using KbQueue (only record first response)
-            if ~responseReceived
-                % Check VPixx availability safely
-                vpixxReady = false;
-                if debugConfig.buttonbox && debugConfig.useVPixx
-                    try
-                        vpixxReady = Datapixx('IsReady');
-                    catch
-                        vpixxReady = false;
-                    end
-                end
-                
-                if ~debugConfig.buttonbox || ~vpixxReady
-                    % Check keyboard keys 1-5 for colors
-                    [pressed, firstPress] = KbQueueCheck();
-                    if pressed
-                        [responseReceived, responseButton, responseTime] = ...
-                            check_response(kb, firstPress, responseStartTime);
-                    end
-                else
-                    % Use VPixx button box (only if VPixx is ready)
-                    try
-                        pair = getButtonColor([], false);
-                        if ~isempty(pair)
-                            responseReceived = true;
-                            responseTime = GetSecs - responseStartTime;
-                            responseButton = pair{2}; % Get color from response
-                        end
-                    catch ME
-                        % If VPixx fails, fall back to keyboard
-                        fprintf('Warning: VPixx button box error, falling back to keyboard\n');
-                        [pressed, firstPress] = KbQueueCheck();
-                        if pressed
-                            [responseReceived, responseButton, responseTime] = ...
-                                check_response(kb, firstPress, responseStartTime);
-                        end
-                    end
-                end
-            end
-        end
-
-        % Record response data (use direct indexing with pre-allocated arrays)
+        % Record response data
         if responseReceived
             pa.data.response{pa.trialCounter} = responseButton;
             pa.data.reactionTime(pa.trialCounter) = responseTime;
@@ -341,115 +182,12 @@ try
         end
 
         % Phase 3: Feedback
-        feedbackStartTime = GetSecs;
-        feedbackEndTime = feedbackStartTime + pa.feedbackDuration;
-        vbl = feedbackStartTime;
+        [pa, exitFlag, currentFixationAngle, blinkCounter] = run_feedback(VP, pa, kb, experimentStartTime, currentFixationAngle, blinkCounter, blinkFrameThresh, responseReceived, pa.data.correct(pa.trialCounter));
+        if exitFlag, break; end
 
-        while GetSecs < feedbackEndTime
-            % Update traveling dot position
-            currentTime = GetSecs;
-            currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
-
-            % Choose traveling dot color based on correctness
-            if responseReceived
-                if pa.data.correct(pa.trialCounter)
-                    feedbackDotColor = pa.dotColorCorrect; % Green for correct
-                else
-                    feedbackDotColor = pa.dotColorIncorrect; % Red for incorrect
-                end
-            else
-                feedbackDotColor = pa.dotColorIncorrect; % Red for no response
-            end
-
-            % Draw circular path (black) + traveling dot (colored for feedback)
-            drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
-                pa.travelingDotRadiusPix, feedbackDotColor, pa.circleColorDefault, ...
-                pa.circleLineWidth, VP.backGroundColor);
-
-            % Use optimized flip timing for smooth animation
-            vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
-
-            % Check for ESC key to abort experiment
-            [pressed, firstPress] = KbQueueCheck();
-            if pressed && firstPress(kb.escKey)
-                fprintf('\n*** Experiment terminated by user (ESC pressed during feedback) ***\n');
-                break;
-            end
-
-            % Continuous eye tracking monitoring (following vri_restingstate pattern)
-            if pa.eyeTrackingEnabled
-                evt = Eyelink('newestfloatsample');
-                xPos = evt.gx;
-                yPos = evt.gy;
-                if isequal(xPos(1), xPos(2), yPos(1), yPos(2))
-                    blinkCounter = blinkCounter + 1;
-                    if blinkCounter >= blinkFrameThresh
-                        % play alarm: Beeper(400, 0.8, 1);
-                    end
-                else
-                    blinkCounter = 0;
-                end
-                
-                % Record continuous gaze sample (every 0.5 seconds)
-                pa = record_continuous_gaze(pa, experimentStartTime);
-            end
-        end
-
-        % Check if ESC was pressed to exit trial loop
-        [pressed, firstPress] = KbQueueCheck();
-        if pressed && firstPress(kb.escKey)
-            break;
-        end
-
-        % Phase 4: Inter-trial interval
-        itiStartTime = GetSecs;
-        itiEndTime = itiStartTime + pa.itiDuration;
-        vbl = itiStartTime;
-
-        while GetSecs < itiEndTime
-            % Update traveling dot position
-            currentTime = GetSecs;
-            currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
-
-            % Draw circular path (black) + traveling dot (white) during ITI
-            drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
-                pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
-                pa.circleLineWidth, VP.backGroundColor);
-
-            % Use optimized flip timing for smooth animation
-            vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
-
-            % Check for ESC key to abort experiment
-            [pressed, firstPress] = KbQueueCheck();
-            if pressed && firstPress(kb.escKey)
-                fprintf('\n*** Experiment terminated by user (ESC pressed during ITI) ***\n');
-                break;
-            end
-
-            % Continuous eye tracking monitoring (following vri_restingstate pattern)
-            if pa.eyeTrackingEnabled
-                evt = Eyelink('newestfloatsample');
-                xPos = evt.gx;
-                yPos = evt.gy;
-                if isequal(xPos(1), xPos(2), yPos(1), yPos(2))
-                    blinkCounter = blinkCounter + 1;
-                    if blinkCounter >= blinkFrameThresh
-                        % play alarm: Beeper(400, 0.8, 1);
-                    end
-                else
-                    blinkCounter = 0;
-                end
-                
-                % Record continuous gaze sample (every 0.5 seconds)
-                pa = record_continuous_gaze(pa, experimentStartTime);
-            end
-        end
-
-        % Check if ESC was pressed to exit trial loop
-        [pressed, firstPress] = KbQueueCheck();
-        if pressed && firstPress(kb.escKey)
-            break;
-        end
+        % Phase 4: ITI
+        [pa, exitFlag, currentFixationAngle, blinkCounter] = run_iti(VP, pa, kb, experimentStartTime, currentFixationAngle, blinkCounter, blinkFrameThresh);
+        if exitFlag, break; end
 
         % Print trial result
         if responseReceived
@@ -463,78 +201,9 @@ try
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % END EXPERIMENT
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % Trim pre-allocated arrays to actual number of trials completed
-    nCompleted = pa.trialCounter;
-    pa.data.trialNumber = pa.data.trialNumber(1:nCompleted);
-    pa.data.targetColor = pa.data.targetColor(1:nCompleted);
-    pa.data.response = pa.data.response(1:nCompleted);
-    pa.data.correct = pa.data.correct(1:nCompleted);
-    pa.data.reactionTime = pa.data.reactionTime(1:nCompleted);
-    pa.data.trialStartTime = pa.data.trialStartTime(1:nCompleted);
-    pa.data.cumulativeTime = pa.data.cumulativeTime(1:nCompleted);
-    pa.data.fixationAngle = pa.data.fixationAngle(1:nCompleted);
-    pa.data.gazeX = pa.data.gazeX(1:nCompleted);
-    pa.data.gazeY = pa.data.gazeY(1:nCompleted);
-    
-    % Trim continuous gaze arrays to actual number of samples
-    if pa.gazeSampleCounter > 0
-        pa.data.continuousGazeX = pa.data.continuousGazeX(1:pa.gazeSampleCounter);
-        pa.data.continuousGazeY = pa.data.continuousGazeY(1:pa.gazeSampleCounter);
-        pa.data.continuousGazeTime = pa.data.continuousGazeTime(1:pa.gazeSampleCounter);
-    else
-        pa.data.continuousGazeX = [];
-        pa.data.continuousGazeY = [];
-        pa.data.continuousGazeTime = [];
-    end
 
-    % End screen - show circular path with moving traveling dot (no stimulus)
-    endScreenStartTime = GetSecs;
-    endScreenEndTime = endScreenStartTime + pa.endScreenDuration;
-    vbl = endScreenStartTime;
-
-    while GetSecs < endScreenEndTime
-        % Update traveling dot position
-        currentTime = GetSecs;
-        currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
-
-        % Draw circular path (black) + traveling dot (white)
-        drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
-            pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
-            pa.circleLineWidth, VP.backGroundColor);
-
-        % Use optimized flip timing for smooth animation
-        vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
-
-        % Check for ESC key to abort experiment
-        [pressed, firstPress] = KbQueueCheck();
-        if pressed && firstPress(kb.escKey)
-            fprintf('\n*** Experiment terminated by user (ESC pressed during end screen) ***\n');
-            break;
-        end
-
-        % Continuous eye tracking monitoring (following vri_restingstate pattern)
-        if pa.eyeTrackingEnabled
-            evt = Eyelink('newestfloatsample');
-            xPos = evt.gx;
-            yPos = evt.gy;
-            if isequal(xPos(1), xPos(2), yPos(1), yPos(2))
-                blinkCounter = blinkCounter + 1;
-                if blinkCounter >= blinkFrameThresh
-                    % play alarm: Beeper(400, 0.8, 1);
-                end
-            else
-                blinkCounter = 0;
-            end
-            
-            % Record continuous gaze sample (every 0.5 seconds)
-            pa = record_continuous_gaze(pa, experimentStartTime);
-        end
-    end
-
-    % Stop and save Eyelink data (guarded)
-    if pa.eyeTrackingEnabled
-        initEyelinkStates('eyestop', VP.window, {pa.eyeFileBase, pa.eyeDataDir});
-    end
+    % End screen
+    [pa, ~, ~, ~] = run_end_screen(VP, pa, kb, experimentStartTime, currentFixationAngle, blinkCounter, blinkFrameThresh);
 
 catch ME
     % Error occurred - display detailed message
@@ -550,65 +219,7 @@ catch ME
     end
 end
 
-% Clean up resources (always executed)
-fprintf('\nCleaning up resources...\n');
-
-% Clean up keyboard queue
-try
-    KbQueueStop();
-    KbQueueRelease();
-    fprintf('  Keyboard queue released\n');
-catch ME
-    fprintf('  Warning: Could not release keyboard queue: %s\n', ME.message);
-end
-
-% Close Psychtoolbox windows
-try
-    sca; % Screen('CloseAll')
-    fprintf('  Psychtoolbox windows closed\n');
-catch ME
-    fprintf('  Warning: Could not close Psychtoolbox windows: %s\n', ME.message);
-end
-
-% Close VPixx connection
-try
-    if Datapixx('IsReady')
-        Datapixx('Close');
-        fprintf('  VPixx connection closed\n');
-    end
-catch ME
-    fprintf('  Warning: Could not close VPixx connection: %s\n', ME.message);
-end
-
-fprintf('Cleanup complete.\n');
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% CALCULATE AND DISPLAY RESULTS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Calculate final metrics
-totalExperimentTime = GetSecs - experimentStartTime;
-nTrials = pa.trialCounter;
-nCorrect = sum(pa.data.correct);
-accuracy = nCorrect / nTrials * 100;
-
-fprintf('\n=== EXPERIMENT COMPLETE ===\n');
-fprintf('Total trials completed: %d\n', nTrials);
-fprintf('Total experiment time: %.2f seconds (%.2f minutes)\n', totalExperimentTime, totalExperimentTime/60);
-fprintf('Results Summary:\n');
-fprintf('Target Color\tResponse\n');
-fprintf('------------\t--------\n');
-
-for i = 1:nTrials
-    fprintf('%s\t\t%s\n', pa.data.targetColor{i}, pa.data.response{i});
-end
-
-fprintf('\nOverall Accuracy: %d out of %d (%.1f%%)\n', nCorrect, nTrials, accuracy);
-
-% Store total experiment time in data structure
-pa.totalExperimentTime = totalExperimentTime;
-
-% Save data
-save(pa.dataFileName, 'pa');
-fprintf('Data saved to %s\n', pa.dataFileName);
+% Cleanup and finalize experiment (always executed)
+cleanup_experiment(VP, pa, kb, experimentStartTime);
 
 end
