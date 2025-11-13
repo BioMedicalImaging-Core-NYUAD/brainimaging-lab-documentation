@@ -1,12 +1,10 @@
-function [pa, exitFlag, currentFixationAngle, blinkCounter] = run_stimulus(VP, pa, kb, experimentStartTime, currentFixationAngle, blinkCounter, blinkFrameThresh, targetColor, targetIdx)
-% RUN_STIMULUS - Run stimulus phase with colored circle
+function [pa, exitFlag, currentFixationAngle] = s2_stimulus(VP, pa, kb, experimentStartTime, currentFixationAngle, targetColor, targetIdx)
+% S2_STIMULUS - Stimulus phase with colored circle
 %
 % Input:
 %   VP, pa, kb - Standard experiment structures
 %   experimentStartTime - Start time of experiment
 %   currentFixationAngle - Current angle of traveling dot
-%   blinkCounter - Current blink counter
-%   blinkFrameThresh - Blink frame threshold
 %   targetColor - Target color name
 %   targetIdx - Index of target color in pa.colors
 %
@@ -14,7 +12,6 @@ function [pa, exitFlag, currentFixationAngle, blinkCounter] = run_stimulus(VP, p
 %   pa - Updated parameters structure
 %   exitFlag - 1 if ESC pressed, 0 otherwise
 %   currentFixationAngle - Updated angle
-%   blinkCounter - Updated blink counter
 
 stimulusStartTime = GetSecs;
 stimulusEndTime = stimulusStartTime + pa.stimulusDuration;
@@ -47,7 +44,7 @@ while GetSecs < stimulusEndTime
     
     drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
         pa.travelingDotRadiusPix, pa.dotColor, pa.colorRGB(targetIdx,:), ...
-        pa.circleLineWidth, VP.backGroundColor);
+        pa.circleLineWidth, VP.backGroundColor, pa.dotCache);
     
     vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
     
@@ -59,16 +56,6 @@ while GetSecs < stimulusEndTime
     end
     
     if pa.eyeTrackingEnabled
-        evt = Eyelink('newestfloatsample');
-        xPos = evt.gx; yPos = evt.gy;
-        if isequal(xPos(1), xPos(2), yPos(1), yPos(2))
-            blinkCounter = blinkCounter + 1;
-            if blinkCounter >= blinkFrameThresh
-                % play alarm: Beeper(400, 0.8, 1);
-            end
-        else
-            blinkCounter = 0;
-        end
         pa = record_continuous_gaze(pa, experimentStartTime);
     end
 end

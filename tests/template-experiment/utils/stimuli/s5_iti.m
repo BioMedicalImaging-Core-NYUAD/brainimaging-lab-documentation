@@ -1,18 +1,15 @@
-function [pa, exitFlag, currentFixationAngle, blinkCounter] = run_iti(VP, pa, kb, experimentStartTime, currentFixationAngle, blinkCounter, blinkFrameThresh)
-% RUN_ITI - Run inter-trial interval phase
+function [pa, exitFlag, currentFixationAngle] = s5_iti(VP, pa, kb, experimentStartTime, currentFixationAngle)
+% S5_ITI - Inter-trial interval phase
 %
 % Input:
 %   VP, pa, kb - Standard experiment structures
 %   experimentStartTime - Start time of experiment
 %   currentFixationAngle - Current angle of traveling dot
-%   blinkCounter - Current blink counter
-%   blinkFrameThresh - Blink frame threshold
 %
 % Output:
 %   pa - Updated parameters structure
 %   exitFlag - 1 if ESC pressed, 0 otherwise
 %   currentFixationAngle - Updated angle
-%   blinkCounter - Updated blink counter
 
 itiStartTime = GetSecs;
 itiEndTime = itiStartTime + pa.itiDuration;
@@ -25,7 +22,7 @@ while GetSecs < itiEndTime
     
     drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
         pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
-        pa.circleLineWidth, VP.backGroundColor);
+        pa.circleLineWidth, VP.backGroundColor, pa.dotCache);
     
     vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
     
@@ -37,16 +34,6 @@ while GetSecs < itiEndTime
     end
     
     if pa.eyeTrackingEnabled
-        evt = Eyelink('newestfloatsample');
-        xPos = evt.gx; yPos = evt.gy;
-        if isequal(xPos(1), xPos(2), yPos(1), yPos(2))
-            blinkCounter = blinkCounter + 1;
-            if blinkCounter >= blinkFrameThresh
-                % play alarm: Beeper(400, 0.8, 1);
-            end
-        else
-            blinkCounter = 0;
-        end
         pa = record_continuous_gaze(pa, experimentStartTime);
     end
 end

@@ -17,7 +17,8 @@ prompt = {'Subject ID (e.g., 0201):', ...
           'Session ID (e.g., 01):', ...
           'Run ID (e.g., 01):', ...
           'Task Name (optional):'};
-answer = inputdlg(prompt, 'BIDS Information', [1 50], {'', '', '', taskName});
+definput = {'9999', '01', '01', taskName};
+answer = inputdlg(prompt, 'BIDS Information', [1 50], definput);
 
 if isempty(answer)
     error('User cancelled');
@@ -35,9 +36,18 @@ info.runID = regexprep(info.runID, '^run-', '');
 
 % Create directory structure
 dataDir = fullfile(experimentDir, 'data');
-subDir = fullfile(dataDir, sprintf('sub-%s', info.subjectID));
+if ~exist(dataDir, 'dir')
+    mkdir(dataDir);
+end
+expDir = fullfile(dataDir, 'exp');
+if ~exist(expDir, 'dir')
+    mkdir(expDir);
+end
+subDir = fullfile(expDir, sprintf('sub-%s', info.subjectID));
+if ~exist(subDir, 'dir')
+    mkdir(subDir);
+end
 sesDir = fullfile(subDir, sprintf('ses-%s', info.sessionID));
-
 if ~exist(sesDir, 'dir')
     mkdir(sesDir);
 end
