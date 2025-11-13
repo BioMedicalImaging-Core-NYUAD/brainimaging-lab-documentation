@@ -183,6 +183,9 @@ end
 % Store screen center for plotting functions
 pa.screenCenter = VP.windowCenter;
 
+% Initialize dot position cache
+pa.dotCache = get_dot_cache(pa.fixationSpeed, pa.fixationRadiusPix, VP.ifi);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % EYE TRACKING PARAMETERS (following vri_restingstate pattern)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

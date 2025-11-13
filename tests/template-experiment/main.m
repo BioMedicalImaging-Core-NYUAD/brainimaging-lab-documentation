@@ -214,6 +214,12 @@ catch ME
 end
 
 % Cleanup and finalize experiment (always executed)
-cleanup_experiment(VP, pa, kb, experimentStartTime);
+% Check if experimentStartTime was defined before calling cleanup
+if exist('experimentStartTime', 'var')
+    cleanup_experiment(VP, pa, kb, experimentStartTime);
+else
+    % If experiment never started, use current time as fallback
+    cleanup_experiment(VP, pa, kb, GetSecs);
+end
 
 end

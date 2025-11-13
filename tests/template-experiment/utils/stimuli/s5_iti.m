@@ -22,7 +22,7 @@ while GetSecs < itiEndTime
     
     drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
         pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
-        pa.circleLineWidth, VP.backGroundColor);
+        pa.circleLineWidth, VP.backGroundColor, pa.dotCache);
     
     vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
     
