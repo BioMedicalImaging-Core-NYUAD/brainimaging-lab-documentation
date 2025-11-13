@@ -35,9 +35,14 @@ info.runID = regexprep(info.runID, '^run-', '');
 
 % Create directory structure
 dataDir = fullfile(experimentDir, 'data');
+if ~exist(dataDir, 'dir')
+    mkdir(dataDir);
+end
 subDir = fullfile(dataDir, sprintf('sub-%s', info.subjectID));
+if ~exist(subDir, 'dir')
+    mkdir(subDir);
+end
 sesDir = fullfile(subDir, sprintf('ses-%s', info.sessionID));
-
 if ~exist(sesDir, 'dir')
     mkdir(sesDir);
 end

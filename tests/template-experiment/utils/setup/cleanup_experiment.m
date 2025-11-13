@@ -71,12 +71,36 @@ fprintf('\nOverall Accuracy: %d out of %d (%.1f%%)\n', nCorrect, nTrials, accura
 pa.totalExperimentTime = totalExperimentTime;
 
 % Save data
-save(pa.dataFileName, 'pa');
-fprintf('Data saved to %s\n', pa.dataFileName);
+if isfield(pa, 'dataFileName') && ~isempty(pa.dataFileName)
+    % Ensure directory exists
+    [saveDir, ~, ~] = fileparts(pa.dataFileName);
+    if ~exist(saveDir, 'dir')
+        fprintf('Creating directory: %s\n', saveDir);
+        mkdir(saveDir);
+    end
+    fprintf('Saving data to: %s\n', pa.dataFileName);
+    try
+        save(pa.dataFileName, 'pa');
+        if exist(pa.dataFileName, 'file')
+            fprintf('Data saved successfully to %s\n', pa.dataFileName);
+        else
+            fprintf('ERROR: File was not created at %s\n', pa.dataFileName);
+        end
+    catch ME
+        fprintf('ERROR: Could not save data to %s\n', pa.dataFileName);
+        fprintf('Error: %s\n', ME.message);
+    end
+else
+    fprintf('WARNING: No data filename set, data not saved\n');
+end
 
 % Create BIDS events files
 if isfield(pa, 'bidsInfo') && ~isempty(pa.bidsInfo)
-    create_bids_events(pa, pa.bidsInfo);
+    try
+        create_bids_events(pa, pa.bidsInfo);
+    catch ME
+        fprintf('WARNING: Could not create BIDS events files: %s\n', ME.message);
+    end
 end
 
 % Plot eyetracking data if available

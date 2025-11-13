@@ -8,12 +8,24 @@ end
 trialDuration = pa.stimulusDuration + pa.responseWindow + pa.feedbackDuration + pa.itiDuration;
 nTrials = pa.trialCounter;
 
+if nTrials == 0
+    return;
+end
+
 onset = pa.data.trialStartTime(1:nTrials);
 duration = repmat(trialDuration, nTrials, 1);
 trial_type = pa.data.targetColor(1:nTrials);
 response_time = pa.data.reactionTime(1:nTrials);
 response = pa.data.response(1:nTrials);
 correct = double(pa.data.correct(1:nTrials));
+
+% Ensure all are column vectors
+onset = onset(:);
+duration = duration(:);
+trial_type = trial_type(:);
+response_time = response_time(:);
+response = response(:);
+correct = correct(:);
 
 % Convert NaN to 'n/a'
 response_time_str = cell(nTrials, 1);
