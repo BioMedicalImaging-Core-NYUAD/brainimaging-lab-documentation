@@ -128,6 +128,16 @@ pa.data.gazeX = nan(1, pa.maxTrials);
 pa.data.gazeY = nan(1, pa.maxTrials);
 pa.trialCounter = 0; % Track actual number of trials completed
 
+% Continuous gaze tracking arrays (for every 0.5 seconds)
+% Estimate: max 10 minutes = 600 seconds = 1200 samples per experiment
+pa.maxGazeSamples = 2000; % Pre-allocate extra space
+pa.data.continuousGazeX = nan(1, pa.maxGazeSamples);
+pa.data.continuousGazeY = nan(1, pa.maxGazeSamples);
+pa.data.continuousGazeTime = nan(1, pa.maxGazeSamples);
+pa.gazeSampleCounter = 0; % Track actual number of samples
+pa.gazeSampleInterval = 0.5; % Record every 0.5 seconds
+pa.lastGazeSampleTime = 0; % Track when we last recorded
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % VPIXX INITIALIZATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -154,7 +164,18 @@ end
 % EXPERIMENT CONTROL PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 pa.experimentName = 'Circular Path Button Pressing Experiment';
-pa.dataFileName = 'circular_path_data.mat';
+
+% Set up data directory and filename
+scriptDir = fileparts(mfilename('fullpath'));
+experimentDir = fullfile(scriptDir, '..', '..');
+dataDir = fullfile(experimentDir, 'data');
+if ~exist(dataDir, 'dir')
+    mkdir(dataDir);
+end
+pa.dataFileName = fullfile(dataDir, 'circular_path_data.mat');
+
+% Store screen center for plotting functions
+pa.screenCenter = VP.windowCenter;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % EYE TRACKING PARAMETERS (following vri_restingstate pattern)
@@ -164,7 +185,10 @@ if isfield(debugConfig, 'eyetracking')
 else
     pa.eyeTrackingEnabled = 0;
 end
-pa.eyeDataDir = fullfile(pwd, 'eyetracking_data');
+% Set up eyetracking data directory
+scriptDir = fileparts(mfilename('fullpath'));
+experimentDir = fullfile(scriptDir, '..', '..');
+pa.eyeDataDir = fullfile(experimentDir, 'data', 'eyetracking_data');
 if ~exist(pa.eyeDataDir, 'dir'), mkdir(pa.eyeDataDir); end
 base = datestr(now,'mmddHHMM');
 pa.eyeFileBase = base(1:min(end,8));

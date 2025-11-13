@@ -1,4 +1,4 @@
-function main()
+t11242function main()
 % MAIN - Button-pressing experiment with circular path and traveling dot
 %
 % Participants view a circular path with a continuously traveling dot. During
@@ -39,10 +39,10 @@ addpath(genpath(fullfile(scriptDir, 'utils')));
 % Centralized debug settings - modify these to control experiment behavior
 debugConfig = struct();
 debugConfig.enabled = 1;              % 1 = debug mode, 0 = production mode
-debugConfig.useVPixx = 1;             % 1 = use VPixx hardware, 0 = use keyboard
+debugConfig.useVPixx = 0;             % 1 = use VPixx hardware, 0 = use keyboard
 debugConfig.fullscreen = 1;            % 1 = fullscreen, 0 = windowed mode
 debugConfig.skipSyncTests = 1;       % 1 = skip sync tests, 0 = run sync tests
-debugConfig.displayMode = 1;          % 1 = NYUAD lab, 2 = laptop/development
+debugConfig.displayMode = 2;          % 1 = NYUAD lab, 2 = laptop/development
 debugConfig.manualTrigger = 1;        % 1 = manual trigger (5 or t), 0 = scanner trigger
 debugConfig.buttonbox = 1;        % 1 = button box, 0 = keyboard
 debugConfig.eyetracking = 0;       % 1 = enable Eyelink, 0 = disable
@@ -209,13 +209,6 @@ try
             % Use optimized flip timing for smooth animation
             vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
 
-            % Check for ESC key to abort experiment
-            [pressed, firstPress] = KbQueueCheck();
-            if pressed && firstPress(kb.escKey)
-                fprintf('\n*** Experiment terminated by user (ESC pressed during stimulus) ***\n');
-                break;
-            end
-
             % Continuous eye tracking monitoring (following vri_restingstate pattern)
             if pa.eyeTrackingEnabled
                 evt = Eyelink('newestfloatsample');
@@ -233,12 +226,6 @@ try
                 % Record continuous gaze sample (every 0.5 seconds)
                 pa = record_continuous_gaze(pa, experimentStartTime);
             end
-        end
-
-        % Check if ESC was pressed to exit trial loop
-        [pressed, firstPress] = KbQueueCheck();
-        if pressed && firstPress(kb.escKey)
-            break;
         end
 
         % Phase 2: Wait for response
@@ -262,13 +249,6 @@ try
                 pa.circleLineWidth, VP.backGroundColor);
 
             vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
-
-            % Check for ESC key to abort experiment
-            [pressed, firstPress] = KbQueueCheck();
-            if pressed && firstPress(kb.escKey)
-                fprintf('\n*** Experiment terminated by user (ESC pressed during response) ***\n');
-                break;
-            end
 
             % Continuous eye tracking monitoring (following vri_restingstate pattern)
             if pa.eyeTrackingEnabled
@@ -369,13 +349,6 @@ try
             % Use optimized flip timing for smooth animation
             vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
 
-            % Check for ESC key to abort experiment
-            [pressed, firstPress] = KbQueueCheck();
-            if pressed && firstPress(kb.escKey)
-                fprintf('\n*** Experiment terminated by user (ESC pressed during feedback) ***\n');
-                break;
-            end
-
             % Continuous eye tracking monitoring (following vri_restingstate pattern)
             if pa.eyeTrackingEnabled
                 evt = Eyelink('newestfloatsample');
@@ -393,12 +366,6 @@ try
                 % Record continuous gaze sample (every 0.5 seconds)
                 pa = record_continuous_gaze(pa, experimentStartTime);
             end
-        end
-
-        % Check if ESC was pressed to exit trial loop
-        [pressed, firstPress] = KbQueueCheck();
-        if pressed && firstPress(kb.escKey)
-            break;
         end
 
         % Phase 4: Inter-trial interval
@@ -419,13 +386,6 @@ try
             % Use optimized flip timing for smooth animation
             vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
 
-            % Check for ESC key to abort experiment
-            [pressed, firstPress] = KbQueueCheck();
-            if pressed && firstPress(kb.escKey)
-                fprintf('\n*** Experiment terminated by user (ESC pressed during ITI) ***\n');
-                break;
-            end
-
             % Continuous eye tracking monitoring (following vri_restingstate pattern)
             if pa.eyeTrackingEnabled
                 evt = Eyelink('newestfloatsample');
@@ -443,12 +403,6 @@ try
                 % Record continuous gaze sample (every 0.5 seconds)
                 pa = record_continuous_gaze(pa, experimentStartTime);
             end
-        end
-
-        % Check if ESC was pressed to exit trial loop
-        [pressed, firstPress] = KbQueueCheck();
-        if pressed && firstPress(kb.escKey)
-            break;
         end
 
         % Print trial result
@@ -504,13 +458,6 @@ try
 
         % Use optimized flip timing for smooth animation
         vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
-
-        % Check for ESC key to abort experiment
-        [pressed, firstPress] = KbQueueCheck();
-        if pressed && firstPress(kb.escKey)
-            fprintf('\n*** Experiment terminated by user (ESC pressed during end screen) ***\n');
-            break;
-        end
 
         % Continuous eye tracking monitoring (following vri_restingstate pattern)
         if pa.eyeTrackingEnabled
