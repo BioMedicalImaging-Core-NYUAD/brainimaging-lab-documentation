@@ -39,7 +39,11 @@ dataDir = fullfile(experimentDir, 'data');
 if ~exist(dataDir, 'dir')
     mkdir(dataDir);
 end
-subDir = fullfile(dataDir, sprintf('sub-%s', info.subjectID));
+expDir = fullfile(dataDir, 'exp');
+if ~exist(expDir, 'dir')
+    mkdir(expDir);
+end
+subDir = fullfile(expDir, sprintf('sub-%s', info.subjectID));
 if ~exist(subDir, 'dir')
     mkdir(subDir);
 end
