@@ -40,9 +40,9 @@ while GetSecs < stimulusEndTime
     currentTime = GetSecs;
     currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
     
-    % Use target color for fixation line (circle stays black)
+    % Use target color for both fixation line and circle
     drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
-        pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
+        pa.travelingDotRadiusPix, pa.dotColor, pa.colorRGB(targetIdx,:), ...
         pa.circleLineWidth, VP.backGroundColor, pa.fixationLineLengthPix, pa.fixationLineWidth, pa.colorRGB(targetIdx,:));
     
     vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);

@@ -25,11 +25,18 @@ Screen('FrameOval', window, circleColor * 255, ...
     circleLineWidth);
 
 % Draw radial fixation line (forms cross with circular path, replaces traveling dot)
-% Line extends from center outward in the radial direction, rotating around the circle
+% Short line segment centered on the circular path, perpendicular to the circle
 if nargin >= 10 && ~isempty(fixationLineLengthPix) && fixationLineLengthPix > 0
-    % Calculate radial line endpoints (from center outward in direction of dot)
-    lineEndX = screenCenter(1) + fixationLineLengthPix * cos(dotAngle);
-    lineEndY = screenCenter(2) + fixationLineLengthPix * sin(dotAngle);
+    % Calculate center point of line (on the circular path)
+    lineCenterX = screenCenter(1) + circleRadiusPix * cos(dotAngle);
+    lineCenterY = screenCenter(2) + circleRadiusPix * sin(dotAngle);
+    
+    % Calculate line endpoints (half length on each side, in radial direction)
+    halfLength = fixationLineLengthPix / 2;
+    lineStartX = lineCenterX - halfLength * cos(dotAngle);
+    lineStartY = lineCenterY - halfLength * sin(dotAngle);
+    lineEndX = lineCenterX + halfLength * cos(dotAngle);
+    lineEndY = lineCenterY + halfLength * sin(dotAngle);
     
     % Draw radial line
     if nargin >= 11 && ~isempty(fixationLineWidth)
@@ -45,9 +52,9 @@ if nargin >= 10 && ~isempty(fixationLineLengthPix) && fixationLineLengthPix > 0
         lineColor = circleColor * 255;
     end
     
-    % Draw the radial line from center outward (rotates with dotAngle)
+    % Draw the short line segment centered on the circle (rotates with dotAngle)
     Screen('DrawLine', window, lineColor, ...
-        screenCenter(1), screenCenter(2), lineEndX, lineEndY, lineWidth);
+        lineStartX, lineStartY, lineEndX, lineEndY, lineWidth);
 end
 
 % Note: Traveling dot is replaced by the radial fixation line
