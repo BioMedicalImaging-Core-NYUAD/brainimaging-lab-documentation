@@ -22,7 +22,7 @@ if ~exist(imagePath, 'file')
 end
 
 % Duration
-duration = 10.0; % seconds
+duration = 15.0; % seconds
 
 % Debug configuration
 debugConfig = struct();
@@ -63,8 +63,8 @@ else
     pa.eyeTrackingEnabled = 0;
 end
 
-% Initialize gaze recording parameters (same as setup_param.m)
-pa.gazeSampleInterval = 0.5; % Record every 0.5 seconds
+% Initialize gaze recording parameters
+pa.gazeSampleInterval = 0.2; % Record every 0.2 seconds
 pa.maxGazeSamples = ceil(duration / pa.gazeSampleInterval) + 1000; % Extra buffer
 pa.gazeSampleCounter = 0;
 pa.data.continuousGazeX = nan(1, pa.maxGazeSamples);

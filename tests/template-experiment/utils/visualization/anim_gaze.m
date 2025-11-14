@@ -184,9 +184,9 @@ if hasPupilData
     if any(validPupil)
         minPupil = min(pupilAreav(validPupil));
         maxPupil = max(pupilAreav(validPupil));
-        % Scale pupil size to circle size range (e.g., 200-600 pixels)
-        pupilMinSize = 200;
-        pupilMaxSize = 600;
+        % Scale pupil size to circle size range
+        pupilMinSize = 50;
+        pupilMaxSize = 500;
         fprintf('Pupil size data available (range: %.1f - %.1f). Fixation circle size will vary with pupil size.\n', minPupil, maxPupil);
     else
         hasPupilData = false; % No valid pupil data
@@ -265,8 +265,8 @@ hold(ax, 'on');
 axis(ax, 'equal');
 
 % Set axis limits to focus on circle area with padding
-% Calculate padding to show circle area nicely (about 3x the circle radius)
-padding = radius * 3;
+% Calculate padding to show circle area nicely (reduced padding for more zoom)
+padding = radius * 1.5;
 xlim(ax, [center(1) - radius - padding, center(1) + radius + padding]);
 ylim(ax, [center(2) - radius - padding, center(2) + radius + padding]);
 set(ax, 'YDir', 'reverse'); % Match screen coordinates (Y increases downward)

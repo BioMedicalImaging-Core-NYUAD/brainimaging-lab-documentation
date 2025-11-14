@@ -155,8 +155,8 @@ startTime = 0;
 endTime = gazeTimev(end);
 totalDuration = endTime;
 
-% Create time vector for animation (sample at ~60 Hz for smooth animation)
-frameRate = 60; % frames per second
+% Create time vector for animation (sample at ~30 Hz for smooth animation)
+frameRate = 30; % frames per second
 dt = 1 / frameRate;
 timeVec = startTime:dt:endTime;
 
@@ -190,10 +190,12 @@ ylabel(ax, '');
 % Display image if available
 if hasImage && ~isempty(imgRect)
     % Convert image coordinates for display
-    % imgRect format: [left, top, right, bottom]
+    % imgRect format: [left, top, right, bottom] in screen coordinates
+    % Since YDir is reversed (Y increases downward), we need to provide Y coordinates correctly
+    % For imagesc with reversed Y, we provide [bottom, top] for Y range
     imgX = [imgRect(1), imgRect(3)];
-    imgY = [imgRect(2), imgRect(4)];
-    imagesc(ax, imgX, imgY, flipud(imgData));
+    imgY = [imgRect(4), imgRect(2)]; % [bottom, top] since Y increases downward
+    imagesc(ax, imgX, imgY, imgData);
     set(ax, 'YDir', 'reverse'); % Keep Y reversed for gaze coordinates
 end
 
@@ -207,18 +209,15 @@ gazeY_plotted = [];
 pupilArea_plotted = [];
 lastIdx = 0;
 
+% Animation loop
 fprintf('Starting animation (duration: %.1f seconds)...\n', totalDuration);
 fprintf('Press any key to pause/resume, close figure to exit.\n');
 
-% Animation loop
 for tIdx = 1:length(timeVec)
     currentTime = timeVec(tIdx);
     
     % Find all gaze samples up to current time
     idx = find(gazeTimev <= currentTime);
-    if isempty(idx)
-        continue;
-    end
     
     % Only update if we have new samples
     if length(idx) > lastIdx
@@ -254,8 +253,10 @@ for tIdx = 1:length(timeVec)
         end
         
         lastIdx = length(idx);
-        drawnow;
     end
+    
+    % Update display every frame for smoothness
+    drawnow('limitrate'); % Limit rate for smoother animation
     
     % Real-time pacing (match experiment speed)
     if tIdx < length(timeVec)
