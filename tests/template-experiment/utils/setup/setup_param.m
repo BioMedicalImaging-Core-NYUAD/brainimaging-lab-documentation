@@ -83,11 +83,10 @@ pa.dotColor = [0 0 0];         % Black dot color (constant throughout experiment
 pa.circleLineWidth = 3;        % pixels - thickness of circular path outline
 pa.circleColorDefault = [0 0 0]; % Black circle color (default for all non-stimulus phases)
 
-% Radial fixation line (forms cross with circular path)
-pa.fixationLineLengthDeg = 0.5; % degrees - length of radial line from center
-pa.fixationLineLengthPix = pa.fixationLineLengthDeg * VP.pixelsPerDegree; % pixels
-pa.fixationLineLengthExtendedDeg = 0.75; % degrees - extended length for incorrect feedback
-pa.fixationLineLengthExtendedPix = pa.fixationLineLengthExtendedDeg * VP.pixelsPerDegree; % pixels
+% Radial fixation line (forms cross with circular path, replaces traveling dot)
+% Line extends from center to beyond the circle radius
+pa.fixationLineLengthPix = pa.fixationRadiusPix + 50; % Extend slightly beyond circle radius
+pa.fixationLineLengthExtendedPix = pa.fixationRadiusPix + 100; % Extended length for incorrect feedback
 pa.fixationLineWidth = 2;       % pixels - thickness of radial line
 pa.fixationLineColorDefault = [0 0 0]; % Black default color
 

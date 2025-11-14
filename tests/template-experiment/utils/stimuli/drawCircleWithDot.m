@@ -1,13 +1,13 @@
-function drawCircleWithDot(window, screenCenter, circleRadiusPix, dotAngle, dotSize, dotColor, circleColor, circleLineWidth, backGroundColor, fixationLineLengthPix, fixationLineWidth, fixationLineColor)
-% DRAW_CIRCLE_WITH_DOT - Draw circular path outline with traveling dot and radial fixation line
+function drawCircleWithDot(window, screenCenter, circleRadiusPix, dotAngle, ~, ~, circleColor, circleLineWidth, backGroundColor, fixationLineLengthPix, fixationLineWidth, fixationLineColor)
+% DRAW_CIRCLE_WITH_DOT - Draw circular path outline with radial fixation line (replaces traveling dot)
 %
 % Inputs:
 %   window - Psychtoolbox window pointer
 %   screenCenter - [x, y] center of screen
 %   circleRadiusPix - radius of circular path in pixels
-%   dotAngle - current angle of traveling dot in radians
-%   dotSize - size of traveling dot in pixels
-%   dotColor - color of traveling dot [R, G, B]
+%   dotAngle - current angle of radial line in radians (rotates around circle)
+%   ~ - dotSize (unused, kept for backward compatibility)
+%   ~ - dotColor (unused, kept for backward compatibility)
 %   circleColor - color of circular path outline [R, G, B]
 %   circleLineWidth - thickness of circular path outline
 %   backGroundColor - background color
@@ -24,7 +24,8 @@ Screen('FrameOval', window, circleColor * 255, ...
     screenCenter(1)+circleRadiusPix, screenCenter(2)+circleRadiusPix], ...
     circleLineWidth);
 
-% Draw radial fixation line (forms cross with circular path)
+% Draw radial fixation line (forms cross with circular path, replaces traveling dot)
+% Line extends from center outward in the radial direction, rotating around the circle
 if nargin >= 10 && ~isempty(fixationLineLengthPix) && fixationLineLengthPix > 0
     % Calculate radial line endpoints (from center outward in direction of dot)
     lineEndX = screenCenter(1) + fixationLineLengthPix * cos(dotAngle);
@@ -44,17 +45,13 @@ if nargin >= 10 && ~isempty(fixationLineLengthPix) && fixationLineLengthPix > 0
         lineColor = circleColor * 255;
     end
     
+    % Draw the radial line from center outward (rotates with dotAngle)
     Screen('DrawLine', window, lineColor, ...
         screenCenter(1), screenCenter(2), lineEndX, lineEndY, lineWidth);
 end
 
-% Calculate traveling dot position on circular path
-dotX = screenCenter(1) + circleRadiusPix * cos(dotAngle);
-dotY = screenCenter(2) + circleRadiusPix * sin(dotAngle);
-
-% Draw traveling dot
-Screen('FillOval', window, dotColor * 255, ...
-    [dotX-dotSize, dotY-dotSize, dotX+dotSize, dotY+dotSize]);
+% Note: Traveling dot is replaced by the radial fixation line
+% The line rotates around the circle, forming a cross with the circular path
 
 end
 
