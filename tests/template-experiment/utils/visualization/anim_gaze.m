@@ -7,6 +7,7 @@ function anim_gaze(varargin)
 %   anim_gaze('0201', '01', '01', 'circularpath')   % with task name
 %   anim_gaze('02010101')                            % Combined: subject(4) + session(2) + run(2)
 %   anim_gaze(02010101)                              % Numeric version
+%   anim_gaze(..., 'speed', 2)                       % Speed up animation by 2x
 %
 % This function creates an animated visualization showing:
 % - The circular path with a traveling dot (recreating the experiment)
@@ -153,6 +154,25 @@ else
     error('anim_gaze:invalidInput', 'Invalid number of arguments. See help for usage examples.');
 end
 
+% Parse optional name-value pairs (e.g., 'speed', 2)
+speedMultiplier = 1; % Default: no speed change
+i = 1;
+while i <= length(varargin)
+    if ischar(varargin{i}) && strcmpi(varargin{i}, 'speed')
+        if i + 1 <= length(varargin) && isnumeric(varargin{i+1}) && isscalar(varargin{i+1})
+            speedMultiplier = varargin{i+1};
+            if speedMultiplier <= 0
+                error('anim_gaze:invalidSpeed', 'Speed multiplier must be positive');
+            end
+            i = i + 2; % Skip both 'speed' and its value
+        else
+            error('anim_gaze:invalidSpeed', 'Speed flag must be followed by a numeric value');
+        end
+    else
+        i = i + 1;
+    end
+end
+
 % Check if continuous gaze data exists
 if ~isfield(pa.data, 'continuousGazeX') || ~isfield(pa.data, 'continuousGazeY') || ...
    ~isfield(pa.data, 'continuousGazeTime')
@@ -251,6 +271,12 @@ frameRate = 60; % frames per second
 dt = 1 / frameRate;
 timeVec = startTime:dt:endTime;
 
+% Apply speed multiplier to timing
+dt = dt / speedMultiplier;
+if speedMultiplier ~= 1
+    fprintf('Animation speed: %.1fx\n', speedMultiplier);
+end
+
 % Get background color (mid-gray, convert from 0-255 to 0-1 range)
 if isfield(pa, 'backGroundColor')
     bgColor = pa.backGroundColor / 255;
@@ -265,8 +291,9 @@ hold(ax, 'on');
 axis(ax, 'equal');
 
 % Set axis limits to focus on circle area with padding
-% Calculate padding to show circle area nicely (reduced padding for more zoom)
-padding = radius * 1.5;
+% Calculate padding to show circle area nicely (smaller padding = more zoom)
+% Change this value to adjust zoom: smaller = more zoomed in, larger = more zoomed out
+padding = radius * 0.5;
 xlim(ax, [center(1) - radius - padding, center(1) + radius + padding]);
 ylim(ax, [center(2) - radius - padding, center(2) + radius + padding]);
 set(ax, 'YDir', 'reverse'); % Match screen coordinates (Y increases downward)

@@ -15,14 +15,20 @@ vpixxPath = fullfile(projectRoot, 'experiments', 'general', 'vpixx-utilities');
 addpath(vpixxPath);
 addpath(genpath(fullfile(experimentDir, 'utils')));
 
-% Image path (relative to script location)
-imagePath = fullfile(scriptDir, 'photo.png');
-if ~exist(imagePath, 'file')
-    error('Image not found: %s', imagePath);
+% Image paths (relative to script location)
+imagePath1 = fullfile(scriptDir, 'photo.png');
+imagePath2 = fullfile(scriptDir, 'photo2.jpg');
+if ~exist(imagePath1, 'file')
+    error('Image 1 not found: %s', imagePath1);
+end
+if ~exist(imagePath2, 'file')
+    error('Image 2 not found: %s', imagePath2);
 end
 
-% Duration
-duration = 15.0; % seconds
+% Duration for each photo
+duration1 = 10.0; % seconds for first photo
+duration2 = 15.0; % seconds for second photo
+duration = duration1 + duration2; % total duration
 
 % Debug configuration
 debugConfig = struct();
@@ -81,32 +87,50 @@ pa.screenWidthPix = VP.windowWidthPix;
 pa.screenHeightPix = VP.windowHeightPix;
 pa.backGroundColor = VP.backGroundColor;
 
-% Load image
+% Load images
 try
-    img = imread(imagePath);
-    % Convert to RGB if needed (handle grayscale, indexed, etc.)
-    if size(img, 3) == 1
-        img = repmat(img, [1, 1, 3]); % Convert grayscale to RGB
-    elseif size(img, 3) == 4
-        % RGBA - extract RGB only for Psychtoolbox
-        img = img(:, :, 1:3);
+    % Load first image
+    img1 = imread(imagePath1);
+    if size(img1, 3) == 1
+        img1 = repmat(img1, [1, 1, 3]);
+    elseif size(img1, 3) == 4
+        img1 = img1(:, :, 1:3);
     end
-    % Ensure uint8 format
-    if ~isa(img, 'uint8')
-        img = uint8(img);
+    if ~isa(img1, 'uint8')
+        img1 = uint8(img1);
     end
-    imgTexture = Screen('MakeTexture', VP.window, img);
+    imgTexture1 = Screen('MakeTexture', VP.window, img1);
     
-    % Get image size and scale to match screen height (maintain aspect ratio)
-    [imgHeight, imgWidth, ~] = size(img);
-    scaleFactor = VP.windowHeightPix / imgHeight; % Scale so height matches screen
-    scaledWidth = imgWidth * scaleFactor;
-    scaledHeight = imgHeight * scaleFactor;
-    imgRect = [0, 0, scaledWidth, scaledHeight];
-    imgRect = CenterRectOnPoint(imgRect, VP.windowCenter(1), VP.windowCenter(2));
+    % Scale first image to match screen height
+    [imgHeight1, imgWidth1, ~] = size(img1);
+    scaleFactor1 = VP.windowHeightPix / imgHeight1;
+    scaledWidth1 = imgWidth1 * scaleFactor1;
+    scaledHeight1 = imgHeight1 * scaleFactor1;
+    imgRect1 = [0, 0, scaledWidth1, scaledHeight1];
+    imgRect1 = CenterRectOnPoint(imgRect1, VP.windowCenter(1), VP.windowCenter(2));
+    
+    % Load second image
+    img2 = imread(imagePath2);
+    if size(img2, 3) == 1
+        img2 = repmat(img2, [1, 1, 3]);
+    elseif size(img2, 3) == 4
+        img2 = img2(:, :, 1:3);
+    end
+    if ~isa(img2, 'uint8')
+        img2 = uint8(img2);
+    end
+    imgTexture2 = Screen('MakeTexture', VP.window, img2);
+    
+    % Scale second image to match screen height (maintain aspect ratio)
+    [imgHeight2, imgWidth2, ~] = size(img2);
+    scaleFactor2 = VP.windowHeightPix / imgHeight2;
+    scaledWidth2 = imgWidth2 * scaleFactor2;
+    scaledHeight2 = imgHeight2 * scaleFactor2;
+    imgRect2 = [0, 0, scaledWidth2, scaledHeight2];
+    imgRect2 = CenterRectOnPoint(imgRect2, VP.windowCenter(1), VP.windowCenter(2));
 catch ME
     sca;
-    error('Failed to load image: %s', ME.message);
+    error('Failed to load images: %s', ME.message);
 end
 
 % Calibration (following reference pattern - called before experiment starts)
@@ -151,7 +175,8 @@ pa.lastGazeSampleTime = experimentStartTime - pa.gazeSampleInterval;
 fprintf('Starting experiment...\n');
 
 % Main loop
-while (GetSecs - experimentStartTime) < duration
+elapsedTime = 0;
+while elapsedTime < duration
     % Check for escape
     [keyIsDown, ~, keyCode] = KbCheck(-1);
     if keyIsDown && keyCode(kb.escKey)
@@ -159,11 +184,19 @@ while (GetSecs - experimentStartTime) < duration
         break;
     end
     
+    elapsedTime = GetSecs - experimentStartTime;
+    
     % Draw gray background
     Screen('FillRect', VP.window, VP.backGroundColor);
     
-    % Draw image
-    Screen('DrawTexture', VP.window, imgTexture, [], imgRect);
+    % Draw appropriate image based on elapsed time
+    if elapsedTime < duration1
+        % First photo (0-10 seconds)
+        Screen('DrawTexture', VP.window, imgTexture1, [], imgRect1);
+    else
+        % Second photo (10-25 seconds)
+        Screen('DrawTexture', VP.window, imgTexture2, [], imgRect2);
+    end
     
     % Record gaze
     if pa.eyeTrackingEnabled
@@ -185,8 +218,9 @@ if pa.eyeTrackingEnabled
     end
 end
 
-% Close image texture
-Screen('Close', imgTexture);
+% Close image textures
+Screen('Close', imgTexture1);
+Screen('Close', imgTexture2);
 
 % Save data with timestamp (use full timestamp for .mat file)
 timestampFull = datestr(now, 'yyyymmdd_HHMMSS');
@@ -205,9 +239,13 @@ if pa.eyeTrackingEnabled && pa.gazeSampleCounter > 0
     end
 end
 
-% Store image path for visualization
-pa.imagePath = imagePath;
-pa.imageRect = imgRect;
+% Store image paths and rects for visualization
+pa.imagePath1 = imagePath1;
+pa.imageRect1 = imgRect1;
+pa.imagePath2 = imagePath2;
+pa.imageRect2 = imgRect2;
+pa.duration1 = duration1;
+pa.duration2 = duration2;
 
 save(saveFile, 'pa');
 fprintf('Data saved to: %s\n', saveFile);

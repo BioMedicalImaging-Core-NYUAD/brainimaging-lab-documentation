@@ -134,19 +134,56 @@ else
     bgColor = [128 128 128] / 255; % Default mid-gray
 end
 
-% Load image if path is stored
-hasImage = false;
-imgData = [];
-imgRect = [];
-if isfield(pa, 'imagePath') && exist(pa.imagePath, 'file')
+% Load images if paths are stored
+hasImage1 = false;
+hasImage2 = false;
+imgData1 = [];
+imgData2 = [];
+imgRect1 = [];
+imgRect2 = [];
+duration1 = 10.0; % Default
+duration2 = 15.0; % Default
+
+% Load first image (backward compatibility with old format)
+if isfield(pa, 'imagePath1') && exist(pa.imagePath1, 'file')
     try
-        imgData = imread(pa.imagePath);
-        hasImage = true;
+        imgData1 = imread(pa.imagePath1);
+        hasImage1 = true;
+        if isfield(pa, 'imageRect1')
+            imgRect1 = pa.imageRect1;
+        end
+        if isfield(pa, 'duration1')
+            duration1 = pa.duration1;
+        end
+    catch
+        fprintf('Warning: Could not load image 1 from %s\n', pa.imagePath1);
+    end
+elseif isfield(pa, 'imagePath') && exist(pa.imagePath, 'file')
+    % Backward compatibility
+    try
+        imgData1 = imread(pa.imagePath);
+        hasImage1 = true;
         if isfield(pa, 'imageRect')
-            imgRect = pa.imageRect;
+            imgRect1 = pa.imageRect;
         end
     catch
         fprintf('Warning: Could not load image from %s\n', pa.imagePath);
+    end
+end
+
+% Load second image
+if isfield(pa, 'imagePath2') && exist(pa.imagePath2, 'file')
+    try
+        imgData2 = imread(pa.imagePath2);
+        hasImage2 = true;
+        if isfield(pa, 'imageRect2')
+            imgRect2 = pa.imageRect2;
+        end
+        if isfield(pa, 'duration2')
+            duration2 = pa.duration2;
+        end
+    catch
+        fprintf('Warning: Could not load image 2 from %s\n', pa.imagePath2);
     end
 end
 
@@ -187,16 +224,21 @@ set(ax, 'YTickLabel', []);
 xlabel(ax, '');
 ylabel(ax, '');
 
-% Display image if available
-if hasImage && ~isempty(imgRect)
-    % Convert image coordinates for display
-    % imgRect format: [left, top, right, bottom] in screen coordinates
-    % With YDir='reverse', Y increases downward (top=smaller Y, bottom=larger Y)
-    % imagesc with reversed Y: first row of image goes to smaller Y (top)
-    % So we provide coordinates as [top, bottom] and image data as-is
-    imgX = [imgRect(1), imgRect(3)];
-    imgY = [imgRect(2), imgRect(4)]; % [top, bottom] in screen coordinates
-    imagesc(ax, imgX, imgY, imgData); % No flip needed - YDir reverse handles it
+% Display images will be updated during animation based on time
+% Store image handles for later use
+imgHandle1 = [];
+imgHandle2 = [];
+if hasImage1 && ~isempty(imgRect1)
+    imgX1 = [imgRect1(1), imgRect1(3)];
+    imgY1 = [imgRect1(2), imgRect1(4)];
+    imgHandle1 = imagesc(ax, imgX1, imgY1, imgData1);
+    set(imgHandle1, 'Visible', 'on'); % Show first image initially
+end
+if hasImage2 && ~isempty(imgRect2)
+    imgX2 = [imgRect2(1), imgRect2(3)];
+    imgY2 = [imgRect2(2), imgRect2(4)];
+    imgHandle2 = imagesc(ax, imgX2, imgY2, imgData2);
+    set(imgHandle2, 'Visible', 'off'); % Hide second image initially
 end
 
 % Initialize plot handles
@@ -221,6 +263,27 @@ frameStartTime = tic; % Track frame timing for smoothness
 
 for tIdx = 1:length(timeVec)
     currentTime = timeVec(tIdx);
+    
+    % Update image display based on current time
+    if hasImage1 || hasImage2
+        if currentTime < duration1
+            % Show first image (0 to duration1)
+            if hasImage1 && ~isempty(imgHandle1)
+                set(imgHandle1, 'Visible', 'on');
+            end
+            if hasImage2 && ~isempty(imgHandle2)
+                set(imgHandle2, 'Visible', 'off');
+            end
+        else
+            % Show second image (duration1 onwards)
+            if hasImage1 && ~isempty(imgHandle1)
+                set(imgHandle1, 'Visible', 'off');
+            end
+            if hasImage2 && ~isempty(imgHandle2)
+                set(imgHandle2, 'Visible', 'on');
+            end
+        end
+    end
     
     % Find new gaze samples up to current time (more efficient: binary search)
     while gazeIdx <= length(gazeTimev) && gazeTimev(gazeIdx) <= currentTime
