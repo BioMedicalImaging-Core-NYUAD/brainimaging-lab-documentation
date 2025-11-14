@@ -41,11 +41,7 @@ debugConfig.eyetracking = 1; % Enable eye tracking
 % Setup keyboard
 kb = setup_keyboard();
 
-% Initialize eye tracking
-pa = struct();
-pa.eyeTrackingEnabled = 0;
-pa.pupilDataAvailable = false;
-
+% Initialize eye tracking (following reference pattern exactly)
 if debugConfig.eyetracking
     % Create eye tracking file name (EDF files must be <= 8 characters)
     % Use format: eggHHMM (e.g., egg1430)
@@ -58,33 +54,25 @@ if debugConfig.eyetracking
     
     pa.EL = initEyetracking(VP, pa);
     if isempty(pa.EL)
-        fprintf('Warning: Eye tracking initialization failed. Continuing without eye tracking.\n');
         pa.eyeTrackingEnabled = 0;
     else
         pa.eyeTrackingEnabled = 1;
-        
-        % Initialize gaze recording parameters
-        pa.gazeSampleInterval = 0.01; % Sample every 10ms (~100 Hz)
-        pa.maxGazeSamples = ceil(duration / pa.gazeSampleInterval) + 1000; % Extra buffer
-        pa.gazeSampleCounter = 0;
-        pa.lastGazeSampleTime = GetSecs;
-        
-        % Pre-allocate gaze data arrays
-        pa.data.continuousGazeX = nan(1, pa.maxGazeSamples);
-        pa.data.continuousGazeY = nan(1, pa.maxGazeSamples);
-        pa.data.continuousGazeTime = nan(1, pa.maxGazeSamples);
-        pa.data.continuousPupilArea = nan(1, pa.maxGazeSamples);
-        
-        % Calibrate
-        [~, exitFlag] = initEyelinkStates('calibrate', VP.window, {pa.EL});
-        if exitFlag
-            fprintf('Warning: Eye tracking calibration cancelled. Continuing without eye tracking.\n');
-            pa.eyeTrackingEnabled = 0;
-        else
-            % Start recording
-            initEyelinkStates('trialstart', VP.window, {pa.EL, 1, VP.windowCenter(1), VP.windowCenter(2), 50});
-        end
     end
+else
+    pa.EL = [];
+    pa.eyeTrackingEnabled = 0;
+end
+
+% Initialize gaze recording parameters (same as setup_param.m)
+pa.gazeSampleInterval = 0.5; % Record every 0.5 seconds
+pa.maxGazeSamples = ceil(duration / pa.gazeSampleInterval) + 1000; % Extra buffer
+pa.gazeSampleCounter = 0;
+pa.data.continuousGazeX = nan(1, pa.maxGazeSamples);
+pa.data.continuousGazeY = nan(1, pa.maxGazeSamples);
+pa.data.continuousGazeTime = nan(1, pa.maxGazeSamples);
+pa.pupilDataAvailable = false;
+if pa.eyeTrackingEnabled
+    pa.data.continuousPupilArea = nan(1, pa.maxGazeSamples);
 end
 
 % Store screen info for visualization
@@ -118,6 +106,16 @@ catch ME
     error('Failed to load image: %s', ME.message);
 end
 
+% Calibration (following reference pattern - called before experiment starts)
+if pa.eyeTrackingEnabled
+    [~, exitFlag] = initEyelinkStates('calibrate', VP.window, pa.EL);
+    if exitFlag
+        fprintf('\nCalibration failed or was cancelled. Disabling eye tracking.\n');
+        pa.EL = [];
+        pa.eyeTrackingEnabled = 0;
+    end
+end
+
 % Wait for trigger
 fprintf('Press ''t'' or ''5'' to start...\n');
 while true
@@ -134,8 +132,19 @@ while true
     WaitSecs(0.01);
 end
 
+% Start recording (following reference pattern from main.m)
+if pa.eyeTrackingEnabled
+    err = Eyelink('CheckRecording');
+    if err ~= 0
+        initEyelinkStates('startrecording', VP.window, pa.EL);
+        fprintf('Eyelink now recording ..\n');
+    end
+end
+
 % Start experiment
 experimentStartTime = GetSecs;
+% Initialize gaze sample timing (subtract interval so first sample is recorded immediately)
+pa.lastGazeSampleTime = experimentStartTime - pa.gazeSampleInterval;
 fprintf('Starting experiment...\n');
 
 % Main loop
@@ -162,10 +171,15 @@ while (GetSecs - experimentStartTime) < duration
     Screen('Flip', VP.window);
 end
 
-% Stop eye tracking
+% Stop eye tracking (following reference pattern from cleanup_experiment.m)
 if pa.eyeTrackingEnabled
-    initEyelinkStates('trialstop', VP.window, {});
-    initEyelinkStates('eyestop', VP.window, {pa.eyeFileBase, pa.eyeDataDir});
+    try
+        if isfield(pa, 'eyeFileBase') && isfield(pa, 'eyeDataDir')
+            initEyelinkStates('eyestop', VP.window, {pa.eyeFileBase, pa.eyeDataDir});
+        end
+    catch ME
+        fprintf('  Warning: Could not stop Eyelink: %s\n', ME.message);
+    end
 end
 
 % Close image texture
@@ -200,4 +214,3 @@ sca;
 fprintf('Experiment complete!\n');
 
 end
-
