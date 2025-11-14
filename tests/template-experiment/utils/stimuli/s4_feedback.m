@@ -1,5 +1,5 @@
 function [pa, currentFixationAngle] = s4_feedback(VP, pa, kb, experimentStartTime, currentFixationAngle, responseReceived, correct)
-% S4_FEEDBACK - Feedback phase with colored dot
+% S4_FEEDBACK - Feedback phase with extended fixation line for incorrect responses
 %
 % Input:
 %   VP, pa, kb - Standard experiment structures
@@ -16,19 +16,23 @@ feedbackStartTime = GetSecs;
 feedbackEndTime = feedbackStartTime + pa.feedbackDuration;
 vbl = feedbackStartTime;
 
-if responseReceived && correct
-    feedbackDotColor = pa.dotColorCorrect;
+% Determine fixation line length: extended if incorrect, normal if correct
+if responseReceived && ~correct
+    % Incorrect: use extended length
+    fixationLineLength = pa.fixationLineLengthExtendedPix;
 else
-    feedbackDotColor = pa.dotColorIncorrect;
+    % Correct or no response: use normal length
+    fixationLineLength = pa.fixationLineLengthPix;
 end
 
 while GetSecs < feedbackEndTime
     currentTime = GetSecs;
     currentFixationAngle = pa.fixationSpeed * (currentTime - experimentStartTime);
     
+    % Use default black color for fixation line during feedback
     drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
-        pa.travelingDotRadiusPix, feedbackDotColor, pa.circleColorDefault, ...
-        pa.circleLineWidth, VP.backGroundColor);
+        pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
+        pa.circleLineWidth, VP.backGroundColor, fixationLineLength, pa.fixationLineWidth, pa.fixationLineColorDefault);
     
     vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
     

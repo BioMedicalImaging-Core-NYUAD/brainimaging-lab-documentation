@@ -77,13 +77,19 @@ pa.fixationSpeed = 2*pi / pa.fixationRotationPeriod; % radians per second (rotat
 % Traveling dot appearance
 pa.travelingDotRadiusDeg = 0.125; % degrees - radius of traveling dot
 pa.travelingDotRadiusPix = pa.travelingDotRadiusDeg * VP.pixelsPerDegree; % pixels
-pa.dotColor = [0 0 0];         % White dot color (default)
-pa.dotColorCorrect = [0 1 0];  % Green for correct responses
-pa.dotColorIncorrect = [0 0 0]; 
+pa.dotColor = [0 0 0];         % Black dot color (constant throughout experiment) 
 
 % Circular path appearance
 pa.circleLineWidth = 3;        % pixels - thickness of circular path outline
 pa.circleColorDefault = [0 0 0]; % Black circle color (default for all non-stimulus phases)
+
+% Radial fixation line (forms cross with circular path)
+pa.fixationLineLengthDeg = 0.5; % degrees - length of radial line from center
+pa.fixationLineLengthPix = pa.fixationLineLengthDeg * VP.pixelsPerDegree; % pixels
+pa.fixationLineLengthExtendedDeg = 0.75; % degrees - extended length for incorrect feedback
+pa.fixationLineLengthExtendedPix = pa.fixationLineLengthExtendedDeg * VP.pixelsPerDegree; % pixels
+pa.fixationLineWidth = 2;       % pixels - thickness of radial line
+pa.fixationLineColorDefault = [0 0 0]; % Black default color
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BUTTON MAPPING PARAMETERS

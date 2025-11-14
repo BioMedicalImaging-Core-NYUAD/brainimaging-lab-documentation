@@ -285,7 +285,7 @@ for tIdx = 1:length(timeVec)
         end
     end
     
-    % Find new gaze samples up to current time (more efficient: binary search)
+    % Find new gaze samples up to current time
     while gazeIdx <= length(gazeTimev) && gazeTimev(gazeIdx) <= currentTime
         currentIdx = currentIdx + 1;
         gazeX_plotted(currentIdx) = gazeXv(gazeIdx);
@@ -303,12 +303,39 @@ for tIdx = 1:length(timeVec)
             set(gazeLineHandle, 'XData', gazeX_plotted(1:currentIdx-1), 'YData', gazeY_plotted(1:currentIdx-1));
         end
         
-        % Show current fixation (most recent gaze point)
-        currentGazeX = gazeX_plotted(currentIdx);
-        currentGazeY = gazeY_plotted(currentIdx);
+        % Interpolate gaze position for smoother, more accurate display
+        % Find the two samples that bracket the current time
+        if currentIdx > 0 && gazeIdx <= length(gazeTimev)
+            % We have samples before and after current time - interpolate
+            t1 = gazeTimev(gazeIdx - 1);
+            t2 = gazeTimev(gazeIdx);
+            if t2 > t1 && currentTime >= t1 && currentTime <= t2
+                % Linear interpolation
+                alpha = (currentTime - t1) / (t2 - t1);
+                currentGazeX = gazeXv(gazeIdx - 1) + alpha * (gazeXv(gazeIdx) - gazeXv(gazeIdx - 1));
+                currentGazeY = gazeYv(gazeIdx - 1) + alpha * (gazeYv(gazeIdx) - gazeYv(gazeIdx - 1));
+                if hasPupilData
+                    currentPupil = pupilAreav(gazeIdx - 1) + alpha * (pupilAreav(gazeIdx) - pupilAreav(gazeIdx - 1));
+                end
+            else
+                % Use most recent sample
+                currentGazeX = gazeX_plotted(currentIdx);
+                currentGazeY = gazeY_plotted(currentIdx);
+                if hasPupilData
+                    currentPupil = pupilArea_plotted(currentIdx);
+                end
+            end
+        else
+            % Use most recent sample
+            currentGazeX = gazeX_plotted(currentIdx);
+            currentGazeY = gazeY_plotted(currentIdx);
+            if hasPupilData
+                currentPupil = pupilArea_plotted(currentIdx);
+            end
+        end
         
-        if hasPupilData && ~isnan(pupilArea_plotted(currentIdx)) && pupilArea_plotted(currentIdx) > 0
-            currentPupil = pupilArea_plotted(currentIdx);
+        % Calculate circle size
+        if hasPupilData && exist('currentPupil', 'var') && ~isnan(currentPupil) && currentPupil > 0
             normalizedPupil = (currentPupil - minPupil) / (maxPupil - minPupil);
             normalizedPupil = max(0, min(1, normalizedPupil)); % Clamp to [0, 1]
             circleSize = pupilMinSize + normalizedPupil * (pupilMaxSize - pupilMinSize);

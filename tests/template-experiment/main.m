@@ -1,20 +1,21 @@
 function main()
 % MAIN - Button-pressing experiment with circular path and traveling dot
 %
-% Participants view a circular path with a continuously traveling dot. During
-% stimulus presentation, the circular path changes to a target color (white,
-% red, yellow, green, or blue). Participants press the corresponding button
-% for the color they see.
+% Participants view a circular path with a continuously traveling dot and a
+% radial fixation line forming a cross. During stimulus presentation, the
+% fixation line changes to a target color (white, red, yellow, green, or blue).
+% Participants press the corresponding button for the color they see.
 %
 % What do you see:
-% - Circular path: Black during non-stimulus phases, changes to target color during stimulus
-% - Traveling dot: Continuously moves along path; changes color for feedback
+% - Circular path: Black throughout the experiment
+% - Radial fixation line: Changes to target color during stimulus phase
+% - Traveling dot: Continuously moves along path; stays black throughout
 
 %
 % Trial structure:
-% 1. Stimulus: Circular path displays target color
-% 2. Response: Participant responds while path returns to black
-% 3. Feedback: Traveling dot changes color to  indicate correctness
+% 1. Stimulus: Fixation line displays target color
+% 2. Response: Participant responds while fixation line returns to black
+% 3. Feedback: Fixation line extends if incorrect, stays normal if correct
 % 4. Inter-trial interval: Brief pause before next trial
 %
 % All timing and visual parameters are configurable in setup_param.m
