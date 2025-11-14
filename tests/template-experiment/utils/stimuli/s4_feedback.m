@@ -1,4 +1,4 @@
-function [pa, exitFlag, currentFixationAngle] = s4_feedback(VP, pa, kb, experimentStartTime, currentFixationAngle, responseReceived, correct)
+function [pa, currentFixationAngle] = s4_feedback(VP, pa, kb, experimentStartTime, currentFixationAngle, responseReceived, correct)
 % S4_FEEDBACK - Feedback phase with colored dot
 %
 % Input:
@@ -10,13 +10,11 @@ function [pa, exitFlag, currentFixationAngle] = s4_feedback(VP, pa, kb, experime
 %
 % Output:
 %   pa - Updated parameters structure
-%   exitFlag - 1 if ESC pressed, 0 otherwise
 %   currentFixationAngle - Updated angle
 
 feedbackStartTime = GetSecs;
 feedbackEndTime = feedbackStartTime + pa.feedbackDuration;
 vbl = feedbackStartTime;
-exitFlag = 0;
 
 if responseReceived && correct
     feedbackDotColor = pa.dotColorCorrect;
@@ -30,15 +28,14 @@ while GetSecs < feedbackEndTime
     
     drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
         pa.travelingDotRadiusPix, feedbackDotColor, pa.circleColorDefault, ...
-        pa.circleLineWidth, VP.backGroundColor, pa.dotCache);
+        pa.circleLineWidth, VP.backGroundColor);
     
     vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
     
     [pressed, firstPress] = KbQueueCheck();
     if pressed && firstPress(kb.escKey)
         fprintf('\n*** Experiment terminated by user (ESC pressed during feedback) ***\n');
-        exitFlag = 1;
-        break;
+        error('ExperimentAborted', 'User pressed ESC to abort experiment');
     end
     
     if pa.eyeTrackingEnabled

@@ -124,8 +124,7 @@ try
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % START EXPERIMENT (moving dot only, before first trial)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    [pa, exitFlag, currentFixationAngle] = s1_startExp(VP, pa, kb, experimentStartTime, currentFixationAngle);
-    if exitFlag, return; end
+    [pa, currentFixationAngle] = s1_startExp(VP, pa, kb, experimentStartTime, currentFixationAngle);
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % MAIN EXPERIMENT LOOP
@@ -140,7 +139,7 @@ try
         [pressed, firstPress] = KbQueueCheck();
         if pressed && firstPress(kb.escKey)
             fprintf('\n*** Experiment terminated by user (ESC pressed) ***\n');
-            break;
+            error('ExperimentAborted', 'User pressed ESC to abort experiment');
         end
 
         % Get target color from predefined sequence
@@ -157,12 +156,10 @@ try
 
         % Phase 1: Stimulus
         targetIdx = find(strcmp(targetColor, pa.colors));
-        [pa, exitFlag, currentFixationAngle] = s2_stimulus(VP, pa, kb, experimentStartTime, currentFixationAngle, targetColor, targetIdx);
-        if exitFlag, break; end
+        [pa, currentFixationAngle] = s2_stimulus(VP, pa, kb, experimentStartTime, currentFixationAngle, targetColor, targetIdx);
 
         % Phase 2: Response
-        [pa, exitFlag, currentFixationAngle, responseReceived, responseButton, responseTime] = s3_response(VP, pa, kb, experimentStartTime, currentFixationAngle, debugConfig);
-        if exitFlag, break; end
+        [pa, currentFixationAngle, responseReceived, responseButton, responseTime] = s3_response(VP, pa, kb, experimentStartTime, currentFixationAngle, debugConfig);
 
         % Record response data
         if responseReceived
@@ -176,12 +173,10 @@ try
         end
 
         % Phase 3: Feedback
-        [pa, exitFlag, currentFixationAngle] = s4_feedback(VP, pa, kb, experimentStartTime, currentFixationAngle, responseReceived, pa.data.correct(pa.trialCounter));
-        if exitFlag, break; end
+        [pa, currentFixationAngle] = s4_feedback(VP, pa, kb, experimentStartTime, currentFixationAngle, responseReceived, pa.data.correct(pa.trialCounter));
 
         % Phase 4: ITI
-        [pa, exitFlag, currentFixationAngle] = s5_iti(VP, pa, kb, experimentStartTime, currentFixationAngle);
-        if exitFlag, break; end
+        [pa, currentFixationAngle] = s5_iti(VP, pa, kb, experimentStartTime, currentFixationAngle);
 
         % Print trial result
         if responseReceived
@@ -197,18 +192,24 @@ try
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % End screen
-    [pa, ~, ~] = s6_endScreen(VP, pa, kb, experimentStartTime, currentFixationAngle);
+    [pa, ~] = s6_endScreen(VP, pa, kb, experimentStartTime, currentFixationAngle);
 
 catch ME
-    % Error occurred - display detailed message
-    fprintf('\n!!! ERROR OCCURRED !!!\n');
-    fprintf('Error message: %s\n', ME.message);
-    if ~isempty(ME.stack)
-        fprintf('Error in: %s (line %d)\n', ME.stack(1).name, ME.stack(1).line);
-        % Print full stack trace
-        fprintf('\nStack trace:\n');
-        for i = 1:length(ME.stack)
-            fprintf('  %d. %s (line %d)\n', i, ME.stack(i).name, ME.stack(i).line);
+    % Check if this is a user-initiated abort (ESC pressed)
+    if strcmp(ME.identifier, 'ExperimentAborted')
+        fprintf('\nExperiment aborted by user.\n');
+        % Don't print error details for user-initiated aborts
+    else
+        % Real error occurred - display detailed message
+        fprintf('\n!!! ERROR OCCURRED !!!\n');
+        fprintf('Error message: %s\n', ME.message);
+        if ~isempty(ME.stack)
+            fprintf('Error in: %s (line %d)\n', ME.stack(1).name, ME.stack(1).line);
+            % Print full stack trace
+            fprintf('\nStack trace:\n');
+            for i = 1:length(ME.stack)
+                fprintf('  %d. %s (line %d)\n', i, ME.stack(i).name, ME.stack(i).line);
+            end
         end
     end
 end

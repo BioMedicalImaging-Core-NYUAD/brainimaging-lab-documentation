@@ -1,4 +1,4 @@
-function [pa, exitFlag, currentFixationAngle] = s2_stimulus(VP, pa, kb, experimentStartTime, currentFixationAngle, targetColor, targetIdx)
+function [pa, currentFixationAngle] = s2_stimulus(VP, pa, kb, experimentStartTime, currentFixationAngle, targetColor, targetIdx)
 % S2_STIMULUS - Stimulus phase with colored circle
 %
 % Input:
@@ -10,13 +10,11 @@ function [pa, exitFlag, currentFixationAngle] = s2_stimulus(VP, pa, kb, experime
 %
 % Output:
 %   pa - Updated parameters structure
-%   exitFlag - 1 if ESC pressed, 0 otherwise
 %   currentFixationAngle - Updated angle
 
 stimulusStartTime = GetSecs;
 stimulusEndTime = stimulusStartTime + pa.stimulusDuration;
 vbl = stimulusStartTime;
-exitFlag = 0;
 
 if pa.eyeTrackingEnabled
     try
@@ -44,15 +42,14 @@ while GetSecs < stimulusEndTime
     
     drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
         pa.travelingDotRadiusPix, pa.dotColor, pa.colorRGB(targetIdx,:), ...
-        pa.circleLineWidth, VP.backGroundColor, pa.dotCache);
+        pa.circleLineWidth, VP.backGroundColor);
     
     vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
     
     [pressed, firstPress] = KbQueueCheck();
     if pressed && firstPress(kb.escKey)
         fprintf('\n*** Experiment terminated by user (ESC pressed during stimulus) ***\n');
-        exitFlag = 1;
-        break;
+        error('ExperimentAborted', 'User pressed ESC to abort experiment');
     end
     
     if pa.eyeTrackingEnabled

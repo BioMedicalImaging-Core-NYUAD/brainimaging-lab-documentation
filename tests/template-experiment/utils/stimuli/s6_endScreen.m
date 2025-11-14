@@ -1,4 +1,4 @@
-function [pa, exitFlag, currentFixationAngle] = s6_endScreen(VP, pa, kb, experimentStartTime, currentFixationAngle)
+function [pa, currentFixationAngle] = s6_endScreen(VP, pa, kb, experimentStartTime, currentFixationAngle)
 % S6_ENDSCREEN - End screen phase
 %
 % Input:
@@ -8,13 +8,11 @@ function [pa, exitFlag, currentFixationAngle] = s6_endScreen(VP, pa, kb, experim
 %
 % Output:
 %   pa - Updated parameters structure
-%   exitFlag - 1 if ESC pressed, 0 otherwise
 %   currentFixationAngle - Updated angle
 
 endScreenStartTime = GetSecs;
 endScreenEndTime = endScreenStartTime + pa.endScreenDuration;
 vbl = endScreenStartTime;
-exitFlag = 0;
 
 while GetSecs < endScreenEndTime
     currentTime = GetSecs;
@@ -22,15 +20,14 @@ while GetSecs < endScreenEndTime
     
     drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
         pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
-        pa.circleLineWidth, VP.backGroundColor, pa.dotCache);
+        pa.circleLineWidth, VP.backGroundColor);
     
     vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
     
     [pressed, firstPress] = KbQueueCheck();
     if pressed && firstPress(kb.escKey)
         fprintf('\n*** Experiment terminated by user (ESC pressed during end screen) ***\n');
-        exitFlag = 1;
-        break;
+        error('ExperimentAborted', 'User pressed ESC to abort experiment');
     end
     
     if pa.eyeTrackingEnabled

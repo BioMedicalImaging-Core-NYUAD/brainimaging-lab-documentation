@@ -28,11 +28,14 @@ if timeSinceLastSample >= pa.gazeSampleInterval
             rx = s.gx(2); ry = s.gy(2);
             
             % Check for valid left eye data (not NaN and not missing marker)
+            eyeUsed = 0; % Track which eye we're using
             if ~isnan(lx) && ~isnan(ly) && lx ~= -32768 && ly ~= -32768
                 gx = lx; gy = ly;
+                eyeUsed = 1; % Left eye
             % Fall back to right eye if left is invalid
             elseif ~isnan(rx) && ~isnan(ry) && rx ~= -32768 && ry ~= -32768
                 gx = rx; gy = ry;
+                eyeUsed = 2; % Right eye
             end
             
             % Store sample if we have valid data and space
@@ -41,6 +44,28 @@ if timeSinceLastSample >= pa.gazeSampleInterval
                 pa.data.continuousGazeX(pa.gazeSampleCounter) = gx;
                 pa.data.continuousGazeY(pa.gazeSampleCounter) = gy;
                 pa.data.continuousGazeTime(pa.gazeSampleCounter) = currentTime - experimentStartTime;
+                
+                % Check and record pupil data if available
+                if isfield(s, 'pa') && eyeUsed > 0 && length(s.pa) >= eyeUsed
+                    pupilArea = s.pa(eyeUsed);
+                    % Check if valid (not NaN, not missing marker, > 0)
+                    if ~isnan(pupilArea) && pupilArea ~= -32768 && pupilArea > 0
+                        % Mark pupil data as available on first valid sample
+                        if ~pa.pupilDataAvailable
+                            pa.pupilDataAvailable = true;
+                            fprintf('Pupil diameter data detected and will be recorded.\n');
+                        end
+                        pa.data.continuousPupilArea(pa.gazeSampleCounter) = pupilArea;
+                    else
+                        if isfield(pa.data, 'continuousPupilArea')
+                            pa.data.continuousPupilArea(pa.gazeSampleCounter) = NaN;
+                        end
+                    end
+                else
+                    if isfield(pa.data, 'continuousPupilArea')
+                        pa.data.continuousPupilArea(pa.gazeSampleCounter) = NaN;
+                    end
+                end
             end
             pa.lastGazeSampleTime = currentTime;
         end

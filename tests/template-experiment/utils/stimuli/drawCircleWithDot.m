@@ -1,4 +1,4 @@
-function drawCircleWithDot(window, screenCenter, circleRadiusPix, dotAngle, dotSize, dotColor, circleColor, circleLineWidth, backGroundColor, cache)
+function drawCircleWithDot(window, screenCenter, circleRadiusPix, dotAngle, dotSize, dotColor, circleColor, circleLineWidth, backGroundColor)
 % DRAW_CIRCLE_WITH_DOT - Draw circular path outline with traveling dot
 %
 % Inputs:
@@ -11,7 +11,6 @@ function drawCircleWithDot(window, screenCenter, circleRadiusPix, dotAngle, dotS
 %   circleColor - color of circular path outline [R, G, B]
 %   circleLineWidth - thickness of circular path outline
 %   backGroundColor - background color
-%   cache - Optional cached dot positions (if not provided, calculates on the fly)
 
 % Clear screen
 Screen('FillRect', window, backGroundColor);
@@ -23,18 +22,8 @@ Screen('FrameOval', window, circleColor * 255, ...
     circleLineWidth);
 
 % Calculate traveling dot position on circular path
-if nargin >= 10 && ~isempty(cache)
-    % Use cached lookup table
-    angleNormalized = mod(dotAngle, 2*pi);
-    idx = round((angleNormalized / (2*pi)) * (cache.nSamples - 1)) + 1;
-    idx = min(idx, cache.nSamples);  % Ensure within bounds
-    dotX = screenCenter(1) + cache.dotX(idx);
-    dotY = screenCenter(2) + cache.dotY(idx);
-else
-    % Calculate on the fly (backward compatible)
-    dotX = screenCenter(1) + circleRadiusPix * cos(dotAngle);
-    dotY = screenCenter(2) + circleRadiusPix * sin(dotAngle);
-end
+dotX = screenCenter(1) + circleRadiusPix * cos(dotAngle);
+dotY = screenCenter(2) + circleRadiusPix * sin(dotAngle);
 
 % Draw traveling dot
 Screen('FillOval', window, dotColor * 255, ...

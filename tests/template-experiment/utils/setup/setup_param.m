@@ -136,6 +136,13 @@ pa.gazeSampleCounter = 0; % Track actual number of samples
 pa.gazeSampleInterval = 0.5; % Record every 0.5 seconds
 pa.lastGazeSampleTime = 0; % Track when we last recorded
 
+% Initialize pupil data tracking (will be checked during first sample)
+pa.pupilDataAvailable = false;
+if pa.eyeTrackingEnabled
+    % Pre-allocate array, will be populated if pupil data is available
+    pa.data.continuousPupilArea = nan(1, pa.maxGazeSamples);
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % VPIXX INITIALIZATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -180,11 +187,11 @@ else
     pa.bidsInfo = [];
 end
 
-% Store screen center for plotting functions
+% Store screen center and dimensions for plotting functions
 pa.screenCenter = VP.windowCenter;
-
-% Initialize dot position cache
-pa.dotCache = get_dot_cache(pa.fixationSpeed, pa.fixationRadiusPix, VP.ifi);
+pa.screenWidthPix = VP.windowWidthPix;
+pa.screenHeightPix = VP.windowHeightPix;
+pa.backGroundColor = VP.backGroundColor; % Store background color for visualization
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % EYE TRACKING PARAMETERS (following vri_restingstate pattern)

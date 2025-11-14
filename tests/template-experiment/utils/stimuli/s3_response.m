@@ -1,4 +1,4 @@
-function [pa, exitFlag, currentFixationAngle, responseReceived, responseButton, responseTime] = s3_response(VP, pa, kb, experimentStartTime, currentFixationAngle, debugConfig)
+function [pa, currentFixationAngle, responseReceived, responseButton, responseTime] = s3_response(VP, pa, kb, experimentStartTime, currentFixationAngle, debugConfig)
 % S3_RESPONSE - Response phase waiting for button press
 %
 % Input:
@@ -9,7 +9,6 @@ function [pa, exitFlag, currentFixationAngle, responseReceived, responseButton, 
 %
 % Output:
 %   pa - Updated parameters structure
-%   exitFlag - 1 if ESC pressed, 0 otherwise
 %   currentFixationAngle - Updated angle
 %   responseReceived - Whether response was received
 %   responseButton - Button/color that was pressed
@@ -20,7 +19,6 @@ responseReceived = false;
 responseTime = NaN;
 responseButton = '';
 vbl = responseStartTime;
-exitFlag = 0;
 
 KbQueueFlush();
 
@@ -30,15 +28,14 @@ while (GetSecs - responseStartTime) < pa.responseWindow
     
     drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...
         pa.travelingDotRadiusPix, pa.dotColor, pa.circleColorDefault, ...
-        pa.circleLineWidth, VP.backGroundColor, pa.dotCache);
+        pa.circleLineWidth, VP.backGroundColor);
     
     vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
     
     [pressed, firstPress] = KbQueueCheck();
     if pressed && firstPress(kb.escKey)
         fprintf('\n*** Experiment terminated by user (ESC pressed during response) ***\n');
-        exitFlag = 1;
-        break;
+        error('ExperimentAborted', 'User pressed ESC to abort experiment');
     end
     
     if pa.eyeTrackingEnabled
