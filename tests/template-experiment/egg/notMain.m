@@ -16,7 +16,7 @@ addpath(vpixxPath);
 addpath(genpath(fullfile(experimentDir, 'utils')));
 
 % Image path (relative to script location)
-imagePath = fullfile(scriptDir, 'photo.jpg');
+imagePath = fullfile(scriptDir, 'photo.png');
 if ~exist(imagePath, 'file')
     error('Image not found: %s', imagePath);
 end
@@ -97,9 +97,12 @@ try
     end
     imgTexture = Screen('MakeTexture', VP.window, img);
     
-    % Get image size and center it (scale by 2x)
+    % Get image size and scale to match screen height (maintain aspect ratio)
     [imgHeight, imgWidth, ~] = size(img);
-    imgRect = [0, 0, imgWidth * 2, imgHeight * 2];
+    scaleFactor = VP.windowHeightPix / imgHeight; % Scale so height matches screen
+    scaledWidth = imgWidth * scaleFactor;
+    scaledHeight = imgHeight * scaleFactor;
+    imgRect = [0, 0, scaledWidth, scaledHeight];
     imgRect = CenterRectOnPoint(imgRect, VP.windowCenter(1), VP.windowCenter(2));
 catch ME
     sca;
