@@ -138,7 +138,7 @@ pa.lastGazeSampleTime = 0; % Track when we last recorded
 
 % Initialize pupil data tracking (will be checked during first sample)
 pa.pupilDataAvailable = false;
-if pa.eyeTrackingEnabled
+if isfield(debugConfig, 'eyetracking') && debugConfig.eyetracking
     % Pre-allocate array, will be populated if pupil data is available
     pa.data.continuousPupilArea = nan(1, pa.maxGazeSamples);
 end

@@ -187,9 +187,13 @@ if hasPupilData
         % Scale pupil size to circle size range (e.g., 200-600 pixels)
         pupilMinSize = 200;
         pupilMaxSize = 600;
+        fprintf('Pupil size data available (range: %.1f - %.1f). Fixation circle size will vary with pupil size.\n', minPupil, maxPupil);
     else
         hasPupilData = false; % No valid pupil data
+        fprintf('Pupil size data field exists but contains no valid data. Using fixed circle size.\n');
     end
+else
+    fprintf('No pupil size data available. Using fixed circle size for fixations.\n');
 end
 
 if isempty(gazeXv)
@@ -260,9 +264,11 @@ ax = axes('Parent', fig);
 hold(ax, 'on');
 axis(ax, 'equal');
 
-% Set axis limits to match actual screen coordinates (scaled)
-xlim(ax, [0, screenWidth]);
-ylim(ax, [0, screenHeight]);
+% Set axis limits to focus on circle area with padding
+% Calculate padding to show circle area nicely (about 3x the circle radius)
+padding = radius * 3;
+xlim(ax, [center(1) - radius - padding, center(1) + radius + padding]);
+ylim(ax, [center(2) - radius - padding, center(2) + radius + padding]);
 set(ax, 'YDir', 'reverse'); % Match screen coordinates (Y increases downward)
 
 % Hide axes, ticks, and labels
