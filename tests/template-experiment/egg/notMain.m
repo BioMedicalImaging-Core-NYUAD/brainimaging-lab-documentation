@@ -119,17 +119,17 @@ if pa.eyeTrackingEnabled
     end
 end
 
+% Clear any remaining key presses after calibration
+while KbCheck(-1); end
+WaitSecs(0.1); % Small delay to ensure keys are cleared
+
 % Wait for trigger
-fprintf('Press ''t'' or ''5'' to start...\n');
+fprintf('Press ''t'' or ''5'' to start (or ESC to cancel)...\n');
 while true
     [keyIsDown, ~, keyCode] = KbCheck(-1);
     if keyIsDown
         if keyCode(KbName('5%')) || keyCode(KbName('t'))
             break;
-        elseif keyCode(kb.escKey)
-            sca;
-            fprintf('Experiment cancelled.\n');
-            return;
         end
     end
     WaitSecs(0.01);
