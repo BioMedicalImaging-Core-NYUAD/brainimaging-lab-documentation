@@ -103,8 +103,8 @@ if hasPupilData
     if any(validPupil)
         minPupil = min(pupilAreav(validPupil));
         maxPupil = max(pupilAreav(validPupil));
-        pupilMinSize = 200;
-        pupilMaxSize = 600;
+        pupilMinSize = 50;
+        pupilMaxSize = 500;
         fprintf('Pupil size data available (range: %.1f - %.1f). Fixation circle size will vary with pupil size.\n', minPupil, maxPupil);
     else
         hasPupilData = false;
@@ -155,8 +155,8 @@ startTime = 0;
 endTime = gazeTimev(end);
 totalDuration = endTime;
 
-% Create time vector for animation (sample at ~30 Hz for smooth animation)
-frameRate = 30; % frames per second
+% Create time vector for animation (sample at ~20 Hz for smooth animation)
+frameRate = 20; % frames per second (reduced for smoother playback)
 dt = 1 / frameRate;
 timeVec = startTime:dt:endTime;
 
@@ -203,70 +203,79 @@ end
 gazeLineHandle = plot(ax, NaN, NaN, 'b-', 'LineWidth', 1.5, 'DisplayName', 'Gaze path');
 currentGazeHandle = scatter(ax, NaN, NaN, 400, 'r', 'filled', 'MarkerFaceAlpha', 0.5, 'DisplayName', 'Current fixation');
 
-% Initialize tracking variables
-gazeX_plotted = [];
-gazeY_plotted = [];
-pupilArea_plotted = [];
-lastIdx = 0;
+% Initialize tracking variables - pre-allocate for efficiency
+maxSamples = length(gazeXv);
+gazeX_plotted = nan(1, maxSamples);
+gazeY_plotted = nan(1, maxSamples);
+if hasPupilData
+    pupilArea_plotted = nan(1, maxSamples);
+end
+currentIdx = 0; % Current number of plotted samples
+gazeIdx = 1; % Current index in gaze data
 
 % Animation loop
 fprintf('Starting animation (duration: %.1f seconds)...\n', totalDuration);
 fprintf('Press any key to pause/resume, close figure to exit.\n');
 
+frameStartTime = tic; % Track frame timing for smoothness
+
 for tIdx = 1:length(timeVec)
     currentTime = timeVec(tIdx);
     
-    % Find all gaze samples up to current time
-    idx = find(gazeTimev <= currentTime);
-    
-    % Only update if we have new samples
-    if length(idx) > lastIdx
-        newIdx = (lastIdx + 1):length(idx);
-        gazeX_plotted = [gazeX_plotted; gazeXv(idx(newIdx))];
-        gazeY_plotted = [gazeY_plotted; gazeYv(idx(newIdx))];
+    % Find new gaze samples up to current time (more efficient: binary search)
+    while gazeIdx <= length(gazeTimev) && gazeTimev(gazeIdx) <= currentTime
+        currentIdx = currentIdx + 1;
+        gazeX_plotted(currentIdx) = gazeXv(gazeIdx);
+        gazeY_plotted(currentIdx) = gazeYv(gazeIdx);
         if hasPupilData
-            pupilArea_plotted = [pupilArea_plotted; pupilAreav(idx(newIdx))];
+            pupilArea_plotted(currentIdx) = pupilAreav(gazeIdx);
         end
-        
+        gazeIdx = gazeIdx + 1;
+    end
+    
+    % Update plot only if we have data
+    if currentIdx > 0
         % Update gaze path line (all samples up to current)
-        if length(gazeX_plotted) > 1
-            set(gazeLineHandle, 'XData', gazeX_plotted(1:end-1), 'YData', gazeY_plotted(1:end-1));
+        if currentIdx > 1
+            set(gazeLineHandle, 'XData', gazeX_plotted(1:currentIdx-1), 'YData', gazeY_plotted(1:currentIdx-1));
         end
         
-        % Show current fixation (most recent gaze point) as semi-transparent red circle
-        if ~isempty(gazeX_plotted)
-            currentGazeX = gazeX_plotted(end);
-            currentGazeY = gazeY_plotted(end);
-            
-            if hasPupilData && ~isempty(pupilArea_plotted) && ~isnan(pupilArea_plotted(end)) && pupilArea_plotted(end) > 0
-                currentPupil = pupilArea_plotted(end);
-                normalizedPupil = (currentPupil - minPupil) / (maxPupil - minPupil);
-                normalizedPupil = max(0, min(1, normalizedPupil)); % Clamp to [0, 1]
-                circleSize = pupilMinSize + normalizedPupil * (pupilMaxSize - pupilMinSize);
-            else
-                circleSize = 400; % Default size if no pupil data
-            end
-            
-            set(currentGazeHandle, 'XData', currentGazeX, 'YData', currentGazeY, 'SizeData', circleSize, 'Visible', 'on');
+        % Show current fixation (most recent gaze point)
+        currentGazeX = gazeX_plotted(currentIdx);
+        currentGazeY = gazeY_plotted(currentIdx);
+        
+        if hasPupilData && ~isnan(pupilArea_plotted(currentIdx)) && pupilArea_plotted(currentIdx) > 0
+            currentPupil = pupilArea_plotted(currentIdx);
+            normalizedPupil = (currentPupil - minPupil) / (maxPupil - minPupil);
+            normalizedPupil = max(0, min(1, normalizedPupil)); % Clamp to [0, 1]
+            circleSize = pupilMinSize + normalizedPupil * (pupilMaxSize - pupilMinSize);
         else
-            set(currentGazeHandle, 'Visible', 'off');
+            circleSize = 400; % Default size if no pupil data
         end
         
-        lastIdx = length(idx);
+        set(currentGazeHandle, 'XData', currentGazeX, 'YData', currentGazeY, 'SizeData', circleSize, 'Visible', 'on');
+    else
+        set(currentGazeHandle, 'Visible', 'off');
     end
     
-    % Update display every frame for smoothness
-    drawnow('limitrate'); % Limit rate for smoother animation
+    % Update display
+    drawnow;
     
-    % Real-time pacing (match experiment speed)
+    % Accurate timing control
     if tIdx < length(timeVec)
-        pause(dt);
+        elapsed = toc(frameStartTime);
+        frameStartTime = tic; % Reset for next frame
+        sleepTime = dt - elapsed;
+        if sleepTime > 0
+            pause(sleepTime);
+        end
     end
     
-    % Check for key press to pause/resume
+    % Check for key press to pause/resume (non-blocking)
     if ~isempty(get(fig, 'CurrentCharacter'))
         pause;
         set(fig, 'CurrentCharacter', char(0)); % Clear the character
+        frameStartTime = tic; % Reset timing after pause
     end
 end
 

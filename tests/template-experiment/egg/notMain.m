@@ -64,7 +64,7 @@ else
 end
 
 % Initialize gaze recording parameters
-pa.gazeSampleInterval = 0.2; % Record every 0.2 seconds
+pa.gazeSampleInterval = 0.05; % Record 20 times per second (1/20 = 0.05 seconds)
 pa.maxGazeSamples = ceil(duration / pa.gazeSampleInterval) + 1000; % Extra buffer
 pa.gazeSampleCounter = 0;
 pa.data.continuousGazeX = nan(1, pa.maxGazeSamples);
