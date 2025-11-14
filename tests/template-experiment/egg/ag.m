@@ -191,11 +191,11 @@ ylabel(ax, '');
 if hasImage && ~isempty(imgRect)
     % Convert image coordinates for display
     % imgRect format: [left, top, right, bottom] in screen coordinates
-    % Since YDir is reversed (Y increases downward), we need to provide Y coordinates correctly
-    % For imagesc with reversed Y, we provide [bottom, top] for Y range
+    % Since YDir is reversed (Y increases downward), we need to flip the image vertically
+    % and provide coordinates in normal order [top, bottom]
     imgX = [imgRect(1), imgRect(3)];
-    imgY = [imgRect(4), imgRect(2)]; % [bottom, top] since Y increases downward
-    imagesc(ax, imgX, imgY, imgData);
+    imgY = [imgRect(2), imgRect(4)]; % [top, bottom] in screen coordinates
+    imagesc(ax, imgX, imgY, flipud(imgData)); % Flip image vertically to match reversed Y
     set(ax, 'YDir', 'reverse'); % Keep Y reversed for gaze coordinates
 end
 
