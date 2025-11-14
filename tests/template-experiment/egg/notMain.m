@@ -5,16 +5,18 @@ function notMain()
 % Clear workspace and close any open windows
 clear all; close all; sca;
 
-% Add utility folders to path
+% Get script directory
 scriptDir = fileparts(mfilename('fullpath'));
+
+% Add utility folders to path
 experimentDir = fullfile(scriptDir, '..');
 projectRoot = fullfile(experimentDir, '..', '..');
 vpixxPath = fullfile(projectRoot, 'experiments', 'general', 'vpixx-utilities');
 addpath(vpixxPath);
 addpath(genpath(fullfile(experimentDir, 'utils')));
 
-% Image path
-imagePath = '/Users/pw1246/Desktop/haidee.jpg';
+% Image path (relative to script location)
+imagePath = fullfile(scriptDir, 'photo.jpg');
 if ~exist(imagePath, 'file')
     error('Image not found: %s', imagePath);
 end
