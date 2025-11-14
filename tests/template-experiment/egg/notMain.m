@@ -97,9 +97,9 @@ try
     end
     imgTexture = Screen('MakeTexture', VP.window, img);
     
-    % Get image size and center it
+    % Get image size and center it (scale by 2x)
     [imgHeight, imgWidth, ~] = size(img);
-    imgRect = [0, 0, imgWidth, imgHeight];
+    imgRect = [0, 0, imgWidth * 2, imgHeight * 2];
     imgRect = CenterRectOnPoint(imgRect, VP.windowCenter(1), VP.windowCenter(2));
 catch ME
     sca;
