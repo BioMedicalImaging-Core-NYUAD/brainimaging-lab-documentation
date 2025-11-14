@@ -137,12 +137,16 @@ end
 % Load images if paths are stored
 hasImage1 = false;
 hasImage2 = false;
+hasImage3 = false;
 imgData1 = [];
 imgData2 = [];
+imgData3 = [];
 imgRect1 = [];
 imgRect2 = [];
+imgRect3 = [];
 duration1 = 10.0; % Default
 duration2 = 15.0; % Default
+duration3 = 10.0; % Default
 
 % Load first image (backward compatibility with old format)
 if isfield(pa, 'imagePath1') && exist(pa.imagePath1, 'file')
@@ -187,6 +191,22 @@ if isfield(pa, 'imagePath2') && exist(pa.imagePath2, 'file')
     end
 end
 
+% Load third image
+if isfield(pa, 'imagePath3') && exist(pa.imagePath3, 'file')
+    try
+        imgData3 = imread(pa.imagePath3);
+        hasImage3 = true;
+        if isfield(pa, 'imageRect3')
+            imgRect3 = pa.imageRect3;
+        end
+        if isfield(pa, 'duration3')
+            duration3 = pa.duration3;
+        end
+    catch
+        fprintf('Warning: Could not load image 3 from %s\n', pa.imagePath3);
+    end
+end
+
 % Determine animation time range
 startTime = 0;
 endTime = gazeTimev(end);
@@ -228,6 +248,7 @@ ylabel(ax, '');
 % Store image handles for later use
 imgHandle1 = [];
 imgHandle2 = [];
+imgHandle3 = [];
 if hasImage1 && ~isempty(imgRect1)
     imgX1 = [imgRect1(1), imgRect1(3)];
     imgY1 = [imgRect1(2), imgRect1(4)];
@@ -239,6 +260,12 @@ if hasImage2 && ~isempty(imgRect2)
     imgY2 = [imgRect2(2), imgRect2(4)];
     imgHandle2 = imagesc(ax, imgX2, imgY2, imgData2);
     set(imgHandle2, 'Visible', 'off'); % Hide second image initially
+end
+if hasImage3 && ~isempty(imgRect3)
+    imgX3 = [imgRect3(1), imgRect3(3)];
+    imgY3 = [imgRect3(2), imgRect3(4)];
+    imgHandle3 = imagesc(ax, imgX3, imgY3, imgData3);
+    set(imgHandle3, 'Visible', 'off'); % Hide third image initially
 end
 
 % Initialize plot handles
@@ -254,6 +281,8 @@ if hasPupilData
 end
 currentIdx = 0; % Current number of plotted samples
 gazeIdx = 1; % Current index in gaze data
+currentPhoto = 0; % Track which photo is currently displayed (0=photo1, 1=photo2, 2=photo3)
+photoStartIdx = 1; % Track where current photo's gaze data starts
 
 % Animation loop
 fprintf('Starting animation (duration: %.1f seconds)...\n', totalDuration);
@@ -264,25 +293,35 @@ frameStartTime = tic; % Track frame timing for smoothness
 for tIdx = 1:length(timeVec)
     currentTime = timeVec(tIdx);
     
-    % Update image display based on current time
-    if hasImage1 || hasImage2
-        if currentTime < duration1
-            % Show first image (0 to duration1)
-            if hasImage1 && ~isempty(imgHandle1)
-                set(imgHandle1, 'Visible', 'on');
-            end
-            if hasImage2 && ~isempty(imgHandle2)
-                set(imgHandle2, 'Visible', 'off');
-            end
-        else
-            % Show second image (duration1 onwards)
-            if hasImage1 && ~isempty(imgHandle1)
-                set(imgHandle1, 'Visible', 'off');
-            end
-            if hasImage2 && ~isempty(imgHandle2)
-                set(imgHandle2, 'Visible', 'on');
-            end
-        end
+    % Update image display based on current time and clear lines when switching photos
+    newPhoto = 0; % Determine which photo should be displayed
+    if currentTime < duration1
+        newPhoto = 0; % Photo 1
+    elseif currentTime < duration1 + duration2
+        newPhoto = 1; % Photo 2
+    else
+        newPhoto = 2; % Photo 3
+    end
+    
+    % If photo changed, clear previous gaze lines and reset tracking
+    if newPhoto ~= currentPhoto
+        % Clear the gaze line by setting it to empty
+        set(gazeLineHandle, 'XData', NaN, 'YData', NaN);
+        % Reset plotted arrays for new photo
+        currentIdx = 0;
+        photoStartIdx = gazeIdx; % Mark where new photo's data starts
+        currentPhoto = newPhoto;
+    end
+    
+    % Update image visibility
+    if hasImage1 && ~isempty(imgHandle1)
+        set(imgHandle1, 'Visible', newPhoto == 0);
+    end
+    if hasImage2 && ~isempty(imgHandle2)
+        set(imgHandle2, 'Visible', newPhoto == 1);
+    end
+    if hasImage3 && ~isempty(imgHandle3)
+        set(imgHandle3, 'Visible', newPhoto == 2);
     end
     
     % Find new gaze samples up to current time

@@ -18,17 +18,22 @@ addpath(genpath(fullfile(experimentDir, 'utils')));
 % Image paths (relative to script location)
 imagePath1 = fullfile(scriptDir, 'photo.png');
 imagePath2 = fullfile(scriptDir, 'photo2.jpg');
+imagePath3 = fullfile(scriptDir, 'photo3.png');
 if ~exist(imagePath1, 'file')
     error('Image 1 not found: %s', imagePath1);
 end
 if ~exist(imagePath2, 'file')
     error('Image 2 not found: %s', imagePath2);
 end
+if ~exist(imagePath3, 'file')
+    error('Image 3 not found: %s', imagePath3);
+end
 
 % Duration for each photo
 duration1 = 10.0; % seconds for first photo
 duration2 = 15.0; % seconds for second photo
-duration = duration1 + duration2; % total duration
+duration3 = 10.0; % seconds for third photo
+duration = duration1 + duration2 + duration3; % total duration
 
 % Debug configuration
 debugConfig = struct();
@@ -128,6 +133,26 @@ try
     scaledHeight2 = imgHeight2 * scaleFactor2;
     imgRect2 = [0, 0, scaledWidth2, scaledHeight2];
     imgRect2 = CenterRectOnPoint(imgRect2, VP.windowCenter(1), VP.windowCenter(2));
+    
+    % Load third image
+    img3 = imread(imagePath3);
+    if size(img3, 3) == 1
+        img3 = repmat(img3, [1, 1, 3]);
+    elseif size(img3, 3) == 4
+        img3 = img3(:, :, 1:3);
+    end
+    if ~isa(img3, 'uint8')
+        img3 = uint8(img3);
+    end
+    imgTexture3 = Screen('MakeTexture', VP.window, img3);
+    
+    % Scale third image to match screen height (maintain aspect ratio)
+    [imgHeight3, imgWidth3, ~] = size(img3);
+    scaleFactor3 = VP.windowHeightPix / imgHeight3;
+    scaledWidth3 = imgWidth3 * scaleFactor3;
+    scaledHeight3 = imgHeight3 * scaleFactor3;
+    imgRect3 = [0, 0, scaledWidth3, scaledHeight3];
+    imgRect3 = CenterRectOnPoint(imgRect3, VP.windowCenter(1), VP.windowCenter(2));
 catch ME
     sca;
     error('Failed to load images: %s', ME.message);
@@ -193,9 +218,12 @@ while elapsedTime < duration
     if elapsedTime < duration1
         % First photo (0-10 seconds)
         Screen('DrawTexture', VP.window, imgTexture1, [], imgRect1);
-    else
+    elseif elapsedTime < duration1 + duration2
         % Second photo (10-25 seconds)
         Screen('DrawTexture', VP.window, imgTexture2, [], imgRect2);
+    else
+        % Third photo (25-35 seconds)
+        Screen('DrawTexture', VP.window, imgTexture3, [], imgRect3);
     end
     
     % Record gaze
@@ -221,6 +249,7 @@ end
 % Close image textures
 Screen('Close', imgTexture1);
 Screen('Close', imgTexture2);
+Screen('Close', imgTexture3);
 
 % Save data with timestamp (use full timestamp for .mat file)
 timestampFull = datestr(now, 'yyyymmdd_HHMMSS');
@@ -244,8 +273,11 @@ pa.imagePath1 = imagePath1;
 pa.imageRect1 = imgRect1;
 pa.imagePath2 = imagePath2;
 pa.imageRect2 = imgRect2;
+pa.imagePath3 = imagePath3;
+pa.imageRect3 = imgRect3;
 pa.duration1 = duration1;
 pa.duration2 = duration2;
+pa.duration3 = duration3;
 
 save(saveFile, 'pa');
 fprintf('Data saved to: %s\n', saveFile);
