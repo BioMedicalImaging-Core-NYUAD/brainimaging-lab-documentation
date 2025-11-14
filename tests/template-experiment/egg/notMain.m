@@ -15,25 +15,38 @@ vpixxPath = fullfile(projectRoot, 'experiments', 'general', 'vpixx-utilities');
 addpath(vpixxPath);
 addpath(genpath(fullfile(experimentDir, 'utils')));
 
-% Image paths (relative to script location)
-imagePath1 = fullfile(scriptDir, 'photo.png');
-imagePath2 = fullfile(scriptDir, 'photo2.jpg');
-imagePath3 = fullfile(scriptDir, 'photo3.png');
-if ~exist(imagePath1, 'file')
-    error('Image 1 not found: %s', imagePath1);
-end
-if ~exist(imagePath2, 'file')
-    error('Image 2 not found: %s', imagePath2);
-end
-if ~exist(imagePath3, 'file')
-    error('Image 3 not found: %s', imagePath3);
+% Find all images in assets folder
+assetsDir = fullfile(scriptDir, 'assets');
+if ~exist(assetsDir, 'dir')
+    error('Assets folder not found: %s', assetsDir);
 end
 
-% Duration for each photo
-duration1 = 10.0; % seconds for first photo
-duration2 = 15.0; % seconds for second photo
-duration3 = 10.0; % seconds for third photo
-duration = duration1 + duration2 + duration3; % total duration
+% Supported image extensions
+imageExtensions = {'.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff'};
+
+% Find all image files
+imageFiles = dir(assetsDir);
+imagePaths = {};
+for i = 1:length(imageFiles)
+    [~, ~, ext] = fileparts(imageFiles(i).name);
+    if any(strcmpi(ext, imageExtensions)) && ~imageFiles(i).isdir
+        imagePaths{end+1} = fullfile(assetsDir, imageFiles(i).name);
+    end
+end
+
+% Sort alphabetically for consistent ordering
+imagePaths = sort(imagePaths);
+
+if isempty(imagePaths)
+    error('No image files found in assets folder: %s', assetsDir);
+end
+
+nImages = length(imagePaths);
+fprintf('Found %d image(s) in assets folder\n', nImages);
+
+% Duration for each photo (10 seconds each)
+photoDuration = 10.0; % seconds per photo
+duration = nImages * photoDuration; % total duration
 
 % Debug configuration
 debugConfig = struct();
@@ -92,67 +105,42 @@ pa.screenWidthPix = VP.windowWidthPix;
 pa.screenHeightPix = VP.windowHeightPix;
 pa.backGroundColor = VP.backGroundColor;
 
-% Load images
+% Load all images
+imgTextures = cell(nImages, 1);
+imgRects = cell(nImages, 1);
+
 try
-    % Load first image
-    img1 = imread(imagePath1);
-    if size(img1, 3) == 1
-        img1 = repmat(img1, [1, 1, 3]);
-    elseif size(img1, 3) == 4
-        img1 = img1(:, :, 1:3);
+    for i = 1:nImages
+        fprintf('Loading image %d/%d: %s\n', i, nImages, imagePaths{i});
+        
+        % Load image
+        img = imread(imagePaths{i});
+        
+        % Convert grayscale to RGB
+        if size(img, 3) == 1
+            img = repmat(img, [1, 1, 3]);
+        elseif size(img, 3) == 4
+            % Remove alpha channel
+            img = img(:, :, 1:3);
+        end
+        
+        % Ensure uint8 format
+        if ~isa(img, 'uint8')
+            img = uint8(img);
+        end
+        
+        % Create texture
+        imgTextures{i} = Screen('MakeTexture', VP.window, img);
+        
+        % Scale image to match screen height (maintain aspect ratio)
+        [imgHeight, imgWidth, ~] = size(img);
+        scaleFactor = VP.windowHeightPix / imgHeight;
+        scaledWidth = imgWidth * scaleFactor;
+        scaledHeight = imgHeight * scaleFactor;
+        imgRect = [0, 0, scaledWidth, scaledHeight];
+        imgRects{i} = CenterRectOnPoint(imgRect, VP.windowCenter(1), VP.windowCenter(2));
     end
-    if ~isa(img1, 'uint8')
-        img1 = uint8(img1);
-    end
-    imgTexture1 = Screen('MakeTexture', VP.window, img1);
-    
-    % Scale first image to match screen height
-    [imgHeight1, imgWidth1, ~] = size(img1);
-    scaleFactor1 = VP.windowHeightPix / imgHeight1;
-    scaledWidth1 = imgWidth1 * scaleFactor1;
-    scaledHeight1 = imgHeight1 * scaleFactor1;
-    imgRect1 = [0, 0, scaledWidth1, scaledHeight1];
-    imgRect1 = CenterRectOnPoint(imgRect1, VP.windowCenter(1), VP.windowCenter(2));
-    
-    % Load second image
-    img2 = imread(imagePath2);
-    if size(img2, 3) == 1
-        img2 = repmat(img2, [1, 1, 3]);
-    elseif size(img2, 3) == 4
-        img2 = img2(:, :, 1:3);
-    end
-    if ~isa(img2, 'uint8')
-        img2 = uint8(img2);
-    end
-    imgTexture2 = Screen('MakeTexture', VP.window, img2);
-    
-    % Scale second image to match screen height (maintain aspect ratio)
-    [imgHeight2, imgWidth2, ~] = size(img2);
-    scaleFactor2 = VP.windowHeightPix / imgHeight2;
-    scaledWidth2 = imgWidth2 * scaleFactor2;
-    scaledHeight2 = imgHeight2 * scaleFactor2;
-    imgRect2 = [0, 0, scaledWidth2, scaledHeight2];
-    imgRect2 = CenterRectOnPoint(imgRect2, VP.windowCenter(1), VP.windowCenter(2));
-    
-    % Load third image
-    img3 = imread(imagePath3);
-    if size(img3, 3) == 1
-        img3 = repmat(img3, [1, 1, 3]);
-    elseif size(img3, 3) == 4
-        img3 = img3(:, :, 1:3);
-    end
-    if ~isa(img3, 'uint8')
-        img3 = uint8(img3);
-    end
-    imgTexture3 = Screen('MakeTexture', VP.window, img3);
-    
-    % Scale third image to match screen height (maintain aspect ratio)
-    [imgHeight3, imgWidth3, ~] = size(img3);
-    scaleFactor3 = VP.windowHeightPix / imgHeight3;
-    scaledWidth3 = imgWidth3 * scaleFactor3;
-    scaledHeight3 = imgHeight3 * scaleFactor3;
-    imgRect3 = [0, 0, scaledWidth3, scaledHeight3];
-    imgRect3 = CenterRectOnPoint(imgRect3, VP.windowCenter(1), VP.windowCenter(2));
+    fprintf('Successfully loaded %d image(s)\n', nImages);
 catch ME
     sca;
     error('Failed to load images: %s', ME.message);
@@ -214,17 +202,11 @@ while elapsedTime < duration
     % Draw gray background
     Screen('FillRect', VP.window, VP.backGroundColor);
     
-    % Draw appropriate image based on elapsed time
-    if elapsedTime < duration1
-        % First photo (0-10 seconds)
-        Screen('DrawTexture', VP.window, imgTexture1, [], imgRect1);
-    elseif elapsedTime < duration1 + duration2
-        % Second photo (10-25 seconds)
-        Screen('DrawTexture', VP.window, imgTexture2, [], imgRect2);
-    else
-        % Third photo (25-35 seconds)
-        Screen('DrawTexture', VP.window, imgTexture3, [], imgRect3);
-    end
+    % Determine which image to display based on elapsed time
+    currentImageIdx = min(floor(elapsedTime / photoDuration) + 1, nImages);
+    
+    % Draw current image
+    Screen('DrawTexture', VP.window, imgTextures{currentImageIdx}, [], imgRects{currentImageIdx});
     
     % Record gaze
     if pa.eyeTrackingEnabled
@@ -246,10 +228,10 @@ if pa.eyeTrackingEnabled
     end
 end
 
-% Close image textures
-Screen('Close', imgTexture1);
-Screen('Close', imgTexture2);
-Screen('Close', imgTexture3);
+% Close all image textures
+for i = 1:nImages
+    Screen('Close', imgTextures{i});
+end
 
 % Save data with timestamp (use full timestamp for .mat file)
 timestampFull = datestr(now, 'yyyymmdd_HHMMSS');
@@ -268,16 +250,11 @@ if pa.eyeTrackingEnabled && pa.gazeSampleCounter > 0
     end
 end
 
-% Store image paths and rects for visualization
-pa.imagePath1 = imagePath1;
-pa.imageRect1 = imgRect1;
-pa.imagePath2 = imagePath2;
-pa.imageRect2 = imgRect2;
-pa.imagePath3 = imagePath3;
-pa.imageRect3 = imgRect3;
-pa.duration1 = duration1;
-pa.duration2 = duration2;
-pa.duration3 = duration3;
+% Store image paths and rects for visualization (as cell arrays)
+pa.imagePaths = imagePaths;
+pa.imageRects = imgRects;
+pa.photoDuration = photoDuration;
+pa.nImages = nImages;
 
 save(saveFile, 'pa');
 fprintf('Data saved to: %s\n', saveFile);
