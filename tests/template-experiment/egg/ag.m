@@ -174,7 +174,7 @@ axis(ax, 'equal');
 % Set axis limits to match screen
 xlim(ax, [0, screenWidth]);
 ylim(ax, [0, screenHeight]);
-set(ax, 'YDir', 'reverse'); % Match screen coordinates (Y increases downward)
+set(ax, 'YDir', 'reverse'); % Set YDir reverse BEFORE displaying image
 
 % Hide axes, ticks, and labels
 set(ax, 'Color', bgColor);
@@ -191,12 +191,12 @@ ylabel(ax, '');
 if hasImage && ~isempty(imgRect)
     % Convert image coordinates for display
     % imgRect format: [left, top, right, bottom] in screen coordinates
-    % Since YDir is reversed (Y increases downward), we need to flip the image vertically
-    % and provide coordinates in normal order [top, bottom]
+    % With YDir='reverse', Y increases downward (top=smaller Y, bottom=larger Y)
+    % imagesc with reversed Y: first row of image goes to smaller Y (top)
+    % So we provide coordinates as [top, bottom] and image data as-is
     imgX = [imgRect(1), imgRect(3)];
     imgY = [imgRect(2), imgRect(4)]; % [top, bottom] in screen coordinates
-    imagesc(ax, imgX, imgY, flipud(imgData)); % Flip image vertically to match reversed Y
-    set(ax, 'YDir', 'reverse'); % Keep Y reversed for gaze coordinates
+    imagesc(ax, imgX, imgY, imgData); % No flip needed - YDir reverse handles it
 end
 
 % Initialize plot handles
