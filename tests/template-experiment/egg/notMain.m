@@ -47,9 +47,10 @@ pa.eyeTrackingEnabled = 0;
 pa.pupilDataAvailable = false;
 
 if debugConfig.eyetracking
-    % Create eye tracking file name with timestamp
-    timestamp = datestr(now, 'yyyymmdd_HHMMSS');
-    pa.eyeFileBase = sprintf('egg_%s', timestamp);
+    % Create eye tracking file name (EDF files must be <= 8 characters)
+    % Use format: eggHHMM (e.g., egg1430)
+    timestamp = datestr(now, 'HHMM');
+    pa.eyeFileBase = sprintf('egg%s', timestamp);
     pa.eyeDataDir = fullfile(scriptDir, 'results');
     if ~exist(pa.eyeDataDir, 'dir')
         mkdir(pa.eyeDataDir);
@@ -94,9 +95,17 @@ pa.backGroundColor = VP.backGroundColor;
 
 % Load image
 try
-    [img, ~, alpha] = imread(imagePath);
-    if ~isempty(alpha)
-        img = cat(3, img, alpha);
+    img = imread(imagePath);
+    % Convert to RGB if needed (handle grayscale, indexed, etc.)
+    if size(img, 3) == 1
+        img = repmat(img, [1, 1, 3]); % Convert grayscale to RGB
+    elseif size(img, 3) == 4
+        % RGBA - extract RGB only for Psychtoolbox
+        img = img(:, :, 1:3);
+    end
+    % Ensure uint8 format
+    if ~isa(img, 'uint8')
+        img = uint8(img);
     end
     imgTexture = Screen('MakeTexture', VP.window, img);
     
@@ -162,8 +171,9 @@ end
 % Close image texture
 Screen('Close', imgTexture);
 
-% Save data with timestamp
-saveFile = fullfile(scriptDir, 'results', sprintf('egg_%s.mat', timestamp));
+% Save data with timestamp (use full timestamp for .mat file)
+timestampFull = datestr(now, 'yyyymmdd_HHMMSS');
+saveFile = fullfile(scriptDir, 'results', sprintf('egg_%s.mat', timestampFull));
 if ~exist(fullfile(scriptDir, 'results'), 'dir')
     mkdir(fullfile(scriptDir, 'results'));
 end
