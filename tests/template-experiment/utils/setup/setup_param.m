@@ -80,7 +80,7 @@ pa.travelingDotRadiusPix = pa.travelingDotRadiusDeg * VP.pixelsPerDegree; % pixe
 pa.dotColor = [0 0 0];         % Black dot color (constant throughout experiment) 
 
 % Circular path appearance
-pa.circleLineWidth = 3;        % pixels - thickness of circular path outline
+pa.circleLineWidth = 2;        % pixels - thickness of circular path outline
 pa.circleColorDefault = [0 0 0]; % Black circle color (default for all non-stimulus phases)
 
 % Radial fixation line (forms cross with circular path, replaces traveling dot)
@@ -140,7 +140,7 @@ pa.data.continuousGazeX = nan(1, pa.maxGazeSamples);
 pa.data.continuousGazeY = nan(1, pa.maxGazeSamples);
 pa.data.continuousGazeTime = nan(1, pa.maxGazeSamples);
 pa.gazeSampleCounter = 0; % Track actual number of samples
-pa.gazeSampleInterval = 0.5; % Record every 0.5 seconds
+pa.gazeSampleInterval = 0.05; % Record every 0.5 seconds
 pa.lastGazeSampleTime = 0; % Track when we last recorded
 
 % Initialize pupil data tracking (will be checked during first sample)

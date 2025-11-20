@@ -7,7 +7,7 @@ function notMain2()
 clear all; close all; sca;
 
 % Get script directory
-scriptDir = fileparts(mfilename('fullpath'));
+scriptDir = fileparts(mfilename('tfullpath'));
 
 % Add utility folders to path
 experimentDir = fullfile(scriptDir, '..');
@@ -17,7 +17,7 @@ addpath(vpixxPath);
 addpath(genpath(fullfile(experimentDir, 'utils')));
 
 % Experiment duration
-duration = 30.0; % seconds
+duration = 60.0; % seconds
 
 % Debug configuration (identical to main experiment)
 debugConfig = struct();
