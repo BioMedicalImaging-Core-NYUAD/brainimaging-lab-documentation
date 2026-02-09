@@ -37,7 +37,7 @@ function [startTime, endTime] = showImageBlockWindow(imagePath, fingerName)
     oldTextSize = Screen('TextSize', screen.win);
     Screen('TextSize', screen.win,oldTextSize + 10 );
     % >> This is now a frame-by-frame drawing loop
-    while GetSecs < endTime_c-0.13
+    while GetSecs < endTime_c
         % Check for a quit key press
         [keyIsDown, ~, keyCode] = KbCheck();
         if keyIsDown && (keyCode(KbName('q')) || keyCode(KbName('Q')))
