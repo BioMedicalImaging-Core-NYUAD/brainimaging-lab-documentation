@@ -6,7 +6,11 @@ function initScreen()
 %         PsychDebugWindowConfiguration(0, parameters.transparency);
 %     end
     % degree of VA to pixel calculation
-   
+    
+    Screen('Preference', 'SkipSyncTests', 1)
+    PsychDefaultSetup(1);
+    ListenChar(0); % Listen for keyboard input
+
     [screen.viewDist, screen.screenNumber, screen.screenXpixels, screen.screenYpixels, screen.screenWidth, screen.screenHeight, screen.pixWidth, screen.pixHeight, screen.Hperdegree, screen.Wperdegree] = DegreesOfVAtoPixels(); 
 
     screen.deg_width = atand(screen.screenWidth/2 / screen.viewDist) * 2;
@@ -19,7 +23,10 @@ function initScreen()
     AssertOpenGL;
     % Set blend function for alpha blending
 
-    [screen.win, screen.screenRect] = PsychImaging('OpenWindow', screen.screenNumber,screen.black, [], 32, 2, [], [], kPsychNeed32BPCFloat);
+    %[screen.win, screen.screenRect] = PsychImaging('OpenWindow', screen.screenNumber,screen.black, [], 32, 2, [], [], kPsychNeed32BPCFloat);
+    [screen.win, screen.screenRect] = PsychImaging('OpenWindow', screen.screenNumber,screen.black);
+    
+    
     screen.ifi = Screen('GetFlipInterval', screen.win);
 
     % Retreive the maximum priority number

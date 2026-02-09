@@ -42,14 +42,14 @@ debugConfig.useVPixx = 1;             % 1 = use VPixx hardware, 0 = use keyboard
 debugConfig.fullscreen = 1;            % 1 = fullscreen, 0 = windowed mode
 debugConfig.skipSyncTests = 1;       % 1 = skip sync tests, 0 = run sync tests
 debugConfig.displayMode = 1;          % 1 = NYUAD lab, 2 = laptop/development
-debugConfig.manualTrigger = 1;        % 1 = manual trigger (5 or t), 0 = scanner trigger
+debugConfig.manualTrigger = 0;        % 1 = manual trigger (5 or t), 0 = scanner trigger
 debugConfig.buttonbox = 1;        % 1 = button box, 0 = keyboard
 debugConfig.eyetracking = 0;       % 1 = enable Eyelink, 0 = disable
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % GET BIDS INFORMATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-experimentDir = scriptDir;
+experimentDir = scriptDir; 
 try
     debugConfig.bidsInfo = get_info(experimentDir, 'circularpath');
 catch ME

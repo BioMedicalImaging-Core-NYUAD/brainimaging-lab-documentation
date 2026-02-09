@@ -65,7 +65,7 @@ function main_ME(meNumberOfBlocks)
     %   Initialize Datapixx
     %--------------------------------------------------------------------------------------------------------------------------------------%
     if ~parameters.isDemoMode
-        datapixx = 1;
+        datapixx = 0;
         AssertOpenGL;
         isReady = Datapixx('Open');
         Datapixx('StopAllSchedules');
