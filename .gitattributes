@@ -1,0 +1,2 @@
+# Force LF line endings to avoid issues when running in WSL/Linux
+pipeline/eeg_fmri_pipelines/fmri_preprocessing/finger-tapping/visualise_betas.sh text eol=lf

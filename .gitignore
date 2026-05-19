@@ -43,3 +43,14 @@ media_dir/
 .DS_Store 
 
 Makefile
+
+*_dm.csv
+sixFingers*.csv
+
+# External MATLAB toolboxes for the sixth-finger project — download separately.
+# See pipeline/fmri_pipelines/projects/sixth-finger/SETUP.md for install instructions.
+pipeline/fmri_pipelines/projects/sixth-finger/spm/
+pipeline/fmri_pipelines/projects/sixth-finger/RSAtoolbox/
+
+# Large saved MATLAB workspaces (regeneratable analysis outputs, not source)
+pipeline/fmri_pipelines/projects/sixth-finger/**/matlab_workspace.mat

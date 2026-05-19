@@ -1,0 +1,140 @@
+{
+  "dcm2niixOptions": "-d 9 -b y -ba y -z y -f '%3s_%f_%p_%t'",
+  "case_sensitive": true,
+  "search_method": "fnmatch",
+  "dup_method": "run",
+  "compKeys": ["SeriesNumber", "AcquisitionTime", "SidecarFilename"],
+  "post_op": [{"cmd": "pydeface --outfile dst_file src_file --verbose --debug --force",
+				"datatype": "anat",
+				"suffix": ["T1w", "FLAIR"]}],
+
+  "extractors": {
+    "SeriesDescription": [
+      "run-(?P<run>[0-9]+)",
+      "task-(?P<task>[0-9]+)"
+    ],
+    "PhaseEncodedDirection": [
+      "dir-(?P<dir>-?j|i)"
+    ],
+    "EchoNumber": [
+      "echo-(?P<echo>[0-9])"
+    ],
+    "BodyPartExamined": [
+      "(?P<bodypart>[a-zA-Z]+)"
+    ]
+  },
+
+
+  "descriptions": [
+    {
+      "datatype": "anat",
+      "suffix": "T1w",
+      "criteria": {
+        "SeriesDescription": "anat-T1w"
+      }
+    },
+    {
+      "datatype": "anat",
+      "suffix": "T2w",
+      "criteria": {
+        "SeriesDescription": "anat-T2w"
+      }
+    },
+    {
+      "id": "task-motor", 
+      "datatype": "func", 
+      "suffix": "bold", 
+      "custom_entities": "task-motor",
+      "criteria": {
+        "SeriesDescription": "func-bold_task-sixthfinger_run*"
+      },
+      "sidecar_changes": {
+        "TaskName": "motor",
+	      "RepetitionTime": 1
+      }
+    },
+    {      
+      "id": "task-motorShort", 
+      "datatype": "func", 
+      "suffix": "bold", 
+      "custom_entities": "task-motorShort",
+      "criteria": {
+        "SeriesDescription": "func-bold_task-sixthfingerShort_run*"
+      },
+      "sidecar_changes": {
+        "TaskName": "motorShort",
+	      "RepetitionTime": 1
+      }
+    },
+    {      
+      "id": "task-Imagery", 
+      "datatype": "func", 
+      "suffix": "bold", 
+      "custom_entities": "task-Imagery",
+      "criteria": {
+        "SeriesDescription": "func-bold_task-Imagery_run*"
+      },
+      "sidecar_changes": {
+        "TaskName": "Imagery",
+	      "RepetitionTime": 1
+      }
+    },
+    {      
+      "id": "task-Execution", 
+      "datatype": "func", 
+      "suffix": "bold", 
+      "custom_entities": "task-Execution",
+      "criteria": {
+        "SeriesDescription": "func-bold_task-Execution_run*"
+      },
+      "sidecar_changes": {
+        "TaskName": "Execution",
+	      "RepetitionTime": 1
+      }
+    },
+    {
+      "datatype": "func", 
+      "suffix": "sbref", 
+      "custom_entities": "dir-AP",
+      "criteria": {
+        "SeriesDescription": "func-bold_task-SBref_run-01_dir-AP"
+      },
+      "sidecar_changes": {
+        "TaskName": "SBref"
+      }
+    },
+    {
+      "datatype": "func", 
+      "suffix": "sbref", 
+      "custom_entities": "dir-PA",
+      "criteria": {
+        "SeriesDescription": "func-bold_task-SBref_run-02_dir-PA"
+      },
+      "sidecar_changes": {
+        "TaskName": "SBref"
+      }
+    },
+    {
+      "datatype": "fmap", 
+      "suffix": "epi", 
+      "custom_entities": "dir-AP",
+      "criteria": {
+        "SeriesDescription": "fmap_acq-se_run-*_dir-AP_topup"
+      },
+      "sidecar_changes": {
+        "IntendedFor": ["task-motor", "task-motorShort", "task-Execution", "task-Imagery"]
+      }
+    },
+    {
+      "datatype": "fmap", 
+      "suffix": "epi", 
+      "custom_entities": "dir-PA",
+      "criteria": {
+        "SeriesDescription": "fmap_acq-se_run-*_dir-PA_topup"
+      },
+      "sidecar_changes": {
+        "IntendedFor": ["task-motor", "task-motorShort", "task-Execution", "task-Imagery"]
+      }
+    }
+  ]
+}
