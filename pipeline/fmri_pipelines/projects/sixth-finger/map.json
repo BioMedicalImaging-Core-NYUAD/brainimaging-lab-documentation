@@ -1,0 +1,106 @@
+{
+    "subjects": [
+        {
+            "subID": "sub-0872",
+            "dmNum": 101,
+            "sessions": [
+                "ses-01",
+                "ses-02",
+                "ses-03"
+            ]
+        },
+        {
+            "subID": "sub-0457",
+            "dmNum": 102,
+            "sessions": [
+                "ses-01",
+                "ses-02",
+                "ses-03"
+            ]
+        },
+        {
+            "subID": "sub-0861",
+            "dmNum": 103,
+            "sessions": [
+                "ses-01",
+                "ses-02",
+                "ses-03"
+            ]
+        },
+        {
+            "subID": "sub-0879",
+            "dmNum": 104,
+            "sessions": [
+                "ses-01",
+                "ses-02",
+                "ses-03"
+            ]
+        },
+        {
+            "subID": "sub-0624",
+            "dmNum": 105,
+            "sessions": [
+                "ses-01",
+                "ses-02"
+            ]
+        },
+        {
+            "subID": "sub-0881",
+            "dmNum": 106,
+            "sessions": [
+                "ses-01",
+                "ses-02",
+                "ses-03"
+            ]
+        },
+        {
+            "subID": "sub-0688",
+            "dmNum": 107,
+            "sessions": [
+                "ses-01",
+                "ses-02",
+                "ses-03"
+            ]
+        },
+        {
+            "subID": "sub-0883",
+            "dmNum": 108,
+            "sessions": [
+                "ses-01",
+                "ses-02"
+            ]
+        },
+        {
+            "subID": "sub-0884",
+            "dmNum": 109,
+            "sessions": [
+                "ses-01",
+                "ses-02",
+                "ses-03"
+            ]
+        },
+        {
+            "subID": "sub-0885",
+            "dmNum": 110,
+            "sessions": [
+                "ses-01",
+                "ses-02",
+                "ses-03"
+            ]
+        }
+    ],
+    "sessionDirs": [
+        {
+            "session": "ses-01",
+            "dmDir": "fmri_pre_dm"
+        },
+        {
+            "session": "ses-02",
+            "dmDir": "fmri_post_dm"
+        },
+        {
+            "session": "ses-03",
+            "dmDir": "fmri_post_gap_dm"
+        }
+    ]
+}
