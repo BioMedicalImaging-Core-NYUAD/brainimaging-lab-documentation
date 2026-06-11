@@ -33,7 +33,14 @@ catch ME
     fprintf('Warning: could not close VPixx: %s\n', ME.message);
 end
 
-pa.totalExperimentTime = GetSecs - experimentStartTime;
+if isfield(pa, 'timingBaseTime') && ~isempty(pa.timingBaseTime)
+    pa.totalExperimentTime = GetSecs - pa.timingBaseTime;
+else
+    pa.totalExperimentTime = GetSecs - experimentStartTime;
+end
+if isfield(pa, 'textureMap')
+    pa = rmfield(pa, 'textureMap');
+end
 
 if isfield(pa, 'dataFileName') && ~isempty(pa.dataFileName)
     [saveDir, ~, ~] = fileparts(pa.dataFileName);
