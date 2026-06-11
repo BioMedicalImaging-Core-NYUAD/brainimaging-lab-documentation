@@ -33,10 +33,20 @@ catch ME
     fprintf('Warning: could not close VPixx: %s\n', ME.message);
 end
 
-if isfield(pa, 'timingBaseTime') && ~isempty(pa.timingBaseTime)
-    pa.totalExperimentTime = GetSecs - pa.timingBaseTime;
+if isfield(pa, 'nextEpochOnset') && ~isempty(pa.nextEpochOnset)
+    pa.totalDesignTime = pa.nextEpochOnset;
 else
-    pa.totalExperimentTime = GetSecs - experimentStartTime;
+    pa.totalDesignTime = NaN;
+end
+if isfield(pa, 'timingBaseTime') && ~isempty(pa.timingBaseTime)
+    pa.wallClockElapsedAtCleanup = GetSecs - pa.timingBaseTime;
+else
+    pa.wallClockElapsedAtCleanup = GetSecs - experimentStartTime;
+end
+if isfinite(pa.totalDesignTime)
+    pa.totalExperimentTime = pa.totalDesignTime;
+else
+    pa.totalExperimentTime = pa.wallClockElapsedAtCleanup;
 end
 if isfield(pa, 'textureMap')
     pa = rmfield(pa, 'textureMap');
@@ -74,6 +84,7 @@ if isfield(pa, 'designMatrixFileName') && ~isempty(pa.designMatrixFileName) && ~
     end
 end
 
-fprintf('Cleanup complete. Total elapsed time: %.2f s\n', pa.totalExperimentTime);
+fprintf('Cleanup complete. Planned design time: %.2f s\n', pa.totalExperimentTime);
+fprintf('Elapsed including cleanup: %.2f s\n', pa.wallClockElapsedAtCleanup);
 
 end

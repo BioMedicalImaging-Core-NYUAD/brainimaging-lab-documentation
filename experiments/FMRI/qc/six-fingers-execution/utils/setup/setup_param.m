@@ -22,7 +22,7 @@ pa.trialsPerBlock = numel(pa.fingerNames);
 pa.nTrials = pa.nBlocks * pa.trialsPerBlock;
 pa.fixationDuration = 12;
 pa.stimulusDuration = 12;
-pa.endScreenDuration = 2;
+pa.endScreenDuration = 0;
 pa.totalDesignDuration = pa.nTrials * (pa.fixationDuration + pa.stimulusDuration) + pa.fixationDuration;
 
 pa.blockFingerOrder = cell(1, pa.nBlocks);
