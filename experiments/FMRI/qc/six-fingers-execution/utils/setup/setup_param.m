@@ -34,6 +34,16 @@ scriptDir = fileparts(mfilename('fullpath'));
 pa.experimentDir = fullfile(scriptDir, '..', '..');
 pa.imageDir = fullfile(pa.experimentDir, 'images');
 
+pa.textureMap = containers.Map();
+allImageFiles = [{pa.restImageFile}, values(pa.imageFiles)];
+for iImage = 1:numel(allImageFiles)
+    imagePath = fullfile(pa.imageDir, allImageFiles{iImage});
+    if ~exist(imagePath, 'file')
+        error('setup_param:missingImage', 'Could not find image: %s', imagePath);
+    end
+    pa.textureMap(imagePath) = Screen('MakeTexture', VP.window, imread(imagePath));
+end
+
 if isfield(debugConfig, 'bidsInfo') && ~isempty(debugConfig.bidsInfo)
     pa.bidsInfo = debugConfig.bidsInfo;
     pa.dataDir = debugConfig.bidsInfo.dataDir;
@@ -51,6 +61,11 @@ end
 
 pa.trialCounter = 0;
 pa.eventCounter = 0;
+pa.nextEpochOnset = 0;
+pa.timingBaseTime = [];
+pa.actualTiming = struct('plannedOnset', {}, 'plannedDuration', {}, ...
+    'actualOnset', {}, 'waitReturn', {}, 'onsetDelay', {}, ...
+    'trial_type', {}, 'finger', {}, 'block', {}, 'trial', {});
 pa.events = struct('onset', {}, 'duration', {}, 'trial_type', {}, ...
     'finger', {}, 'block', {}, 'trial', {});
 
