@@ -9,8 +9,16 @@ if ~isstruct(debugConfig)
 end
 
 pa = struct();
-pa.experimentName = 'Six Fingers Motor Execution';
-pa.taskName = 'Execution';
+
+% Determine task type (flexing or tapping)
+if isfield(debugConfig, 'bidsInfo') && isfield(debugConfig.bidsInfo, 'taskType')
+    pa.taskType = debugConfig.bidsInfo.taskType;
+else
+    pa.taskType = 'flexing';  % default
+end
+pa.experimentName = sprintf('Six Fingers Motor %s', ...
+    [upper(pa.taskType(1)) pa.taskType(2:end)]);
+pa.taskName = [upper(pa.taskType(1)) pa.taskType(2:end)];
 
 pa.fingerNames = {'thumb', 'index', 'middle', 'ring', 'pinky'};
 pa.imageFiles = containers.Map(pa.fingerNames, ...
@@ -35,13 +43,18 @@ pa.experimentDir = fullfile(scriptDir, '..', '..');
 pa.imageDir = fullfile(pa.experimentDir, 'images');
 
 pa.textureMap = containers.Map();
+flipImages = strcmp(pa.taskType, 'tapping');
 allImageFiles = [{pa.restImageFile}, values(pa.imageFiles)];
 for iImage = 1:numel(allImageFiles)
     imagePath = fullfile(pa.imageDir, allImageFiles{iImage});
     if ~exist(imagePath, 'file')
         error('setup_param:missingImage', 'Could not find image: %s', imagePath);
     end
-    pa.textureMap(imagePath) = Screen('MakeTexture', VP.window, imread(imagePath));
+    imgData = imread(imagePath);
+    if flipImages
+        imgData = imgData(:, end:-1:1, :);  % horizontal flip
+    end
+    pa.textureMap(imagePath) = Screen('MakeTexture', VP.window, imgData);
 end
 
 if isfield(debugConfig, 'bidsInfo') && ~isempty(debugConfig.bidsInfo)
@@ -76,11 +89,16 @@ pa.debugMode = debugConfig.enabled;
 pa.useVPixx = debugConfig.useVPixx;
 pa.useScannerTrigger = ~debugConfig.manualTrigger;
 
-fprintf('=== Motor Execution Design ===\n');
+fprintf('=== Motor %s Design ===\n', pa.taskName);
+if flipImages
+    fprintf('Task type: %s (images flipped)\n', pa.taskType);
+else
+    fprintf('Task type: %s\n', pa.taskType);
+end
 fprintf('Blocks: %d\n', pa.nBlocks);
 fprintf('Trials per block: %d\n', pa.trialsPerBlock);
 fprintf('Rest duration: %.1fs\n', pa.fixationDuration);
-fprintf('Execution cue duration: %.1fs\n', pa.stimulusDuration);
+fprintf('%s cue duration: %.1fs\n', pa.taskName, pa.stimulusDuration);
 fprintf('Planned design duration: %.1fs (%.2f min)\n', ...
     pa.totalDesignDuration, pa.totalDesignDuration / 60);
 for blockIdx = 1:pa.nBlocks

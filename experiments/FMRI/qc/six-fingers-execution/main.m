@@ -1,5 +1,5 @@
 function main()
-% MAIN - Six-fingers motor execution task, template-style QC version
+% MAIN - Six-fingers motor task (flexing or tapping), template-style QC version
 %
 % This version keeps the original ME design but follows the MRI-center
 % template structure:
@@ -31,7 +31,7 @@ debugConfig.eyetracking = 0;          % Not used in this QC task
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 experimentDir = scriptDir;
 try
-    debugConfig.bidsInfo = get_info(experimentDir, 'Execution');
+    debugConfig.bidsInfo = get_info(experimentDir);
 catch ME
     if contains(ME.message, 'cancelled') || contains(ME.message, 'not to overwrite')
         fprintf('Exiting.\n');

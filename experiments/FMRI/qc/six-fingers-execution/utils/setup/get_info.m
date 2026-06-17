@@ -5,6 +5,19 @@ if nargin < 2
     taskName = '';
 end
 
+% --- Choose task type: Flexing or Tapping ---
+taskTypeChoice = questdlg('Select task type:', ...
+    'Task Type', 'Flexing', 'Tapping', 'Flexing');
+if isempty(taskTypeChoice)
+    error('User cancelled');
+end
+info.taskType = lower(taskTypeChoice);  % 'flexing' or 'tapping'
+
+% Update default task name to reflect choice
+if isempty(taskName) || strcmpi(taskName, 'Execution')
+    taskName = taskTypeChoice;
+end
+
 prompt = {'Subject ID (e.g., 0872):', ...
           'Session ID (e.g., 01):', ...
           'Run ID (e.g., 01):', ...
