@@ -1,0 +1,19 @@
+{
+  "onset": {
+    "Description": "Onset in seconds from first stimulus flip",
+    "Units": "seconds"
+  },
+  "duration": {
+    "Description": "Duration of the event",
+    "Units": "seconds"
+  },
+  "trial_type": {
+    "Description": "Breathing epoch type"
+  },
+  "instruction": {
+    "Description": "Text instruction shown to participant"
+  },
+  "cycle": {
+    "Description": "Breath-hold cycle number"
+  }
+}

@@ -1,0 +1,14 @@
+onset	duration	trial_type	instruction	cycle
+0	4	inhale	Breathe in	1
+4	16	hold	Hold your breath	1
+20	40	rest	Breathe normally	1
+60	4	inhale	Breathe in	2
+64	16	hold	Hold your breath	2
+80	40	rest	Breathe normally	2
+120	4	inhale	Breathe in	3
+124	16	hold	Hold your breath	3
+140	40	rest	Breathe normally	3
+180	4	inhale	Breathe in	4
+184	16	hold	Hold your breath	4
+200	40	rest	Breathe normally	4
+240	20	rest	Breathe normally	5
