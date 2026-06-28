@@ -84,8 +84,8 @@ try
     whichLoc = 0;
     fixColor = 1;
 
-    KbQueueCreate();
-    KbQueueStart();
+    KbQueueCreate(-1);  % -1 = all keyboards; avoids conflict with ListenChar
+    KbQueueStart(-1);
 
     ListenChar(2);  % suppress keyboard input to MATLAB editor
     wait_trigger(VP, debugConfig.manualTrigger);
@@ -199,7 +199,7 @@ try
             end
 
             % --- Check escape ---
-            [pressed, firstPress] = KbQueueCheck();
+            [pressed, firstPress] = KbQueueCheck(-1);
             if pressed && firstPress(kb.escKey)
                 fprintf('Terminated by user.\n');
                 break;
@@ -210,13 +210,14 @@ try
         if pressed && firstPress(kb.escKey), break; end
     end
 
-    % End screen
+    pa.totalExperimentTime = GetSecs - experimentStartTime;
+
+    % End screen (not included in reported time)
     Screen('FillRect', VP.window, VP.backGroundColor);
     Screen('TextSize', VP.window, 36);
     DrawFormattedText(VP.window, 'Done', 'center', 'center', [255 255 255]);
     Screen('Flip', VP.window);
     WaitSecs(pa.endScreenDuration);
-    pa.totalExperimentTime = GetSecs - experimentStartTime;
 
 catch ME
     if exist('experimentStartTime', 'var')

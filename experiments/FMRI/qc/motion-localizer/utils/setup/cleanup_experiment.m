@@ -3,7 +3,7 @@ function cleanup_experiment(VP, pa, kb, experimentStartTime)
 
 fprintf('\nCleaning up resources...\n');
 
-try, KbQueueStop(); KbQueueRelease(); catch, end
+try, KbQueueStop(-1); KbQueueRelease(-1); catch, end
 try, Priority(0); catch, end
 try, ListenChar(0); catch, end
 try, sca; catch ME, fprintf('Warning: %s\n', ME.message); end
