@@ -97,14 +97,18 @@ try
     for ev = 1:pa.nEvents
         plannedOnsetAbs = experimentStartTime + pa.plannedOnsets(ev);
 
-        % Exit wait loop ~2 frames early to pre-draw the first frame
+        % Active wait: keep flipping fixation every frame to prevent
+        % the GPU pipeline from going idle — idle pipeline causes
+        % PsychVulkanCore timestamp timeouts that stall the next Flip.
         while GetSecs < plannedOnsetAbs - 2 * VP.ifi
             [pressed, firstPress] = KbQueueCheck(-1);
             if pressed && firstPress(kb.escKey)
                 fprintf('Terminated by user.\n');
                 error('user_abort');
             end
-            WaitSecs(0.001);
+            Screen('FillRect', VP.window, VP.backGroundColor);
+            draw_fixation(VP, pa, pa.fixColor);
+            Screen('Flip', VP.window);
         end
 
         % Pre-draw first checkerboard frame into back buffer and
@@ -189,7 +193,9 @@ try
             fprintf('Terminated by user.\n');
             error('user_abort');
         end
-        WaitSecs(0.001);
+        Screen('FillRect', VP.window, VP.backGroundColor);
+        draw_fixation(VP, pa, pa.fixColor);
+        Screen('Flip', VP.window);
     end
 
     Screen('FillRect', VP.window, VP.backGroundColor);
