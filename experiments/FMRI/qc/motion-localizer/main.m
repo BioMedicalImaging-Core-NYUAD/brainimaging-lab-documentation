@@ -1,4 +1,4 @@
-tfunction main()
+function main()
 % MAIN - Motion localizer for MT+ (moving vs. static random dots)
 %
 % Block design: alternating motion and baseline blocks.
@@ -133,14 +133,19 @@ try
         frameInBlock = 0;
         pressed = false;
         firstPress = zeros(1, 256);
+        lastFrameTime = GetSecs;
+        needsRedraw = true;
 
         while (GetSecs - blockStart) < pa.blockDuration
             frameInBlock = frameInBlock + 1;
+            now = GetSecs;
+            dt = now - lastFrameTime;
+            lastFrameTime = now;
 
             % --- Dot position update ---
             if isMotion
-                % Dot lifetime
-                pa.lifetime = pa.lifetime + 1/VP.frameRate;
+                % Dot lifetime (actual elapsed time)
+                pa.lifetime = pa.lifetime + dt;
                 dotsOut = pa.lifetime >= pa.totalLife;
                 pa.lifetime(dotsOut) = 0;
                 pa.r(dotsOut) = (pa.rmax - pa.rmin) .* (rand(1, sum(dotsOut)).^(1/2)) + pa.rmin;
@@ -148,7 +153,7 @@ try
 
                 switch whichLoc
                     case 1  % outward
-                        pa.r = pa.r + pa.pps / VP.frameRate * pa.r.^(1/2) ./ max(pa.r.^(1/2));
+                        pa.r = pa.r + pa.pps * dt * pa.r.^(1/2) ./ max(pa.r.^(1/2));
                         radialOut = pa.r >= pa.rmax;
                         pa.r(radialOut) = (pa.rmax - pa.rmin) .* (rand(1, sum(radialOut)).^(1/2)) + pa.rmin;
                         pa.theta(radialOut) = (2*pi .* rand(1, sum(radialOut))) - 2*pi;
@@ -162,51 +167,63 @@ try
                         pa.theta = dotMat(:, fi, 2)';
 
                     case 3  % clockwise
-                        pa.theta = pa.theta + pa.thetaspeed * pa.r.^(1/8) ./ max(pa.r.^(1/8));
+                        pa.theta = pa.theta + pa.speedDeg / pa.apertureDeg * dt * pa.r.^(1/8) ./ max(pa.r.^(1/8));
 
                     case 4  % counter-clockwise
-                        pa.theta = pa.theta - pa.thetaspeed * pa.r.^(1/8) ./ max(pa.r.^(1/8));
+                        pa.theta = pa.theta - pa.speedDeg / pa.apertureDeg * dt * pa.r.^(1/8) ./ max(pa.r.^(1/8));
                 end
 
                 [x, y] = pol2cart(pa.theta, pa.r);
+                needsRedraw = true;
+
             else
                 % Baseline block
                 if strcmp(pa.baselineType, 'flickering')
                     % Same lifetime — dots stay put, reappear at new location on death
-                    pa.lifetime = pa.lifetime + 1/VP.frameRate;
+                    pa.lifetime = pa.lifetime + dt;
                     dotsOut = pa.lifetime >= pa.totalLife;
-                    pa.lifetime(dotsOut) = 0;
-                    pa.r(dotsOut) = (pa.rmax - pa.rmin) .* (rand(1, sum(dotsOut)).^(1/2)) + pa.rmin;
-                    pa.theta(dotsOut) = (2*pi .* rand(1, sum(dotsOut))) - 2*pi;
-
-                    [x, y] = pol2cart(pa.theta, pa.r);
+                    if any(dotsOut)
+                        pa.lifetime(dotsOut) = 0;
+                        pa.r(dotsOut) = (pa.rmax - pa.rmin) .* (rand(1, sum(dotsOut)).^(1/2)) + pa.rmin;
+                        pa.theta(dotsOut) = (2*pi .* rand(1, sum(dotsOut))) - 2*pi;
+                        [x, y] = pol2cart(pa.theta, pa.r);
+                        needsRedraw = true;
+                    end
                 end
                 % Static: x,y unchanged from last motion frame
             end
 
             % --- Fixation color-change task ---
-            if (GetSecs - taskLastChange) > (2 + rand(1) * 10)
+            if (now - taskLastChange) > (2 + rand(1) * 10)
                 fixColor = fixColor + 1;
-                taskLastChange = GetSecs;
+                taskLastChange = now;
+                needsRedraw = true;
             end
-            currentFixColor = pa.fixationColor(mod(fixColor, 2) + 1, :);
 
-            % --- Draw ---
-            Screen('DrawDots', VP.window, ...
-                [x + VP.windowCenter(1); y + VP.windowCenter(2)], ...
-                pa.dotDiameter, pa.dotColor, [], 2);
-            Screen('DrawLines', VP.window, ...
-                [-pa.fixCrossLen, pa.fixCrossLen, 0, 0; ...
-                 0, 0, -pa.fixCrossLen, pa.fixCrossLen], ...
-                2, currentFixColor, VP.windowCenter);
-
-            Screen('Flip', VP.window);
+            % --- Draw only when something changed ---
+            if needsRedraw
+                currentFixColor = pa.fixationColor(mod(fixColor, 2) + 1, :);
+                Screen('DrawDots', VP.window, ...
+                    [x + VP.windowCenter(1); y + VP.windowCenter(2)], ...
+                    pa.dotDiameter, pa.dotColor, [], 2);
+                Screen('DrawLines', VP.window, ...
+                    [-pa.fixCrossLen, pa.fixCrossLen, 0, 0; ...
+                     0, 0, -pa.fixCrossLen, pa.fixCrossLen], ...
+                    2, currentFixColor, VP.windowCenter);
+                Screen('Flip', VP.window);
+                needsRedraw = isMotion;  % motion always redraws; static only on change
+            end
 
             % --- Check escape ---
             [pressed, firstPress] = KbQueueCheck();
             if pressed && firstPress(kb.escKey)
                 fprintf('Terminated by user.\n');
                 break;
+            end
+
+            % Don't busy-loop during static baseline
+            if ~isMotion && ~needsRedraw
+                WaitSecs(0.005);
             end
         end
 
