@@ -77,6 +77,8 @@ try
     catch
     end
 
+    warmup_checkerboard_draw(VP, pa, chk1, chk2);
+
     ListenChar(2);  % suppress keyboard input to MATLAB editor
     wait_trigger(VP, debugConfig.manualTrigger);
 
@@ -241,6 +243,26 @@ end
 tex1 = Screen('MakeTexture', VP.window, img1);
 tex2 = Screen('MakeTexture', VP.window, img2);
 
+end
+
+function warmup_checkerboard_draw(VP, pa, chk1, chk2)
+% Submit first-use draw commands without presenting the checkerboard.
+try
+    Screen('DrawTexture', VP.window, chk1);
+    draw_fixation(VP, pa, pa.fixColor);
+    Screen('DrawingFinished', VP.window);
+
+    Screen('FillRect', VP.window, VP.backGroundColor);
+    Screen('DrawTexture', VP.window, chk2);
+    draw_fixation(VP, pa, pa.fixColor);
+    Screen('DrawingFinished', VP.window);
+
+    Screen('FillRect', VP.window, VP.backGroundColor);
+    Screen('DrawingFinished', VP.window);
+catch ME
+    warning('checkerboard:warmupFailed', ...
+        'Invisible checkerboard warm-up failed: %s', ME.message);
+end
 end
 
 function draw_fixation(VP, pa, color)
