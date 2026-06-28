@@ -94,22 +94,36 @@ try
     Screen('FillRect', VP.window, VP.backGroundColor);
     draw_fixation(VP, pa, pa.fixColor);
     vbl = Screen('Flip', VP.window);
-    WaitSecs(pa.initialBaselineDuration);
 
     % --- Event loop ---
     for ev = 1:pa.nEvents
+        plannedOnsetAbs = experimentStartTime + pa.plannedOnsets(ev);
+
+        while GetSecs < plannedOnsetAbs - 0.5 * VP.ifi
+            [pressed, firstPress] = KbQueueCheck();
+            if pressed && firstPress(kb.escKey)
+                fprintf('Terminated by user.\n');
+                error('user_abort');
+            end
+            WaitSecs(0.001);
+        end
+
         % --- Flash the checkerboard (contrast-reversing) ---
-        nFlipFrames = max(1, round(pa.stimDuration / VP.ifi));
-        for f = 1:nFlipFrames
-            phase = mod(floor((f - 1) * VP.ifi * pa.flickerHz * 2), 2);
+        eventEndAbs = plannedOnsetAbs + pa.stimDuration;
+        frameCount = 0;
+        eventOnset = NaN;
+        while GetSecs < eventEndAbs - 0.5 * VP.ifi
+            frameCount = frameCount + 1;
+            nowTime = GetSecs;
+            phase = mod(floor((nowTime - plannedOnsetAbs) * pa.flickerHz * 2), 2);
             if phase == 0
                 Screen('DrawTexture', VP.window, chk1);
             else
                 Screen('DrawTexture', VP.window, chk2);
             end
             draw_fixation(VP, pa, pa.fixColor);
-            if f == 1
-                vbl = Screen('Flip', VP.window);
+            if frameCount == 1
+                vbl = Screen('Flip', VP.window, plannedOnsetAbs - 0.5 * VP.ifi);
 
                 eventOnset = vbl - experimentStartTime;
                 fprintf('Event %d/%d (onset %.3f s)\n', ev, pa.nEvents, eventOnset);
@@ -126,27 +140,29 @@ try
         % --- ISI: fixation only ---
         Screen('FillRect', VP.window, VP.backGroundColor);
         draw_fixation(VP, pa, pa.fixColor);
-        vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
-
-        isiDuration = pa.isiSequence(ev);
-        isiEnd = GetSecs + isiDuration;
-
-        while GetSecs < isiEnd - 0.5 * VP.ifi
-            % Check escape
-            [pressed, firstPress] = KbQueueCheck();
-            if pressed && firstPress(kb.escKey)
-                fprintf('Terminated by user.\n');
-                error('user_abort');
-            end
-            WaitSecs(0.001);
+        vbl = Screen('Flip', VP.window, eventEndAbs - 0.5 * VP.ifi);
+        if ~isnan(eventOnset)
+            pa.events(pa.eventCounter).actual_duration = vbl - experimentStartTime - eventOnset;
+            pa.events(pa.eventCounter).planned_onset = pa.plannedOnsets(ev);
         end
     end
 
     % --- Final baseline ---
+    finalBaselineStartAbs = experimentStartTime + ...
+        pa.totalDesignDuration - pa.finalBaselineDuration;
+    while GetSecs < finalBaselineStartAbs - 0.5 * VP.ifi
+        [pressed, firstPress] = KbQueueCheck();
+        if pressed && firstPress(kb.escKey)
+            fprintf('Terminated by user.\n');
+            error('user_abort');
+        end
+        WaitSecs(0.001);
+    end
+
     Screen('FillRect', VP.window, VP.backGroundColor);
     draw_fixation(VP, pa, pa.fixColor);
-    Screen('Flip', VP.window);
-    WaitSecs(pa.finalBaselineDuration);
+    Screen('Flip', VP.window, finalBaselineStartAbs - 0.5 * VP.ifi);
+    WaitSecs('UntilTime', experimentStartTime + pa.totalDesignDuration);
 
     % End screen
     Screen('FillRect', VP.window, VP.backGroundColor);
