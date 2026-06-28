@@ -97,8 +97,8 @@ try
     for ev = 1:pa.nEvents
         plannedOnsetAbs = experimentStartTime + pa.plannedOnsets(ev);
 
-        % Exit wait loop ~2 frames early to pre-draw the first frame
-        while GetSecs < plannedOnsetAbs - 2 * VP.ifi
+        % Exit wait loop ~3 frames early for warm-up flip + pre-draw
+        while GetSecs < plannedOnsetAbs - 3 * VP.ifi
             [pressed, firstPress] = KbQueueCheck(-1);
             if pressed && firstPress(kb.escKey)
                 fprintf('Terminated by user.\n');
@@ -107,10 +107,18 @@ try
             WaitSecs(0.001);
         end
 
-        % Pre-draw first checkerboard frame into back buffer so the
-        % first Flip only waits for vsync (no draw overhead at onset).
+        % Warm-up flip one frame before onset: re-draw fixation
+        % (visually unchanged) to wake the GPU/display pipeline
+        % after the long ISI idle, preventing first-frame latency.
+        Screen('FillRect', VP.window, VP.backGroundColor);
+        draw_fixation(VP, pa, pa.fixColor);
+        Screen('Flip', VP.window, plannedOnsetAbs - VP.ifi - 0.5 * VP.ifi);
+
+        % Pre-draw first checkerboard frame and tell the GPU to
+        % start processing immediately (not deferred until Flip).
         Screen('DrawTexture', VP.window, chk1);
         draw_fixation(VP, pa, pa.fixColor);
+        Screen('DrawingFinished', VP.window);
 
         % --- Flash the checkerboard (contrast-reversing) ---
         eventEndAbs = plannedOnsetAbs + pa.stimDuration;
@@ -130,6 +138,7 @@ try
                     Screen('DrawTexture', VP.window, chk2);
                 end
                 draw_fixation(VP, pa, pa.fixColor);
+                Screen('DrawingFinished', VP.window);
             end
             vbl = Screen('Flip', VP.window, nextFlipAbs - 0.5 * VP.ifi);
 
