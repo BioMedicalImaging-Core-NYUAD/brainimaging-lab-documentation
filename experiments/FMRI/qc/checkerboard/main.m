@@ -91,7 +91,7 @@ try
     % --- Initial baseline fixation ---
     Screen('FillRect', VP.window, VP.backGroundColor);
     draw_fixation(VP, pa, pa.fixColor);
-    vbl = Screen('Flip', VP.window);
+    Screen('Flip', VP.window);
 
     % --- Event loop ---
     for ev = 1:pa.nEvents
@@ -108,41 +108,40 @@ try
 
         % --- Flash the checkerboard (contrast-reversing) ---
         eventEndAbs = plannedOnsetAbs + pa.stimDuration;
-        frameCount = 0;
-        eventOnset = NaN;
-        while GetSecs < eventEndAbs - 0.5 * VP.ifi
-            frameCount = frameCount + 1;
-            nowTime = GetSecs;
-            phase = mod(floor((nowTime - plannedOnsetAbs) * pa.actualFlickerHz * 2), 2);
+        Screen('DrawTexture', VP.window, chk1);
+        draw_fixation(VP, pa, pa.fixColor);
+        vbl = Screen('Flip', VP.window, plannedOnsetAbs - 0.5 * VP.ifi);
+
+        eventOnset = vbl - experimentStartTime;
+        fprintf('Event %d/%d (onset %.3f s)\n', ev, pa.nEvents, eventOnset);
+
+        pa.eventCounter = pa.eventCounter + 1;
+        pa.events(pa.eventCounter).onset = eventOnset;
+        pa.events(pa.eventCounter).duration = pa.stimDuration;
+        pa.events(pa.eventCounter).trial_type = 'checkerboard';
+
+        frameIndex = 1;
+        nextFlipAbs = plannedOnsetAbs + frameIndex * VP.ifi;
+        while nextFlipAbs < eventEndAbs - 0.5 * VP.ifi
+            phase = mod(floor(frameIndex / pa.framesPerFlickerPhase), 2);
             if phase == 0
                 Screen('DrawTexture', VP.window, chk1);
             else
                 Screen('DrawTexture', VP.window, chk2);
             end
             draw_fixation(VP, pa, pa.fixColor);
-            if frameCount == 1
-                vbl = Screen('Flip', VP.window, plannedOnsetAbs - 0.5 * VP.ifi);
+            vbl = Screen('Flip', VP.window, nextFlipAbs - 0.5 * VP.ifi);
 
-                eventOnset = vbl - experimentStartTime;
-                fprintf('Event %d/%d (onset %.3f s)\n', ev, pa.nEvents, eventOnset);
-
-                pa.eventCounter = pa.eventCounter + 1;
-                pa.events(pa.eventCounter).onset = eventOnset;
-                pa.events(pa.eventCounter).duration = pa.stimDuration;
-                pa.events(pa.eventCounter).trial_type = 'checkerboard';
-            else
-                vbl = Screen('Flip', VP.window, vbl + 0.5 * VP.ifi);
-            end
+            frameIndex = max(frameIndex + 1, floor((vbl - plannedOnsetAbs) / VP.ifi) + 1);
+            nextFlipAbs = plannedOnsetAbs + frameIndex * VP.ifi;
         end
 
         % --- ISI: fixation only ---
         Screen('FillRect', VP.window, VP.backGroundColor);
         draw_fixation(VP, pa, pa.fixColor);
         vbl = Screen('Flip', VP.window, eventEndAbs - 0.5 * VP.ifi);
-        if ~isnan(eventOnset)
-            pa.events(pa.eventCounter).actual_duration = vbl - experimentStartTime - eventOnset;
-            pa.events(pa.eventCounter).planned_onset = pa.plannedOnsets(ev);
-        end
+        pa.events(pa.eventCounter).actual_duration = vbl - experimentStartTime - eventOnset;
+        pa.events(pa.eventCounter).planned_onset = pa.plannedOnsets(ev);
     end
 
     % --- Final baseline ---
