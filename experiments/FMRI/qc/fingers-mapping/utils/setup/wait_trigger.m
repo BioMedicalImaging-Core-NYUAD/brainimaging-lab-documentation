@@ -5,18 +5,19 @@ if nargin < 2
     error('wait_trigger:missingInput', 'VP and manualTrigger are required');
 end
 
-Screen('FillRect', VP.window, VP.backGroundColor);
-Screen('TextSize', VP.window, 36);
-DrawFormattedText(VP.window, 'Waiting for Trigger...', 'center', VP.windowCenter(2) - 40, [255 255 255]);
-if manualTrigger
-    DrawFormattedText(VP.window, '(debug mode - press 5 or t)', 'center', VP.windowCenter(2) + 20, [180 180 180]);
-end
-Screen('Flip', VP.window);
+% Continuously redraw and flip the trigger screen every frame to keep
+% the GPU pipeline warm — prevents PsychVulkanCore timestamp timeouts
+% on the first stimulus flip after trigger.
 
 if manualTrigger
     fprintf('DEBUG MODE: press 5 or t to start\n');
     while KbCheck(-1); end
     while true
+        Screen('FillRect', VP.window, VP.backGroundColor);
+        Screen('TextSize', VP.window, 36);
+        DrawFormattedText(VP.window, 'Waiting for Trigger...', 'center', VP.windowCenter(2) - 40, [255 255 255]);
+        DrawFormattedText(VP.window, '(debug mode - press 5 or t)', 'center', VP.windowCenter(2) + 20, [180 180 180]);
+        Screen('Flip', VP.window);
         [keyIsDown, ~, keyCode] = KbCheck(-1);
         if keyIsDown
             if keyCode(KbName('5%')) || keyCode(KbName('5')) || keyCode(KbName('t'))
@@ -26,7 +27,6 @@ if manualTrigger
                 error('Experiment cancelled');
             end
         end
-        WaitSecs(0.001);
     end
 else
     fprintf('Waiting for scanner trigger via VPixx DIN bit 14...\n');
@@ -42,6 +42,10 @@ else
     trigger_state = init_check(14);
 
     while true
+        Screen('FillRect', VP.window, VP.backGroundColor);
+        Screen('TextSize', VP.window, 36);
+        DrawFormattedText(VP.window, 'Waiting for Trigger...', 'center', VP.windowCenter(2) - 40, [255 255 255]);
+        Screen('Flip', VP.window);
         Datapixx('RegWrRd');
         regcheck = dec2bin(Datapixx('GetDinValues'));
         if regcheck(14) ~= trigger_state
@@ -52,7 +56,6 @@ else
         if keyIsDown && keyCode(KbName('ESCAPE'))
             error('Experiment cancelled');
         end
-        WaitSecs(0.001);
     end
 end
 

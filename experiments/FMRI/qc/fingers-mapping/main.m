@@ -78,9 +78,15 @@ try
         [pa, ~] = s1_rest(VP, pa, kb, experimentStartTime, pa.nBlocks + 1, 0);
     end
 
+    pa.totalExperimentTime = GetSecs - experimentStartTime;
+
+    % End screen (not included in reported time)
     s3_endScreen(VP, pa);
 
 catch ME
+    if exist('experimentStartTime', 'var')
+        pa.totalExperimentTime = GetSecs - experimentStartTime;
+    end
     fprintf('\n!!! ERROR OCCURRED !!!\n');
     fprintf('Error message: %s\n', ME.message);
     if ~isempty(ME.stack)

@@ -29,8 +29,8 @@ Screen('Preference', 'Verbosity', 0);
 
 switch debugConfig.displayMode
     case 1
-        VP.screenDistance = 880;   % mm, MRI center/projector estimate
-        VP.screenWidthMm = 711;
+        VP.screenDistance = 835;   % mm, MRI center/projector estimate
+        VP.screenWidthMm = 643.55;
         VP.screenHeightMm = VP.screenWidthMm * 9 / 16;
     case 2
         VP.screenDistance = 500;   % mm, laptop/development estimate

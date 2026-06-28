@@ -4,8 +4,8 @@ function cleanup_experiment(VP, pa, kb, experimentStartTime)
 fprintf('\nCleaning up resources...\n');
 
 try
-    KbQueueStop();
-    KbQueueRelease();
+    KbQueueStop(-1);
+    KbQueueRelease(-1);
 catch
 end
 
@@ -43,10 +43,13 @@ if isfield(pa, 'timingBaseTime') && ~isempty(pa.timingBaseTime)
 else
     pa.wallClockElapsedAtCleanup = GetSecs - experimentStartTime;
 end
-if isfinite(pa.totalDesignTime)
-    pa.totalExperimentTime = pa.totalDesignTime;
-else
-    pa.totalExperimentTime = pa.wallClockElapsedAtCleanup;
+% Use pre-computed time if set in main (excludes end screen and cleanup)
+if ~isfield(pa, 'totalExperimentTime') || isempty(pa.totalExperimentTime)
+    if isfinite(pa.totalDesignTime)
+        pa.totalExperimentTime = pa.totalDesignTime;
+    else
+        pa.totalExperimentTime = pa.wallClockElapsedAtCleanup;
+    end
 end
 if isfield(pa, 'textureMap')
     pa = rmfield(pa, 'textureMap');
