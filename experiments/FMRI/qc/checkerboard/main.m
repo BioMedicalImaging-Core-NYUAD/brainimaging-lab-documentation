@@ -77,6 +77,7 @@ try
     catch
     end
 
+    ListenChar(2);  % suppress keyboard input to MATLAB editor
     wait_trigger(VP, debugConfig.manualTrigger);
 
     experimentStartTime = GetSecs;
@@ -126,15 +127,17 @@ try
 
             if isnan(eventOnset)
                 eventOnset = vbl - experimentStartTime;
-                fprintf('Event %d/%d (onset %.3f s)\n', ev, pa.nEvents, eventOnset);
-
-                pa.eventCounter = pa.eventCounter + 1;
-                pa.events(pa.eventCounter).onset = eventOnset;
-                pa.events(pa.eventCounter).duration = pa.stimDuration;
-                pa.events(pa.eventCounter).trial_type = 'checkerboard';
             end
 
             frameIndex = max(frameIndex + 1, floor((vbl - plannedOnsetAbs) / VP.ifi) + 1);
+        end
+
+        % Log event
+        if ~isnan(eventOnset)
+            pa.eventCounter = pa.eventCounter + 1;
+            pa.events(pa.eventCounter).onset = eventOnset;
+            pa.events(pa.eventCounter).duration = pa.stimDuration;
+            pa.events(pa.eventCounter).trial_type = 'checkerboard';
         end
 
         % --- ISI: fixation only ---
