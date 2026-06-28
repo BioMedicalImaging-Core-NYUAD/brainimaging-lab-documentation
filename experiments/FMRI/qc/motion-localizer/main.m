@@ -189,10 +189,11 @@ try
                 2, currentFixColor, VP.windowCenter);
             vbl = Screen('Flip', VP.window);
 
-            % Log event on first frame (after flip so timing is accurate)
+            % Log event on first frame (use GetSecs — vbl timestamps are
+            % unreliable with PsychVulkanCore on macOS).
             if frameInBlock == 1
                 pa.eventCounter = pa.eventCounter + 1;
-                pa.events(pa.eventCounter).onset = vbl - experimentStartTime;
+                pa.events(pa.eventCounter).onset = GetSecs - experimentStartTime;
                 pa.events(pa.eventCounter).duration = pa.blockDuration;
                 pa.events(pa.eventCounter).trial_type = trialType;
             end
@@ -215,8 +216,12 @@ try
     DrawFormattedText(VP.window, 'Done', 'center', 'center', [255 255 255]);
     Screen('Flip', VP.window);
     WaitSecs(pa.endScreenDuration);
+    pa.totalExperimentTime = GetSecs - experimentStartTime;
 
 catch ME
+    if exist('experimentStartTime', 'var')
+        pa.totalExperimentTime = GetSecs - experimentStartTime;
+    end
     fprintf('\n!!! ERROR !!!\n%s\n', ME.message);
     if ~isempty(ME.stack)
         for i = 1:length(ME.stack)

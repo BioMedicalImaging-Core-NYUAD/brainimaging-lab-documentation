@@ -13,8 +13,10 @@ try
     end
 catch, end
 
-% Compute total time
-pa.totalExperimentTime = GetSecs - experimentStartTime;
+% Use pre-computed time if set in main (excludes cleanup overhead)
+if ~isfield(pa, 'totalExperimentTime') || isempty(pa.totalExperimentTime)
+    pa.totalExperimentTime = GetSecs - experimentStartTime;
+end
 
 % Save MAT
 if isfield(pa, 'dataFileName') && ~isempty(pa.dataFileName)
