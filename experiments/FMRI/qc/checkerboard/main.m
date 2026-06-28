@@ -73,12 +73,10 @@ try
     fprintf('Checkerboard textures created (radius %.0f px, %d rings, %d wedges)\n', ...
         pa.checkerRadiusPix, pa.nRings, pa.nWedges);
 
-    % Touch both textures once before the scanner trigger so first stimulus
-    % presentation does not pay a one-time texture binding cost.
-    Screen('DrawTexture', VP.window, chk1);
-    Screen('DrawingFinished', VP.window);
-    Screen('DrawTexture', VP.window, chk2);
-    Screen('DrawingFinished', VP.window);
+    try
+        Screen('PreloadTextures', VP.window, [chk1, chk2]);
+    catch
+    end
 
     wait_trigger(VP, debugConfig.manualTrigger);
 
@@ -115,7 +113,7 @@ try
         while GetSecs < eventEndAbs - 0.5 * VP.ifi
             frameCount = frameCount + 1;
             nowTime = GetSecs;
-            phase = mod(floor((nowTime - plannedOnsetAbs) * pa.flickerHz * 2), 2);
+            phase = mod(floor((nowTime - plannedOnsetAbs) * pa.actualFlickerHz * 2), 2);
             if phase == 0
                 Screen('DrawTexture', VP.window, chk1);
             else
@@ -217,11 +215,9 @@ halfH = h / 2;
 r = sqrt(xx.^2 + yy.^2);
 theta = atan2(yy, xx);
 
-% Radial rings (log-spaced for roughly equal cortical magnification)
-maxR = max(halfW, halfH);
-logR = log(r + 1);
-logMax = log(maxR + 1);
-ringPhase = floor(logR / logMax * pa.nRings);
+% Equal-width rings within the stimulus aperture.
+ringPhase = floor(r / pa.checkerRadiusPix * pa.nRings);
+ringPhase(r >= pa.checkerRadiusPix) = pa.nRings - 1;
 
 % Angular wedges
 wedgePhase = floor((theta + pi) / (2*pi) * pa.nWedges);
