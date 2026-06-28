@@ -26,8 +26,8 @@ design.isiMax = 12;                   % seconds
 design.nEvents = 27;
 design.initialBaselineDuration = 10;  % seconds
 design.finalBaselineDuration = 10;    % seconds
-design.dimDuration = 0.3;             % seconds
-design.dimFraction = 0.3;
+design.dimDuration = 0;               % fixation remains red throughout
+design.dimFraction = 0;
 
 targetIsiSum = design.targetRunDuration - ...
     design.initialBaselineDuration - design.finalBaselineDuration - ...
@@ -61,11 +61,6 @@ design.totalDesignDuration = design.initialBaselineDuration + ...
     design.finalBaselineDuration;
 
 design.dimSchedule = zeros(1, design.nEvents);
-dimTrials = randperm(design.nEvents, round(design.nEvents * design.dimFraction));
-for i = dimTrials
-    maxDimOnset = max(0.5, design.isiSequence(i) - design.dimDuration - 0.5);
-    design.dimSchedule(i) = 0.5 + (maxDimOnset - 0.5) * rand();
-end
-design.dimTrials = dimTrials;
+design.dimTrials = [];
 
 end

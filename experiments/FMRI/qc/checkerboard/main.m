@@ -127,28 +127,7 @@ try
         isiDuration = pa.isiSequence(ev);
         isiEnd = GetSecs + isiDuration;
 
-        % Fixation dimming task during ISI
-        if pa.dimSchedule(ev) > 0
-            dimTime = GetSecs + pa.dimSchedule(ev);
-            dimDone = false;
-        else
-            dimTime = Inf;
-            dimDone = true;
-        end
-
         while GetSecs < isiEnd - 0.5 * VP.ifi
-            % Dimming task
-            if ~dimDone && GetSecs >= dimTime && GetSecs < dimTime + pa.dimDuration
-                Screen('FillRect', VP.window, VP.backGroundColor);
-                draw_fixation(VP, pa, pa.fixDimColor);
-                Screen('Flip', VP.window);
-            elseif ~dimDone && GetSecs >= dimTime + pa.dimDuration
-                Screen('FillRect', VP.window, VP.backGroundColor);
-                draw_fixation(VP, pa, pa.fixColor);
-                Screen('Flip', VP.window);
-                dimDone = true;
-            end
-
             % Check escape
             [pressed, firstPress] = KbQueueCheck();
             if pressed && firstPress(kb.escKey)
