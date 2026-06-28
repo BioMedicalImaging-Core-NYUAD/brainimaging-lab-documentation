@@ -1,6 +1,6 @@
 function main()
 % MAIN - Brief checkerboard events for HRF estimation (scanner QC)
-%
+% test
 % Event-related design: 1 s full-field contrast-reversing checkerboard
 % flashes with jittered inter-stimulus intervals (4-12 s, uniform).
 % 27 events over ~4 minutes.
@@ -132,8 +132,10 @@ try
             end
 
             if frameIndex == 0
-                % Target the planned onset for the first frame
-                Screen('Flip', VP.window, plannedOnsetAbs - 0.5 * VP.ifi);
+                % Wait via CPU clock, then bare flip — bypasses broken
+                % PsychVulkanCore timed-presentation path on macOS.
+                WaitSecs('UntilTime', plannedOnsetAbs - 0.5 * VP.ifi);
+                Screen('Flip', VP.window);
             else
                 % Subsequent frames: flip at next vsync — avoids
                 % unreliable vbl-based scheduling with Vulkan backend.
@@ -167,7 +169,8 @@ try
         % --- ISI: fixation only ---
         Screen('FillRect', VP.window, VP.backGroundColor);
         draw_fixation(VP, pa, pa.fixColor);
-        Screen('Flip', VP.window, eventEndAbs - 0.5 * VP.ifi);
+        WaitSecs('UntilTime', eventEndAbs - 0.5 * VP.ifi);
+        Screen('Flip', VP.window);
         if ~isnan(eventOnset)
             pa.events(pa.eventCounter).actual_duration = ...
                 GetSecs - experimentStartTime - eventOnset;
@@ -191,7 +194,8 @@ try
 
     Screen('FillRect', VP.window, VP.backGroundColor);
     draw_fixation(VP, pa, pa.fixColor);
-    Screen('Flip', VP.window, finalBaselineStartAbs - 0.5 * VP.ifi);
+    WaitSecs('UntilTime', finalBaselineStartAbs - 0.5 * VP.ifi);
+    Screen('Flip', VP.window);
     WaitSecs('UntilTime', experimentStartTime + pa.totalDesignDuration);
 
     % End screen
