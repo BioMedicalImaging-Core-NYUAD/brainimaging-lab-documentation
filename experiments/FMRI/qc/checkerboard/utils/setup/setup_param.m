@@ -31,6 +31,8 @@ pa.designSeed = design.designSeed;
 pa.targetRunDuration = design.targetRunDuration;
 pa.stimDuration = design.stimDuration;
 pa.flickerHz = design.flickerHz;
+pa.framesPerFlickerPhase = max(1, round(VP.frameRate / (2 * pa.flickerHz)));
+pa.actualFlickerHz = VP.frameRate / (2 * pa.framesPerFlickerPhase);
 pa.isiMin = design.isiMin;
 pa.isiMax = design.isiMax;
 pa.nEvents = design.nEvents;
@@ -45,10 +47,7 @@ pa.totalDesignDuration = design.totalDesignDuration;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % CHECKERBOARD PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-pa.checkerRadiusDeg = 12;       % radius of checkerboard in degrees
-pa.checkerRadiusPix = pa.checkerRadiusDeg * VP.pixelsPerDegree;
-pa.nRings = 10;                 % number of concentric rings (log-spaced)
-pa.nWedges = 24;                % number of angular wedges
+pa.checkSizeDeg = 1.0;          % full-field Cartesian check size
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FIXATION CROSS
@@ -100,7 +99,9 @@ fprintf('=== Checkerboard HRF Estimation ===\n');
 fprintf('Design: %s (seed %d)\n', pa.designID, pa.designSeed);
 fprintf('Events: %d\n', pa.nEvents);
 fprintf('Stimulus duration: %.0f ms\n', pa.stimDuration * 1000);
-fprintf('Flicker rate: %.0f Hz\n', pa.flickerHz);
+fprintf('Requested flicker rate: %.1f Hz\n', pa.flickerHz);
+fprintf('Displayed flicker rate: %.2f Hz (%d frames/phase at %.2f Hz refresh)\n', ...
+    pa.actualFlickerHz, pa.framesPerFlickerPhase, VP.frameRate);
 fprintf('ISI range: %.0f - %.0f s (mean %.1f s)\n', pa.isiMin, pa.isiMax, mean(pa.isiSequence));
 fprintf('Planned total: %.0f s (%.1f min)\n', pa.totalDesignDuration, pa.totalDesignDuration/60);
 fprintf('Fixation dimming events: %d / %d ISIs\n', length(dimTrials), pa.nEvents);
