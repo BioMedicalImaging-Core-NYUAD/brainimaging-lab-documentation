@@ -18,14 +18,14 @@ end
 design = struct();
 design.designID = designID;
 design.designSeed = designSeeds(seedIndex);
-design.targetRunDuration = 238;       % seconds, excluding end screen
+design.targetRunDuration = 240;       % seconds, excluding end screen
 design.stimDuration = 1.000;          % seconds
 design.flickerHz = 8;                 % contrast reversals per second
 design.isiMin = 4;                    % seconds
 design.isiMax = 12;                   % seconds
 design.nEvents = 27;
-design.initialBaselineDuration = 10;  % seconds
-design.finalBaselineDuration = 10;    % seconds
+design.initialBaselineDuration = 12;  % seconds (divisible by 2s and 0.75s TR)
+design.finalBaselineDuration = 12;    % seconds (divisible by 2s and 0.75s TR)
 design.dimDuration = 0;               % fixation remains red throughout
 design.dimFraction = 0;
 
