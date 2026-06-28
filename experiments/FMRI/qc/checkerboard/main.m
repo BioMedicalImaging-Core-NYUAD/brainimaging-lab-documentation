@@ -203,14 +203,14 @@ try
     WaitSecs('UntilTime', finalBaselineStartAbs - 0.5 * VP.ifi);
     Screen('Flip', VP.window);
     WaitSecs('UntilTime', experimentStartTime + pa.totalDesignDuration);
+    pa.totalExperimentTime = GetSecs - experimentStartTime;
 
-    % End screen
+    % End screen (not included in reported time)
     Screen('FillRect', VP.window, VP.backGroundColor);
     Screen('TextSize', VP.window, 36);
     DrawFormattedText(VP.window, 'Done', 'center', 'center', [255 255 255]);
     Screen('Flip', VP.window);
     WaitSecs(pa.endScreenDuration);
-    pa.totalExperimentTime = GetSecs - experimentStartTime;
 
 catch ME
     if exist('experimentStartTime', 'var')
