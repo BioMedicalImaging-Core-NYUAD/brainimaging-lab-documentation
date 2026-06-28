@@ -8,9 +8,8 @@ end
 prompt = {'Subject ID (e.g., 0872):', ...
           'Session ID (e.g., 01):', ...
           'Run ID (e.g., 01):', ...
-          'Design ID (A, B, or C):', ...
           'Task Name:'};
-definput = {'9999', '01', '01', 'A', taskName};
+definput = {'0248', '01', '01', taskName};
 answer = inputdlg(prompt, 'BIDS Information', [1 50], definput);
 
 if isempty(answer)
@@ -20,12 +19,22 @@ end
 info.subjectID = regexprep(strtrim(answer{1}), '^sub-', '');
 info.sessionID = regexprep(strtrim(answer{2}), '^ses-', '');
 info.runID = regexprep(strtrim(answer{3}), '^run-', '');
-info.designID = upper(strtrim(answer{4}));
-info.taskName = strtrim(answer{5});
+info.taskName = strtrim(answer{4});
 
-if ~ismember(info.designID, {'A', 'B', 'C'})
-    error('Invalid design ID. Choose A, B, or C.');
+designIDs = {'A', 'B', 'C'};
+[designSelection, ok] = listdlg( ...
+    'PromptString', 'Select design:', ...
+    'SelectionMode', 'single', ...
+    'ListString', {'Design A', 'Design B', 'Design C'}, ...
+    'InitialValue', 1, ...
+    'ListSize', [160 95], ...
+    'Name', 'Design Selection');
+
+if ~ok
+    error('User cancelled');
 end
+
+info.designID = designIDs{designSelection};
 
 dataDir = fullfile(experimentDir, 'data', 'exp', ...
     sprintf('sub-%s', info.subjectID), sprintf('ses-%s', info.sessionID));

@@ -1,9 +1,9 @@
 function main()
-% MAIN - Brief checkerboard flashes for HRF estimation (scanner QC)
-%t
-% Event-related design: 200 ms full-field contrast-reversing checkerboard
+% MAIN - Brief checkerboard events for HRF estimation (scanner QC)
+%
+% Event-related design: 1 s full-field contrast-reversing checkerboard
 % flashes with jittered inter-stimulus intervals (4-12 s, uniform).
-% ~50 events over ~6 minutes.
+% 27 events over ~4 minutes.
 %
 % Purpose: estimate the hemodynamic response function in V1 to compare
 % BOLD sensitivity and temporal resolution across scanners.
@@ -41,7 +41,7 @@ debugConfig.fullscreen = 1;
 debugConfig.skipSyncTests = 1;
 debugConfig.displayMode = 2;          % 1 = NYUAD lab, 2 = laptop
 debugConfig.manualTrigger = 1;
-debugConfig.buttonbox = 0t;
+debugConfig.buttonbox = 0;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % GET BIDS INFORMATION
@@ -102,7 +102,7 @@ try
         pa.events(pa.eventCounter).duration = pa.stimDuration;
         pa.events(pa.eventCounter).trial_type = 'checkerboard';
 
-        % --- Flash the checkerboard (200 ms, contrast-reversing) ---
+        % --- Flash the checkerboard (contrast-reversing) ---
         nFlipFrames = round(pa.stimDuration * VP.frameRate);
         framesPerPhase = max(1, round((1 / pa.flickerHz / 2) * VP.frameRate));
         phase = 0;
