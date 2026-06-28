@@ -5,18 +5,19 @@ if nargin < 2
     error('wait_trigger:missingInput', 'Both VP and manualTrigger are required');
 end
 
-Screen('FillRect', VP.window, VP.backGroundColor);
-Screen('TextSize', VP.window, 36);
-DrawFormattedText(VP.window, 'Waiting for Trigger...', 'center', VP.windowCenter(2) - 40, [1 1 1] * 255);
-if manualTrigger
-    DrawFormattedText(VP.window, '(debug mode - press ''t'')', 'center', VP.windowCenter(2) + 20, [0.7 0.7 0.7] * 255);
-end
-Screen('Flip', VP.window);
+% Continuously redraw and flip the trigger screen every frame to keep
+% the GPU pipeline warm — prevents PsychVulkanCore timestamp timeouts
+% on the first stimulus flip after trigger.
 
 if manualTrigger
     fprintf('DEBUG MODE: Press t to start experiment\n');
     while KbCheck(-1); end
     while true
+        Screen('FillRect', VP.window, VP.backGroundColor);
+        Screen('TextSize', VP.window, 36);
+        DrawFormattedText(VP.window, 'Waiting for Trigger...', 'center', VP.windowCenter(2) - 40, [1 1 1] * 255);
+        DrawFormattedText(VP.window, '(debug mode - press ''t'')', 'center', VP.windowCenter(2) + 20, [0.7 0.7 0.7] * 255);
+        Screen('Flip', VP.window);
         [keyIsDown, ~, keyCode] = KbCheck(-1);
         if keyIsDown
             if keyCode(KbName('5%')) || keyCode(KbName('t'))
@@ -27,7 +28,6 @@ if manualTrigger
                 error('Experiment cancelled');
             end
         end
-        WaitSecs(0.001);
     end
 else
     fprintf('Waiting for scanner trigger...\n');
@@ -36,6 +36,10 @@ else
     init_check = dec2bin(Datapixx('GetDinValues'));
     trigger_state = init_check(14);
     while true
+        Screen('FillRect', VP.window, VP.backGroundColor);
+        Screen('TextSize', VP.window, 36);
+        DrawFormattedText(VP.window, 'Waiting for Trigger...', 'center', VP.windowCenter(2) - 40, [1 1 1] * 255);
+        Screen('Flip', VP.window);
         Datapixx('RegWrRd');
         regcheck = dec2bin(Datapixx('GetDinValues'));
         if regcheck(14) ~= trigger_state
@@ -47,7 +51,6 @@ else
             Screen('CloseAll');
             error('Experiment cancelled');
         end
-        WaitSecs(0.001);
     end
 end
 
