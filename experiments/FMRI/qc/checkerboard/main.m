@@ -114,15 +114,12 @@ try
         Screen('DrawingFinished', VP.window);
 
         % --- Flash the checkerboard (contrast-reversing) ---
-        eventEndAbs = plannedOnsetAbs + pa.stimDuration;
+        % Timing uses GetSecs (system clock) instead of Flip return
+        % values, which are unreliable with PsychVulkanCore on macOS.
         eventOnset = NaN;
+        eventEndAbs = plannedOnsetAbs + pa.stimDuration;
         frameIndex = 0;
         while true
-            nextFlipAbs = plannedOnsetAbs + frameIndex * VP.ifi;
-            if nextFlipAbs >= eventEndAbs - 0.5 * VP.ifi
-                break;
-            end
-
             if frameIndex > 0  % frame 0 already pre-drawn
                 phase = mod(floor(frameIndex / pa.framesPerFlickerPhase), 2);
                 if phase == 0
@@ -133,16 +130,30 @@ try
                 draw_fixation(VP, pa, pa.fixColor);
                 Screen('DrawingFinished', VP.window);
             end
-            vbl = Screen('Flip', VP.window, nextFlipAbs - 0.5 * VP.ifi);
 
-            if isnan(eventOnset)
-                eventOnset = vbl - experimentStartTime;
-                % Lock event end to actual onset so a late first flip
-                % doesn't shorten the stimulus — full duration guaranteed.
-                eventEndAbs = vbl + pa.stimDuration;
+            if frameIndex == 0
+                % Target the planned onset for the first frame
+                Screen('Flip', VP.window, plannedOnsetAbs - 0.5 * VP.ifi);
+            else
+                % Subsequent frames: flip at next vsync — avoids
+                % unreliable vbl-based scheduling with Vulkan backend.
+                Screen('Flip', VP.window);
             end
 
-            frameIndex = max(frameIndex + 1, floor((vbl - plannedOnsetAbs) / VP.ifi) + 1);
+            if isnan(eventOnset)
+                t = GetSecs;
+                eventOnset = t - experimentStartTime;
+                % Lock end to actual onset so full duration is
+                % guaranteed even if the first flip was late.
+                eventEndAbs = t + pa.stimDuration;
+            end
+
+            frameIndex = frameIndex + 1;
+
+            % Exit when next frame would exceed stimulus duration
+            if GetSecs >= eventEndAbs - 0.5 * VP.ifi
+                break;
+            end
         end
 
         % Log event
@@ -156,11 +167,13 @@ try
         % --- ISI: fixation only ---
         Screen('FillRect', VP.window, VP.backGroundColor);
         draw_fixation(VP, pa, pa.fixColor);
-        vbl = Screen('Flip', VP.window, eventEndAbs - 0.5 * VP.ifi);
+        Screen('Flip', VP.window, eventEndAbs - 0.5 * VP.ifi);
         if ~isnan(eventOnset)
-            pa.events(pa.eventCounter).actual_duration = vbl - experimentStartTime - eventOnset;
+            pa.events(pa.eventCounter).actual_duration = ...
+                GetSecs - experimentStartTime - eventOnset;
             pa.events(pa.eventCounter).planned_onset = pa.plannedOnsets(ev);
-            fprintf('  actual duration %.3f s\n', pa.events(pa.eventCounter).actual_duration);
+            fprintf('  actual duration %.3f s\n', ...
+                pa.events(pa.eventCounter).actual_duration);
         end
     end
 
@@ -187,8 +200,12 @@ try
     DrawFormattedText(VP.window, 'Done', 'center', 'center', [255 255 255]);
     Screen('Flip', VP.window);
     WaitSecs(pa.endScreenDuration);
+    pa.totalExperimentTime = GetSecs - experimentStartTime;
 
 catch ME
+    if exist('experimentStartTime', 'var')
+        pa.totalExperimentTime = GetSecs - experimentStartTime;
+    end
     if ~strcmp(ME.message, 'user_abort')
         fprintf('\n!!! ERROR !!!\n%s\n', ME.message);
         if ~isempty(ME.stack)
