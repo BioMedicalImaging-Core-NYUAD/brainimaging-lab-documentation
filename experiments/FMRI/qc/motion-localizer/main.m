@@ -75,33 +75,28 @@ kb = setup_keyboard();
 % RUN EXPERIMENT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 try
+    % Pre-allocate everything before trigger so first frame is immediate
+    pa.theta = (2*pi .* rand(1, pa.nDots)) - 2*pi;
+    pa.r = (pa.rmax - pa.rmin) .* (rand(1, pa.nDots).^(1/2)) + pa.rmin;
+    pa.lifetime = rand(pa.nDots, 1) * pa.totalLife;
+    maxFrames = round(pa.blockDuration * VP.frameRate) + 10;
+    dotMat = zeros(pa.nDots, maxFrames, 2);
+    whichLoc = 0;
+    fixColor = 1;
+
+    KbQueueCreate();
+    KbQueueStart();
+
+    ListenChar(2);  % suppress keyboard input to MATLAB editor
     wait_trigger(VP, debugConfig.manualTrigger);
 
     experimentStartTime = GetSecs;
     pa.experimentStartTime = experimentStartTime;
     pa.timingBaseTime = experimentStartTime;
-    fprintf('\n=== %s ===\n', pa.experimentName);
-
-    % Initialize dot positions
-    pa.theta = (2*pi .* rand(1, pa.nDots)) - 2*pi;
-    pa.r = (pa.rmax - pa.rmin) .* (rand(1, pa.nDots).^(1/2)) + pa.rmin;
-    pa.lifetime = rand(pa.nDots, 1) * pa.totalLife;
-    [x, y] = pol2cart(pa.theta, pa.r);
-
-    % Pre-allocate storage for inward-motion replay
-    maxFrames = round(pa.blockDuration * VP.frameRate) + 10;
-    dotMat = zeros(pa.nDots, maxFrames, 2);
-
-    whichLoc = 0;   % motion type counter (cycles 1-4)
-    fixColor = 1;   % fixation color toggle
     taskLastChange = experimentStartTime;
-
-    KbQueueCreate();
-    KbQueueStart();
 
     for blockIdx = 1:pa.nBlocks
         isMotion = mod(blockIdx, 2) ~= 0;  % odd = motion, even = static
-        blockStart = GetSecs;
 
         if isMotion
             whichLoc = whichLoc + 1;
@@ -110,42 +105,29 @@ try
                 dotMat = zeros(pa.nDots, maxFrames, 2);
             end
             trialType = pa.motionLabels{whichLoc};
-
-            % Re-initialize dots for this block
-            pa.theta = (2*pi .* rand(1, pa.nDots)) - 2*pi;
-            pa.r = sort((pa.rmax - pa.rmin) .* (rand(1, pa.nDots).^(1/2)) + pa.rmin);
-            pa.lifetime = rand(pa.nDots, 1) * pa.totalLife;
         else
             trialType = pa.baselineType;  % 'static' or 'flickering'
-            if strcmp(pa.baselineType, 'flickering')
-                pa.lifetime = rand(pa.nDots, 1) * pa.totalLife;
-            end
         end
 
-        fprintf('Block %d/%d: %s\n', blockIdx, pa.nBlocks, trialType);
-
-        % Log event onset
-        pa.eventCounter = pa.eventCounter + 1;
-        pa.events(pa.eventCounter).onset = blockStart - experimentStartTime;
-        pa.events(pa.eventCounter).duration = pa.blockDuration;
-        pa.events(pa.eventCounter).trial_type = trialType;
+        % Re-initialize dot positions every block (lifetime carries over)
+        pa.theta = (2*pi .* rand(1, pa.nDots)) - 2*pi;
+        pa.r = sort((pa.rmax - pa.rmin) .* (rand(1, pa.nDots).^(1/2)) + pa.rmin);
+        [x, y] = pol2cart(pa.theta, pa.r);
 
         frameInBlock = 0;
         pressed = false;
         firstPress = zeros(1, 256);
-        lastFrameTime = GetSecs;
-        needsRedraw = true;
+
+        % blockStart right before loop: no code between this and first flip
+        blockStart = GetSecs;
 
         while (GetSecs - blockStart) < pa.blockDuration
             frameInBlock = frameInBlock + 1;
-            now = GetSecs;
-            dt = now - lastFrameTime;
-            lastFrameTime = now;
 
             % --- Dot position update ---
             if isMotion
-                % Dot lifetime (actual elapsed time)
-                pa.lifetime = pa.lifetime + dt;
+                % Dot lifetime
+                pa.lifetime = pa.lifetime + 1/VP.frameRate;
                 dotsOut = pa.lifetime >= pa.totalLife;
                 pa.lifetime(dotsOut) = 0;
                 pa.r(dotsOut) = (pa.rmax - pa.rmin) .* (rand(1, sum(dotsOut)).^(1/2)) + pa.rmin;
@@ -153,7 +135,7 @@ try
 
                 switch whichLoc
                     case 1  % outward
-                        pa.r = pa.r + pa.pps * dt * pa.r.^(1/2) ./ max(pa.r.^(1/2));
+                        pa.r = pa.r + pa.pps / VP.frameRate * pa.r.^(1/2) ./ max(pa.r.^(1/2));
                         radialOut = pa.r >= pa.rmax;
                         pa.r(radialOut) = (pa.rmax - pa.rmin) .* (rand(1, sum(radialOut)).^(1/2)) + pa.rmin;
                         pa.theta(radialOut) = (2*pi .* rand(1, sum(radialOut))) - 2*pi;
@@ -167,51 +149,52 @@ try
                         pa.theta = dotMat(:, fi, 2)';
 
                     case 3  % clockwise
-                        pa.theta = pa.theta + pa.speedDeg / pa.apertureDeg * dt * pa.r.^(1/8) ./ max(pa.r.^(1/8));
+                        pa.theta = pa.theta + pa.thetaspeed * pa.r.^(1/8) ./ max(pa.r.^(1/8));
 
                     case 4  % counter-clockwise
-                        pa.theta = pa.theta - pa.speedDeg / pa.apertureDeg * dt * pa.r.^(1/8) ./ max(pa.r.^(1/8));
+                        pa.theta = pa.theta - pa.thetaspeed * pa.r.^(1/8) ./ max(pa.r.^(1/8));
                 end
 
                 [x, y] = pol2cart(pa.theta, pa.r);
-                needsRedraw = true;
 
-            else
-                % Baseline block
-                if strcmp(pa.baselineType, 'flickering')
-                    % Same lifetime — dots stay put, reappear at new location on death
-                    pa.lifetime = pa.lifetime + dt;
-                    dotsOut = pa.lifetime >= pa.totalLife;
-                    if any(dotsOut)
-                        pa.lifetime(dotsOut) = 0;
-                        pa.r(dotsOut) = (pa.rmax - pa.rmin) .* (rand(1, sum(dotsOut)).^(1/2)) + pa.rmin;
-                        pa.theta(dotsOut) = (2*pi .* rand(1, sum(dotsOut))) - 2*pi;
-                        [x, y] = pol2cart(pa.theta, pa.r);
-                        needsRedraw = true;
-                    end
+            elseif strcmp(pa.baselineType, 'flickering')
+                % Flickering: same lifetime cycle, dots sit still until death
+                pa.lifetime = pa.lifetime + 1/VP.frameRate;
+                dotsOut = pa.lifetime >= pa.totalLife;
+                if any(dotsOut)
+                    pa.lifetime(dotsOut) = 0;
+                    pa.r(dotsOut) = (pa.rmax - pa.rmin) .* (rand(1, sum(dotsOut)).^(1/2)) + pa.rmin;
+                    pa.theta(dotsOut) = (2*pi .* rand(1, sum(dotsOut))) - 2*pi;
+                    [newX, newY] = pol2cart(pa.theta(dotsOut), pa.r(dotsOut));
+                    x(dotsOut) = newX;
+                    y(dotsOut) = newY;
                 end
-                % Static: x,y unchanged from last motion frame
             end
+            % Static: x,y unchanged
 
             % --- Fixation color-change task ---
-            if (now - taskLastChange) > (2 + rand(1) * 10)
+            if (GetSecs - taskLastChange) > (2 + rand(1) * 10)
                 fixColor = fixColor + 1;
-                taskLastChange = now;
-                needsRedraw = true;
+                taskLastChange = GetSecs;
             end
+            currentFixColor = pa.fixationColor(mod(fixColor, 2) + 1, :);
 
-            % --- Draw only when something changed ---
-            if needsRedraw
-                currentFixColor = pa.fixationColor(mod(fixColor, 2) + 1, :);
-                Screen('DrawDots', VP.window, ...
-                    [x + VP.windowCenter(1); y + VP.windowCenter(2)], ...
-                    pa.dotDiameter, pa.dotColor, [], 2);
-                Screen('DrawLines', VP.window, ...
-                    [-pa.fixCrossLen, pa.fixCrossLen, 0, 0; ...
-                     0, 0, -pa.fixCrossLen, pa.fixCrossLen], ...
-                    2, currentFixColor, VP.windowCenter);
-                Screen('Flip', VP.window);
-                needsRedraw = isMotion;  % motion always redraws; static only on change
+            % --- Draw & flip every frame ---
+            Screen('DrawDots', VP.window, ...
+                [x + VP.windowCenter(1); y + VP.windowCenter(2)], ...
+                pa.dotDiameter, pa.dotColor, [], 2);
+            Screen('DrawLines', VP.window, ...
+                [-pa.fixCrossLen, pa.fixCrossLen, 0, 0; ...
+                 0, 0, -pa.fixCrossLen, pa.fixCrossLen], ...
+                2, currentFixColor, VP.windowCenter);
+            vbl = Screen('Flip', VP.window);
+
+            % Log event on first frame (after flip so timing is accurate)
+            if frameInBlock == 1
+                pa.eventCounter = pa.eventCounter + 1;
+                pa.events(pa.eventCounter).onset = vbl - experimentStartTime;
+                pa.events(pa.eventCounter).duration = pa.blockDuration;
+                pa.events(pa.eventCounter).trial_type = trialType;
             end
 
             % --- Check escape ---
@@ -219,11 +202,6 @@ try
             if pressed && firstPress(kb.escKey)
                 fprintf('Terminated by user.\n');
                 break;
-            end
-
-            % Don't busy-loop during static baseline
-            if ~isMotion && ~needsRedraw
-                WaitSecs(0.005);
             end
         end
 
