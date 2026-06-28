@@ -1,0 +1,239 @@
+tfunction main()
+% MAIN - Motion localizer for MT+ (moving vs. static random dots)
+%
+% Block design: alternating motion and baseline blocks.
+% Motion types cycle: outward -> inward -> clockwise -> counter-clockwise.
+% Baseline condition (selected at start): 'static' (dots frozen) or
+% 'flickering' (random positions each frame, eliminates motion aftereffect).
+%
+% Fixation task: fixation cross changes color (green/red) at random
+% intervals; participant presses a button on each change.
+%
+% Default timing: 15 s blocks, 24 blocks (12 motion + 12 static),
+% total ~6 min.
+%
+% All parameters are configured in utils/setup/setup_param.m
+
+clear all; close all; sca; %#ok<CLALL>
+
+scriptDir = fileparts(mfilename('fullpath'));
+
+% Add shared lab utilities (VPixx, etc.)
+projectRoot = fullfile(scriptDir, '..', '..', '..', '..');
+vpixxPath = fullfile(projectRoot, 'experiments', 'general', 'vpixx-utilities');
+if exist(vpixxPath, 'dir'), addpath(vpixxPath); end
+
+% Add local utilities
+addpath(genpath(fullfile(scriptDir, 'utils')));
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DEBUG CONFIGURATION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+debugConfig = struct();
+debugConfig.enabled = 1;              % 1 = debug mode, 0 = production
+debugConfig.useVPixx = 0;             % 1 = use VPixx hardware
+debugConfig.fullscreen = 1;             % 1 = fullscreen, 0 = windowed
+debugConfig.skipSyncTests = 1;        % 1 = skip sync tests
+debugConfig.displayMode = 2;          % 1 = NYUAD lab, 2 = laptop
+debugConfig.manualTrigger = 1;        % 1 = keyboard trigger, 0 = scanner
+debugConfig.buttonbox = 0;            % 1 = button box, 0 = keyboard
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% GET BIDS INFORMATION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+experimentDir = scriptDir;
+try
+    debugConfig.bidsInfo = get_info(experimentDir, 'motionloc');
+catch ME
+    if contains(ME.message, 'cancelled') || contains(ME.message, 'not to overwrite')
+        fprintf('Exiting.\n');
+        return;
+    end
+    rethrow(ME);
+end
+
+% Select baseline condition for off-blocks
+baselineChoice = questdlg( ...
+    'Baseline dot condition during off-blocks:', ...
+    'Baseline Condition', ...
+    'Static', 'Flickering', 'Static');
+if isempty(baselineChoice)
+    fprintf('Exiting.\n');
+    return;
+end
+debugConfig.baselineType = lower(baselineChoice);
+fprintf('Baseline condition: %s\n', debugConfig.baselineType);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SETUP
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+[VP, debugConfig] = setup_display(debugConfig);
+[VP, pa] = setup_param(VP, debugConfig);
+kb = setup_keyboard();
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% RUN EXPERIMENT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+try
+    wait_trigger(VP, debugConfig.manualTrigger);
+
+    experimentStartTime = GetSecs;
+    pa.experimentStartTime = experimentStartTime;
+    pa.timingBaseTime = experimentStartTime;
+    fprintf('\n=== %s ===\n', pa.experimentName);
+
+    % Initialize dot positions
+    pa.theta = (2*pi .* rand(1, pa.nDots)) - 2*pi;
+    pa.r = (pa.rmax - pa.rmin) .* (rand(1, pa.nDots).^(1/2)) + pa.rmin;
+    pa.lifetime = rand(pa.nDots, 1) * pa.totalLife;
+    [x, y] = pol2cart(pa.theta, pa.r);
+
+    % Pre-allocate storage for inward-motion replay
+    maxFrames = round(pa.blockDuration * VP.frameRate) + 10;
+    dotMat = zeros(pa.nDots, maxFrames, 2);
+
+    whichLoc = 0;   % motion type counter (cycles 1-4)
+    fixColor = 1;   % fixation color toggle
+    taskLastChange = experimentStartTime;
+
+    KbQueueCreate();
+    KbQueueStart();
+
+    for blockIdx = 1:pa.nBlocks
+        isMotion = mod(blockIdx, 2) ~= 0;  % odd = motion, even = static
+        blockStart = GetSecs;
+
+        if isMotion
+            whichLoc = whichLoc + 1;
+            if whichLoc > 4, whichLoc = 1; end
+            if whichLoc == 1
+                dotMat = zeros(pa.nDots, maxFrames, 2);
+            end
+            trialType = pa.motionLabels{whichLoc};
+
+            % Re-initialize dots for this block
+            pa.theta = (2*pi .* rand(1, pa.nDots)) - 2*pi;
+            pa.r = sort((pa.rmax - pa.rmin) .* (rand(1, pa.nDots).^(1/2)) + pa.rmin);
+            pa.lifetime = rand(pa.nDots, 1) * pa.totalLife;
+        else
+            trialType = pa.baselineType;  % 'static' or 'flickering'
+            if strcmp(pa.baselineType, 'flickering')
+                pa.lifetime = rand(pa.nDots, 1) * pa.totalLife;
+            end
+        end
+
+        fprintf('Block %d/%d: %s\n', blockIdx, pa.nBlocks, trialType);
+
+        % Log event onset
+        pa.eventCounter = pa.eventCounter + 1;
+        pa.events(pa.eventCounter).onset = blockStart - experimentStartTime;
+        pa.events(pa.eventCounter).duration = pa.blockDuration;
+        pa.events(pa.eventCounter).trial_type = trialType;
+
+        frameInBlock = 0;
+        pressed = false;
+        firstPress = zeros(1, 256);
+
+        while (GetSecs - blockStart) < pa.blockDuration
+            frameInBlock = frameInBlock + 1;
+
+            % --- Dot position update ---
+            if isMotion
+                % Dot lifetime
+                pa.lifetime = pa.lifetime + 1/VP.frameRate;
+                dotsOut = pa.lifetime >= pa.totalLife;
+                pa.lifetime(dotsOut) = 0;
+                pa.r(dotsOut) = (pa.rmax - pa.rmin) .* (rand(1, sum(dotsOut)).^(1/2)) + pa.rmin;
+                pa.theta(dotsOut) = (2*pi .* rand(1, sum(dotsOut))) - 2*pi;
+
+                switch whichLoc
+                    case 1  % outward
+                        pa.r = pa.r + pa.pps / VP.frameRate * pa.r.^(1/2) ./ max(pa.r.^(1/2));
+                        radialOut = pa.r >= pa.rmax;
+                        pa.r(radialOut) = (pa.rmax - pa.rmin) .* (rand(1, sum(radialOut)).^(1/2)) + pa.rmin;
+                        pa.theta(radialOut) = (2*pi .* rand(1, sum(radialOut))) - 2*pi;
+                        fi = min(frameInBlock, maxFrames);
+                        dotMat(:, fi, 1) = pa.r';
+                        dotMat(:, fi, 2) = pa.theta';
+
+                    case 2  % inward (replay outward in reverse)
+                        fi = max(1, maxFrames - frameInBlock + 1);
+                        pa.r = dotMat(:, fi, 1)';
+                        pa.theta = dotMat(:, fi, 2)';
+
+                    case 3  % clockwise
+                        pa.theta = pa.theta + pa.thetaspeed * pa.r.^(1/8) ./ max(pa.r.^(1/8));
+
+                    case 4  % counter-clockwise
+                        pa.theta = pa.theta - pa.thetaspeed * pa.r.^(1/8) ./ max(pa.r.^(1/8));
+                end
+
+                [x, y] = pol2cart(pa.theta, pa.r);
+            else
+                % Baseline block
+                if strcmp(pa.baselineType, 'flickering')
+                    % Same lifetime — dots stay put, reappear at new location on death
+                    pa.lifetime = pa.lifetime + 1/VP.frameRate;
+                    dotsOut = pa.lifetime >= pa.totalLife;
+                    pa.lifetime(dotsOut) = 0;
+                    pa.r(dotsOut) = (pa.rmax - pa.rmin) .* (rand(1, sum(dotsOut)).^(1/2)) + pa.rmin;
+                    pa.theta(dotsOut) = (2*pi .* rand(1, sum(dotsOut))) - 2*pi;
+
+                    [x, y] = pol2cart(pa.theta, pa.r);
+                end
+                % Static: x,y unchanged from last motion frame
+            end
+
+            % --- Fixation color-change task ---
+            if (GetSecs - taskLastChange) > (2 + rand(1) * 10)
+                fixColor = fixColor + 1;
+                taskLastChange = GetSecs;
+            end
+            currentFixColor = pa.fixationColor(mod(fixColor, 2) + 1, :);
+
+            % --- Draw ---
+            Screen('DrawDots', VP.window, ...
+                [x + VP.windowCenter(1); y + VP.windowCenter(2)], ...
+                pa.dotDiameter, pa.dotColor, [], 2);
+            Screen('DrawLines', VP.window, ...
+                [-pa.fixCrossLen, pa.fixCrossLen, 0, 0; ...
+                 0, 0, -pa.fixCrossLen, pa.fixCrossLen], ...
+                2, currentFixColor, VP.windowCenter);
+
+            Screen('Flip', VP.window);
+
+            % --- Check escape ---
+            [pressed, firstPress] = KbQueueCheck();
+            if pressed && firstPress(kb.escKey)
+                fprintf('Terminated by user.\n');
+                break;
+            end
+        end
+
+        % Check if user pressed escape
+        if pressed && firstPress(kb.escKey), break; end
+    end
+
+    % End screen
+    Screen('FillRect', VP.window, VP.backGroundColor);
+    Screen('TextSize', VP.window, 36);
+    DrawFormattedText(VP.window, 'Done', 'center', 'center', [255 255 255]);
+    Screen('Flip', VP.window);
+    WaitSecs(pa.endScreenDuration);
+
+catch ME
+    fprintf('\n!!! ERROR !!!\n%s\n', ME.message);
+    if ~isempty(ME.stack)
+        for i = 1:length(ME.stack)
+            fprintf('  %d. %s (line %d)\n', i, ME.stack(i).name, ME.stack(i).line);
+        end
+    end
+end
+
+if exist('experimentStartTime', 'var')
+    cleanup_experiment(VP, pa, kb, experimentStartTime);
+else
+    cleanup_experiment(VP, pa, kb, GetSecs);
+end
+
+end

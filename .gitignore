@@ -47,6 +47,10 @@ Makefile
 *_dm.csv
 sixFingers*.csv
 
+# Local QC experiment outputs
+experiments/FMRI/qc/checkerboard/data/
+experiments/FMRI/qc/motion-localizer/data/
+
 # External MATLAB toolboxes for the sixth-finger project — download separately.
 # See pipeline/fmri_pipelines/projects/sixth-finger/SETUP.md for install instructions.
 pipeline/fmri_pipelines/projects/sixth-finger/spm/
