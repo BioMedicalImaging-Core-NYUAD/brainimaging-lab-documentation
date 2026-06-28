@@ -19,19 +19,25 @@ targetRect = CenterRectOnPointd(imageRect * scaleFactor, VP.windowCenter(1), VP.
 plannedOnset = pa.nextEpochOnset;
 plannedEnd = plannedOnset + durationSec;
 
+% Draw stimulus and tell GPU to start processing now (not at Flip time).
 Screen('FillRect', VP.window, VP.backGroundColor);
 Screen('DrawTexture', VP.window, imageTexture, [], targetRect);
+Screen('DrawingFinished', VP.window);
+
+% Use WaitSecs + bare Flip instead of timed Flip — bypasses broken
+% PsychVulkanCore timed-presentation path on macOS.
 if ~isfield(pa, 'timingBaseTime') || isempty(pa.timingBaseTime)
-    [vbl, stimulusOnset] = Screen('Flip', VP.window);
+    Screen('Flip', VP.window);
 else
     targetOnset = pa.timingBaseTime + plannedOnset;
-    [vbl, stimulusOnset] = Screen('Flip', VP.window, targetOnset - 0.5 * VP.ifi);
+    WaitSecs('UntilTime', targetOnset - 0.5 * VP.ifi);
+    Screen('Flip', VP.window);
 end
-if isempty(stimulusOnset) || ~isfinite(stimulusOnset) || stimulusOnset <= 0
-    actualOnset = vbl;
-else
-    actualOnset = stimulusOnset;
-end
+
+% Use GetSecs for onset — Flip return values (vbl/stimulusOnset) are
+% unreliable with PsychVulkanCore on macOS.
+actualOnset = GetSecs;
+
 if ~isfield(pa, 'timingBaseTime') || isempty(pa.timingBaseTime)
     pa.timingBaseTime = actualOnset - plannedOnset;
     pa.experimentStartTime = pa.timingBaseTime;
@@ -40,6 +46,8 @@ targetOnset = pa.timingBaseTime + plannedOnset;
 targetEnd = pa.timingBaseTime + plannedEnd;
 fprintf('Stimulus ON: %s (%s)\n', fingerName, trialType);
 
+% Continuously redraw and flip every frame to keep GPU pipeline warm —
+% prevents PsychVulkanCore stalls on the next epoch's first Flip.
 while GetSecs < targetEnd - 0.5 * VP.ifi
     [keyIsDown, ~, keyCode] = KbCheck(-1);
     if keyIsDown && (keyCode(kb.escKey) || keyCode(kb.qKey))
@@ -47,7 +55,9 @@ while GetSecs < targetEnd - 0.5 * VP.ifi
         exitFlag = true;
         break;
     end
-    WaitSecs(0.01);
+    Screen('FillRect', VP.window, VP.backGroundColor);
+    Screen('DrawTexture', VP.window, imageTexture, [], targetRect);
+    Screen('Flip', VP.window);
 end
 
 actualEnd = GetSecs;

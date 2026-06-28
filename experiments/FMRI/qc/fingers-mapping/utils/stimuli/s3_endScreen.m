@@ -19,11 +19,11 @@ end
 Screen('FillRect', VP.window, VP.backGroundColor);
 Screen('TextSize', VP.window, 42);
 DrawFormattedText(VP.window, 'Thank you for your participation!', 'center', 'center', [255 255 255]);
+% Use WaitSecs + bare Flip — bypasses broken PsychVulkanCore timed Flip.
 if ~isempty(designEndTime)
-    Screen('Flip', VP.window, designEndTime - 0.5 * VP.ifi);
-else
-    Screen('Flip', VP.window);
+    WaitSecs('UntilTime', designEndTime - 0.5 * VP.ifi);
 end
+Screen('Flip', VP.window);
 WaitSecs(pa.endScreenDuration);
 
 end
