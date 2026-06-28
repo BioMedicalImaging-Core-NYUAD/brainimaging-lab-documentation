@@ -51,14 +51,14 @@ pa.nRings = 10;                 % number of concentric rings (log-spaced)
 pa.nWedges = 24;                % number of angular wedges
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FIXATION DOT & DIMMING TASK
+% FIXATION CROSS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-pa.fixCrossLenDeg = 0.25;       % arm length in degrees
+pa.fixCrossLenDeg = 0.20;       % arm length in degrees
 pa.fixCrossLen = max(4, round(pa.fixCrossLenDeg * VP.pixelsPerDegree));
 pa.fixCrossWidth = 2;           % line width in pixels
 pa.fixColor = [255 0 0];        % red cross
-pa.fixDimColor = [80 0 0];      % dim red (target)
-pa.dimDuration = design.dimDuration;  % seconds the cross stays dim
+pa.fixDimColor = pa.fixColor;   % fixation remains red throughout
+pa.dimDuration = design.dimDuration;
 pa.dimSchedule = design.dimSchedule;
 dimTrials = design.dimTrials;
 
@@ -103,6 +103,6 @@ fprintf('Stimulus duration: %.0f ms\n', pa.stimDuration * 1000);
 fprintf('Flicker rate: %.0f Hz\n', pa.flickerHz);
 fprintf('ISI range: %.0f - %.0f s (mean %.1f s)\n', pa.isiMin, pa.isiMax, mean(pa.isiSequence));
 fprintf('Planned total: %.0f s (%.1f min)\n', pa.totalDesignDuration, pa.totalDesignDuration/60);
-fprintf('Dimming events: %d / %d ISIs\n', length(dimTrials), pa.nEvents);
+fprintf('Fixation dimming events: %d / %d ISIs\n', length(dimTrials), pa.nEvents);
 
 end
