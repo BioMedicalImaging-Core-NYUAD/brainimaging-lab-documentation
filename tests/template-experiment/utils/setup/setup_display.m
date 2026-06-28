@@ -32,9 +32,9 @@ global GL; % Use OpenGL constants
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 switch(debugConfig.displayMode) % Select hardware profile
     case 1 % NYUAD Lab Setup
-        VP.screenDistance = 880;   % mm viewing distance
+        VP.screenDistance = 835;   % mm viewing distance
         VP.IOD = 66.5;             % mm interpupillary distance
-        VP.screenWidthMm = 711;    % mm physical screen width
+        VP.screenWidthMm = 643.55;    % mm physical screen width
         VP.screenHeightMm = VP.screenWidthMm*9/16; % mm height from 16:9
         VP.whiteValue = 255; % Max luminance value
         if debugConfig.fullscreen == 1 % Fullscreen toggle

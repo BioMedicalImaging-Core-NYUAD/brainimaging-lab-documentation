@@ -1,7 +1,7 @@
 function [VP, pa] = setup_param(VP, debugConfig)
 % SETUP_PARAM - Parameters for checkerboard HRF estimation task.
 %
-% Event-related: 200 ms checkerboard flashes, jittered ISI 4-12 s,
+% Event-related: 1 s checkerboard events, jittered ISI 4-12 s,
 % fixed A/B/C schedules. Total 4 min.
 
 if ~isstruct(VP)
