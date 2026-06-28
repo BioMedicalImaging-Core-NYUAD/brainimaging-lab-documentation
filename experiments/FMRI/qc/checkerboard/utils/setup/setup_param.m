@@ -47,10 +47,7 @@ pa.totalDesignDuration = design.totalDesignDuration;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % CHECKERBOARD PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-pa.checkerRadiusDeg = 12;       % radius of checkerboard in degrees
-pa.checkerRadiusPix = pa.checkerRadiusDeg * VP.pixelsPerDegree;
-pa.nRings = 10;                 % number of equal-width concentric rings
-pa.nWedges = 24;                % number of angular wedges
+pa.checkSizeDeg = 1.0;          % full-field Cartesian check size
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FIXATION CROSS

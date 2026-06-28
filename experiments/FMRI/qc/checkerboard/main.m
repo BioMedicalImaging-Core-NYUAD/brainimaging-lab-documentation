@@ -70,8 +70,7 @@ kb = setup_keyboard();
 try
     % Pre-compute checkerboard textures (inside try so errors are caught)
     [chk1, chk2] = make_checkerboard_textures(VP, pa);
-    fprintf('Checkerboard textures created (radius %.0f px, %d rings, %d wedges)\n', ...
-        pa.checkerRadiusPix, pa.nRings, pa.nWedges);
+    fprintf('Checkerboard textures created (%.1f deg checks)\n', pa.checkSizeDeg);
 
     try
         Screen('PreloadTextures', VP.window, [chk1, chk2]);
@@ -108,21 +107,14 @@ try
 
         % --- Flash the checkerboard (contrast-reversing) ---
         eventEndAbs = plannedOnsetAbs + pa.stimDuration;
-        Screen('DrawTexture', VP.window, chk1);
-        draw_fixation(VP, pa, pa.fixColor);
-        vbl = Screen('Flip', VP.window, plannedOnsetAbs - 0.5 * VP.ifi);
+        eventOnset = NaN;
+        frameIndex = 0;
+        while true
+            nextFlipAbs = plannedOnsetAbs + frameIndex * VP.ifi;
+            if nextFlipAbs >= eventEndAbs - 0.5 * VP.ifi
+                break;
+            end
 
-        eventOnset = vbl - experimentStartTime;
-        fprintf('Event %d/%d (onset %.3f s)\n', ev, pa.nEvents, eventOnset);
-
-        pa.eventCounter = pa.eventCounter + 1;
-        pa.events(pa.eventCounter).onset = eventOnset;
-        pa.events(pa.eventCounter).duration = pa.stimDuration;
-        pa.events(pa.eventCounter).trial_type = 'checkerboard';
-
-        frameIndex = 1;
-        nextFlipAbs = plannedOnsetAbs + frameIndex * VP.ifi;
-        while nextFlipAbs < eventEndAbs - 0.5 * VP.ifi
             phase = mod(floor(frameIndex / pa.framesPerFlickerPhase), 2);
             if phase == 0
                 Screen('DrawTexture', VP.window, chk1);
@@ -132,16 +124,28 @@ try
             draw_fixation(VP, pa, pa.fixColor);
             vbl = Screen('Flip', VP.window, nextFlipAbs - 0.5 * VP.ifi);
 
+            if isnan(eventOnset)
+                eventOnset = vbl - experimentStartTime;
+                fprintf('Event %d/%d (onset %.3f s)\n', ev, pa.nEvents, eventOnset);
+
+                pa.eventCounter = pa.eventCounter + 1;
+                pa.events(pa.eventCounter).onset = eventOnset;
+                pa.events(pa.eventCounter).duration = pa.stimDuration;
+                pa.events(pa.eventCounter).trial_type = 'checkerboard';
+            end
+
             frameIndex = max(frameIndex + 1, floor((vbl - plannedOnsetAbs) / VP.ifi) + 1);
-            nextFlipAbs = plannedOnsetAbs + frameIndex * VP.ifi;
         end
 
         % --- ISI: fixation only ---
         Screen('FillRect', VP.window, VP.backGroundColor);
         draw_fixation(VP, pa, pa.fixColor);
         vbl = Screen('Flip', VP.window, eventEndAbs - 0.5 * VP.ifi);
-        pa.events(pa.eventCounter).actual_duration = vbl - experimentStartTime - eventOnset;
-        pa.events(pa.eventCounter).planned_onset = pa.plannedOnsets(ev);
+        if ~isnan(eventOnset)
+            pa.events(pa.eventCounter).actual_duration = vbl - experimentStartTime - eventOnset;
+            pa.events(pa.eventCounter).planned_onset = pa.plannedOnsets(ev);
+            fprintf('  actual duration %.3f s\n', pa.events(pa.eventCounter).actual_duration);
+        end
     end
 
     % --- Final baseline ---
@@ -203,36 +207,22 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [tex1, tex2] = make_checkerboard_textures(VP, pa)
-% MAKE_CHECKERBOARD_TEXTURES - Create two phase-inverted radial checkerboards.
+% MAKE_CHECKERBOARD_TEXTURES - Create two phase-inverted Cartesian checkerboards.
 
 w = round(VP.windowWidthPix);
 h = round(VP.windowHeightPix);
-halfW = w / 2;
-halfH = h / 2;
+checkSizePix = max(1, round(pa.checkSizeDeg * VP.pixelsPerDegree));
+[xx, yy] = meshgrid(0:w-1, 0:h-1);
 
-[xx, yy] = meshgrid(linspace(-halfW, halfW, w), linspace(-halfH, halfH, h));
-r = sqrt(xx.^2 + yy.^2);
-theta = atan2(yy, xx);
-
-% Equal-width rings within the stimulus aperture.
-ringPhase = floor(r / pa.checkerRadiusPix * pa.nRings);
-ringPhase(r >= pa.checkerRadiusPix) = pa.nRings - 1;
-
-% Angular wedges
-wedgePhase = floor((theta + pi) / (2*pi) * pa.nWedges);
-
-% Checkerboard pattern
-pattern = mod(ringPhase + wedgePhase, 2);
-
-% Circular aperture
-inField = r <= pa.checkerRadiusPix;
+% Full-field Cartesian checkerboard.
+pattern = mod(floor(xx / checkSizePix) + floor(yy / checkSizePix), 2);
 
 % Phase 1: white checks on black
 img1 = uint8(VP.backGroundColor(1) * ones(h, w, 3));
 for ch = 1:3
     plane = img1(:,:,ch);
-    plane(inField & pattern == 1) = 255;
-    plane(inField & pattern == 0) = 0;
+    plane(pattern == 1) = 255;
+    plane(pattern == 0) = 0;
     img1(:,:,ch) = plane;
 end
 
@@ -240,8 +230,8 @@ end
 img2 = uint8(VP.backGroundColor(1) * ones(h, w, 3));
 for ch = 1:3
     plane = img2(:,:,ch);
-    plane(inField & pattern == 1) = 0;
-    plane(inField & pattern == 0) = 255;
+    plane(pattern == 1) = 0;
+    plane(pattern == 0) = 255;
     img2(:,:,ch) = plane;
 end
 
