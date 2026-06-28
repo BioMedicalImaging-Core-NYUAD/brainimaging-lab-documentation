@@ -21,8 +21,8 @@ global GL;
 
 switch(debugConfig.displayMode)
     case 1
-        VP.screenDistance = 880;
-        VP.screenWidthMm = 711;
+        VP.screenDistance = 835;    % mm
+        VP.screenWidthMm = 643.55;    % mm
         VP.screenHeightMm = VP.screenWidthMm * 9/16;
         VP.whiteValue = 255;
         if debugConfig.fullscreen == 1
