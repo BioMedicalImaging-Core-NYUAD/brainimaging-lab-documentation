@@ -41,8 +41,12 @@ if ~exist(dataDir, 'dir')
 end
 info.dataDir = dataDir;
 
-fileName = sprintf('sub-%s_ses-%s_task-%s_run-%s', ...
-    info.subjectID, info.sessionID, info.taskName, info.runID);
+% Append current date and time so files are never overwritten, even when
+% subject/session/run/task fields are identical across acquisitions.
+info.timestamp = datestr(now, 'yyyymmdd-HHMMSS');
+
+fileName = sprintf('sub-%s_ses-%s_task-%s_run-%s_%s', ...
+    info.subjectID, info.sessionID, info.taskName, info.runID, info.timestamp);
 
 info.fullPath = fullfile(dataDir, [fileName '.mat']);
 info.fullPathTSV = fullfile(dataDir, [fileName '_events.tsv']);
