@@ -129,6 +129,7 @@ Network settings for Eyetracker system
 | **Search Domains**  | Search Domains    |
 +---------------------+-------------------+
 
+
 The Eyetracker is connected to the Stimulus computer on the bottom-most ethernet card in the Stimulus computer.
 
 
@@ -146,5 +147,3 @@ Installation path on Stimulus computer
 - The Eyelink Development kit is installed on the stimulus computer in the following path:
     - `Macintosh HD -> Eyelink`
     - `Macintosh HD -> Library -> Frameworks -> eyelink*`
-
-
