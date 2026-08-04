@@ -1,16 +1,22 @@
-FROM poldracklab/fmriprep:latest
-
-USER root
+# docker/fmriprep-wrapper/Dockerfile
+FROM nipreps/fmriprep:24.1.1          # includes FreeSurfer + TemplateFlow client
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-      nodejs npm python3-pip && \
+    apt-get install -y --no-install-recommends git jq && \
     rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g bids-validator \
-    && pip install --no-cache-dir boxsdk
+# Optional: pre-fetch templates into the image (skip if you prefer a lean image)
+ENV TEMPLATEFLOW_HOME=/opt/templateflow
+RUN mkdir -p $TEMPLATEFLOW_HOME && \
+    python - <<'PY'
+import templateflow.api as tf
+for t in ("OASIS30ANTs", "MNI152NLin2009cAsym", "fsaverage"):
+    tf.get(template=t, resolution=1)
+PY
 
-# Leave a mount point for your scripts
-VOLUME ["/usr/local/bin"]
+# --- placeholder launcher so the image builds ---
+RUN printf '#!/usr/bin/env python3\nprint("Bind-mount real launcher at run-time")\n' > /launcher.py
+RUN chmod +x /launcher.py
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+WORKDIR /work
+ENTRYPOINT ["python", "/launcher.py"]
