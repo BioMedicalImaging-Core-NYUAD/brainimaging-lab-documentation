@@ -13,18 +13,6 @@ Brain Imaging: NYUAD documentation page
 
 The Brain Imaging NYUAD lab, part of the BioMedical Imaging Core at NYU Abu Dhabi, provides a comprehensive documentation page covering the Magnetic Resonance Imaging (MRI) system and its associated ancillary equipment. This resource is aimed at all NYUAD users who need guidance on utilizing the lab's imaging facilities.
 
-*************
-Head Scanning
-*************
-
-Set up the Polhemus FASTRAK, collect head-surface points in PiMgr, and visualize the results in MATLAB.
-
-:doc:`Open the Head Scanning guide <Polhemus/head-scanning>`.
-
-
-.. raw:: html
-
-   <br><br>
 
 ****
 Team
