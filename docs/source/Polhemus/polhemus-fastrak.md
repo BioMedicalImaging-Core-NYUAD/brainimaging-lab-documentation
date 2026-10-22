@@ -125,19 +125,90 @@ To use the **button on the stylus** to start and stop data collection, follow th
   <em><strong>Figure 9: Stylus-Button Configuration — Step 1.</strong></em>
 </p>
 
-#### Step 2
+#### Step 2: Configure the Stylus
+
+Select **Stylus**, then configure the following settings:
+
+- **Selected Sensor(s):** `1`
+- **Stylus Mode:** `Point/Track`
+
+Click **OK** to apply the settings.
 
 <p align="center">
-  <img src="images/pimgr/image_4.png" alt="Step 2 of configuring stylus-button control in PiMgr" width="850">
+  <img src="images/pimgr/image_4.png" alt="Selecting sensor 1 and Point/Track stylus mode in PiMgr" width="850">
 </p>
 <p align="center">
-  <em><strong>Figure 10: Stylus-Button Configuration — Step 2.</strong></em>
+  <em><strong>Figure 9: Step 2 — Configuring the Stylus.</strong></em>
 </p>
 
-### 2.2. Data Collection in Single-Point Mode
+#### Step 3: Enable Stylus Point Mode
 
-*Instructions to be added.*
+Toggle **Stylus Point Mode** by clicking the **pencil icon**, as shown in Figure 10.
+
+<p align="center">
+  <img src="images/pimgr/image_5.png" alt="Pencil icon used to toggle Stylus Point Mode in PiMgr" width="850">
+</p>
+<p align="center">
+  <em><strong>Figure 10: Step 3 — Enabling Stylus Point Mode.</strong></em>
+</p>
+
+With these settings applied, press the stylus button once to begin continuous data collection. Press it again to pause collection.
+
+#### Understanding the Collected Data
+
+The collected data appear in the PiMgr display as shown below.
+
+<p align="center">
+  <img src="images/pimgr/image_6.png" alt="Position and orientation data collected in continuous mode using PiMgr" width="850">
+</p>
+<p align="center">
+  <em><strong>Figure 11: Collected Data in Continuous Mode.</strong></em>
+</p>
+
+Each row contains one measurement from a sensor. For the output format shown here, the seven columns are:
+
+| Column | Quantity | Description |
+| --- | --- | --- |
+| 1 | Sensor ID | Identifies the sensor: `1` is the stylus and `2` is the head-mounted receiver in this setup. |
+| 2 | X | Position along the X-axis. |
+| 3 | Y | Position along the Y-axis. |
+| 4 | Z | Position along the Z-axis. |
+| 5 | Azimuth | Orientation angle corresponding to yaw, in degrees. |
+| 6 | Elevation | Orientation angle corresponding to pitch, in degrees. |
+| 7 | Roll | Orientation angle corresponding to roll, in degrees. |
+
+The X, Y, and Z coordinates are reported in the configured tracking coordinate system, normally relative to the transmitter. Position values are in **inches by default**, or **centimeters** if metric output has been selected.
+
+Rows with sensor ID `1` describe the stylus, while rows with sensor ID `2` describe the head-mounted receiver. To visualize the digitized head surface, extract the stylus coordinates from columns **2–4** of the rows labeled `1`.
 
 ## 3. Data Visualization with MATLAB
 
-*Instructions to be added.*
+### 3.1. Export the Data from PiMgr
+
+1. Right-click inside the PiMgr data display.
+2. Choose **Select All**, then **Copy**.
+3. Paste the numerical data into a plain-text editor.
+4. Save the file as **`data.txt`**.
+
+Save only the numerical measurement rows, excluding any status messages or other text.
+
+### 3.2. Plot the Head-Surface Points
+
+Place `data.txt` and the MATLAB script in the same directory, and set that directory as MATLAB's **Current Folder**.
+
+Run the following script:
+
+```matlab
+data = readmatrix("data.txt");
+points = data(data(:,1)==1, 2:4);
+
+scatter3(points(:,1), points(:,2), points(:,3), '.')
+axis equal; grid on
+set(gca, 'ZDir', 'reverse')
+```
+
+The script selects the rows belonging to **sensor 1**, extracts their **X, Y, and Z coordinates**, and displays them as a 3D point cloud.
+
+`axis equal` keeps the same scale along all three axes. The final line reverses the displayed Z-axis direction without changing the recorded coordinates.
+
+This basic visualization plots the stylus positions directly; it does not use sensor 2 to compensate for head movement.
