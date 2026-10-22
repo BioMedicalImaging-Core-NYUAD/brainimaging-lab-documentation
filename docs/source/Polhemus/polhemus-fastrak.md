@@ -224,3 +224,14 @@ Figure 12 shows a trial data collection using a head phantom. Collecting more po
 <p align="center">
   <em><strong>Figure 12: Head Phantom Point Cloud from Trial Data Collection.</strong></em>
 </p>
+
+### 3.4. Clearing the Motion Display
+
+After completing data collection, or before starting a new acquisition, clear the motion display by selecting **Tools → Clear Motion Display**.
+
+<p align="center">
+  <img src="images/pimgr/image_8.png" alt="Selecting Clear Motion Display from the Tools menu in PiMgr" width="850">
+</p>
+<p align="center">
+  <em><strong>Figure 13: Clearing the Motion Display in PiMgr.</strong></em>
+</p>
