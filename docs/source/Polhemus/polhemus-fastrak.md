@@ -212,3 +212,15 @@ The script selects the rows belonging to **sensor 1**, extracts their **X, Y, an
 `axis equal` keeps the same scale along all three axes. The final line reverses the displayed Z-axis direction without changing the recorded coordinates.
 
 This basic visualization plots the stylus positions directly; it does not use sensor 2 to compensate for head movement.
+
+
+### 3.3. Example Result
+
+Figure 12 shows a trial data collection using a head phantom. Collecting more points, particularly in sparsely sampled regions, can improve the surface coverage and level of detail in the resulting point cloud.
+
+<p align="center">
+  <img src="images/pimgr/image_7.png" alt="3D point cloud obtained from trial data collection using a head phantom" width="750">
+</p>
+<p align="center">
+  <em><strong>Figure 12: Head Phantom Point Cloud from Trial Data Collection.</strong></em>
+</p>
