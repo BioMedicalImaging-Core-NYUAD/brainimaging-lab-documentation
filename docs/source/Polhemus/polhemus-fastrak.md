@@ -94,8 +94,6 @@ A **PiMgr prerelease version** is available that supports connecting to FASTRAK 
 
 This section introduces basic data collection in **single-point** and **continuous** modes using PiMgr.
 
-### 2.1. Data Collection in Continuous Mode
-
 Open PiMgr. Figure 7 shows the main software window.
 
 <p align="center">
@@ -104,6 +102,11 @@ Open PiMgr. Figure 7 shows the main software window.
 <p align="center">
   <em><strong>Figure 7: PiMgr Main Window.</strong></em>
 </p>
+
+
+
+### 2.1. Data Collection in Continuous Mode
+
 
 Toggle **Continuous Mode** using the control shown in Figure 8.
 
