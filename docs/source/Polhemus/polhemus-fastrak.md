@@ -23,7 +23,7 @@ For detailed setup instructions, operating procedures, and technical specificati
 </p>
 <p align="center">
   <em><strong>Figure 1: Complete FASTRAK System.</strong><br>
-  1: System Electronics Unit; 2: Charger (power supply); 3: RS-232 to USB-A cable;<br>
+  1: System Electronics Unit; 2: Charger (power supply); 3: USB-A cable;<br>
   4: Receiver; 5: Stylus; 6: Transmitter.</em>
 </p>
 
@@ -38,7 +38,7 @@ The **On/Off switch (2)** powers the unit. Leave it **OFF** until the stylus, re
 </p>
 <p align="center">
   <em><strong>Figure 2: Power and Communication Panel.</strong><br>
-  1: Power connector; 2: On/Off switch; 3: RS-232 cable connection.</em>
+  1: Power connector; 2: On/Off switch; 3: USB-A cable connection.</em>
 </p>
 
 ### 1.3. Stylus, Receiver, and Transmitter Connections
