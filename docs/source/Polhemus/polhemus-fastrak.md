@@ -103,21 +103,9 @@ Open PiMgr. Figure 7 shows the main software window.
   <em><strong>Figure 7: PiMgr Main Window.</strong></em>
 </p>
 
+To control data collection using the **button on the stylus**, follow the configuration steps shown in Figures 9 and 10.
 
 
-### 2.1. Data Collection in Continuous Mode
-
-
-Toggle **Continuous Mode** using the control shown in Figure 8.
-
-<p align="center">
-  <img src="images/pimgr/image_2.png" alt="PiMgr control for toggling continuous mode" width="850">
-</p>
-<p align="center">
-  <em><strong>Figure 8: Toggling Continuous Mode in PiMgr.</strong></em>
-</p>
-
-To use the **button on the stylus** to start and stop data collection, follow the configuration steps shown in Figures 9 and 10.
 
 #### Step 1
 
@@ -155,7 +143,36 @@ Toggle **Stylus Point Mode** by clicking the **pencil icon**, as shown in Figure
   <em><strong>Figure 10: Step 3 — Enabling Stylus Point Mode.</strong></em>
 </p>
 
-With these settings applied, press the stylus button once to begin continuous data collection. Press it again to pause collection.
+With these settings applied we can use the button on the stylus for data collection in continous and single modes.
+
+
+
+
+### 2.2. Data Collection
+
+PiMgr supports **continuous** and **single-point** data collection.
+
+Select **Continuous Mode** using the control shown in Figure 8. After configuring the stylus button as described below, pressing it once starts continuous data collection, and pressing it again pauses collection.
+
+Alternatively, select **Single Frame** instead of Continuous Mode to collect individual points. In this mode, each press of the stylus button records a single point.
+
+<p align="center">
+  <img src="images/pimgr/image_2.png" alt="PiMgr controls for selecting continuous or single-frame data collection" width="850">
+</p>
+<p align="center">
+  <em><strong>Figure 8: Selecting the Data Collection Mode in PiMgr — Continuous Mode Shown.</strong></em>
+</p>
+
+
+
+
+
+
+
+
+
+
+
 
 #### Understanding the Collected Data
 
