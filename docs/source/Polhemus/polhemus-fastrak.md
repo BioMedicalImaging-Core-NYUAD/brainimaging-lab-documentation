@@ -103,7 +103,11 @@ Open PiMgr. Figure 7 shows the main software window.
   <em><strong>Figure 7: PiMgr Main Window.</strong></em>
 </p>
 
-To control data collection using the **button on the stylus**, follow the configuration steps shown in Figures 9 and 10.
+
+
+### 2.1. Configure the Stylus
+
+To control data collection using the **button on the stylus**, follow the configuration steps shown in Figures 8-10.
 
 
 
@@ -113,10 +117,10 @@ To control data collection using the **button on the stylus**, follow the config
   <img src="images/pimgr/image_3.png" alt="Step 1 of configuring stylus-button control in PiMgr" width="850">
 </p>
 <p align="center">
-  <em><strong>Figure 9: Stylus-Button Configuration — Step 1.</strong></em>
+  <em><strong>Figure 8: Stylus-Button Configuration — Step 1.</strong></em>
 </p>
 
-#### Step 2: Configure the Stylus
+#### Step 2: 
 
 Select **Stylus**, then configure the following settings:
 
@@ -152,7 +156,7 @@ With these settings applied we can use the button on the stylus for data collect
 
 PiMgr supports **continuous** and **single-point** data collection.
 
-Select **Continuous Mode** using the control shown in Figure 8. After configuring the stylus button as described below, pressing it once starts continuous data collection, and pressing it again pauses collection.
+Select **Continuous Mode** using the control shown in Figure 11. After configuring the stylus button as described below, pressing it once starts continuous data collection, and pressing it again pauses collection.
 
 Alternatively, select **Single Frame** instead of Continuous Mode to collect individual points. In this mode, each press of the stylus button records a single point.
 
@@ -160,7 +164,7 @@ Alternatively, select **Single Frame** instead of Continuous Mode to collect ind
   <img src="images/pimgr/image_2.png" alt="PiMgr controls for selecting continuous or single-frame data collection" width="850">
 </p>
 <p align="center">
-  <em><strong>Figure 8: Selecting the Data Collection Mode in PiMgr — Continuous Mode Shown.</strong></em>
+  <em><strong>Figure 11: Selecting the Data Collection Mode in PiMgr — Continuous Mode Shown.</strong></em>
 </p>
 
 
@@ -182,7 +186,7 @@ The collected data appear in the PiMgr display as shown below.
   <img src="images/pimgr/image_6.PNG" alt="Position and orientation data collected in continuous mode using PiMgr" width="850">
 </p>
 <p align="center">
-  <em><strong>Figure 11: Collected Data in Continuous Mode.</strong></em>
+  <em><strong>Figure 12: Collected Data in Continuous Mode.</strong></em>
 </p>
 
 Each row contains one measurement from a sensor. For the output format shown here, the seven columns are:
@@ -236,13 +240,13 @@ This basic visualization plots the stylus positions directly; it does not use se
 
 ### 3.3. Example Result
 
-Figure 12 shows a trial data collection using a head phantom. Collecting more points, particularly in sparsely sampled regions, can improve the surface coverage and level of detail in the resulting point cloud.
+Figure 13 shows a trial data collection using a head phantom. Collecting more points, particularly in sparsely sampled regions, can improve the surface coverage and level of detail in the resulting point cloud.
 
 <p align="center">
   <img src="images/pimgr/image_7.png" alt="3D point cloud obtained from trial data collection using a head phantom" width="750">
 </p>
 <p align="center">
-  <em><strong>Figure 12: Head Phantom Point Cloud from Trial Data Collection.</strong></em>
+  <em><strong>Figure 13: Head Phantom Point Cloud from Trial Data Collection.</strong></em>
 </p>
 
 ### 3.4. Clearing the Motion Display
@@ -253,5 +257,5 @@ After completing data collection, or before starting a new acquisition, clear th
   <img src="images/pimgr/image_8.png" alt="Selecting Clear Motion Display from the Tools menu in PiMgr" width="850">
 </p>
 <p align="center">
-  <em><strong>Figure 13: Clearing the Motion Display in PiMgr.</strong></em>
+  <em><strong>Figure 14: Clearing the Motion Display in PiMgr.</strong></em>
 </p>
