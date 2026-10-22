@@ -159,7 +159,7 @@ With these settings applied, press the stylus button once to begin continuous da
 The collected data appear in the PiMgr display as shown below.
 
 <p align="center">
-  <img src="images/pimgr/image_6.png" alt="Position and orientation data collected in continuous mode using PiMgr" width="850">
+  <img src="images/pimgr/image_6.PNG" alt="Position and orientation data collected in continuous mode using PiMgr" width="850">
 </p>
 <p align="center">
   <em><strong>Figure 11: Collected Data in Continuous Mode.</strong></em>
