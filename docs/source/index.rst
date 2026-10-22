@@ -9,9 +9,17 @@ Brain Imaging: NYUAD documentation page
 
 .. raw:: html
 
- <br><br>
+   <br><br>
 
-   The Brain Imaging NYUAD lab, part of the BioMedical Imaging Core at NYU Abu Dhabi, provides a comprehensive documentation page covering the Magnetic Resonance Imaging (MRI) system and its associated ancillary equipment. This resource is aimed at all NYUAD users who need guidance on utilizing the lab's imaging facilities.
+The Brain Imaging NYUAD lab, part of the BioMedical Imaging Core at NYU Abu Dhabi, provides a comprehensive documentation page covering the Magnetic Resonance Imaging (MRI) system and its associated ancillary equipment. This resource is aimed at all NYUAD users who need guidance on utilizing the lab's imaging facilities.
+
+*************
+Head Scanning
+*************
+
+Set up the Polhemus FASTRAK, collect head-surface points in PiMgr, and visualize the results in MATLAB.
+
+:doc:`Open the Head Scanning guide <head-scanning>`.
 
 
 .. raw:: html
@@ -123,6 +131,14 @@ Automated Testing Badges
     3-eeg-fmri-system/2-system-specification.rst
     3-eeg-fmri-system/4-operational-protocol.rst
     3-eeg-fmri-system/5-experiment-design.rst
+
+
+.. toctree::
+   :hidden:
+   :caption: Head Scanning
+   :maxdepth: 2
+
+   Head Scanning <head-scanning>
 
 
 .. toctree::
@@ -355,4 +371,3 @@ Automated Testing Badges
 
        animate();
    </script>
-
