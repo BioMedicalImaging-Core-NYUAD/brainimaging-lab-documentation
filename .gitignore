@@ -58,3 +58,6 @@ pipeline/fmri_pipelines/projects/sixth-finger/RSAtoolbox/
 
 # Large saved MATLAB workspaces (regeneratable analysis outputs, not source)
 pipeline/fmri_pipelines/projects/sixth-finger/**/matlab_workspace.mat
+
+# MATLAB autosave files
+*.asv

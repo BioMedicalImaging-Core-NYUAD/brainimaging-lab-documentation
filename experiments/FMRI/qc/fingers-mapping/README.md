@@ -2,7 +2,7 @@
 
 This is a template-style QC version of the six-fingers Motor Execution task.
 It keeps the original execution design but follows the MRI-center template
-structure used in `tests/template-experiment`.
+structure used in `experiments/FMRI/template-experiment`.
 
 ## Structure
 

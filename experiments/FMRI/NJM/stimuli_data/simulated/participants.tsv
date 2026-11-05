@@ -1,0 +1,34 @@
+participant_id	cohort	country	first_language	design_version	age	handedness	years_in_uae	economic_vulnerability_1to7	perceived_legal_protection_1to7
+sub-S001	Southeast Asian	Philippines	Tagalog	1	31	R	10.4	6	2
+sub-S002	Southeast Asian	Indonesia	Indonesian	2	27	R	4.4	1	6
+sub-S003	Southeast Asian	Indonesia	Indonesian	3	46	R	6.2	6	7
+sub-S004	Southeast Asian	Indonesia	Indonesian	4	23	R	6.1	6	5
+sub-S005	Southeast Asian	Indonesia	Indonesian	1	30	R	6.1	4	7
+sub-S006	Southeast Asian	Philippines	Tagalog	2	29	R	11.7	7	1
+sub-S007	Southeast Asian	Indonesia	Indonesian	3	48	R	8.5	2	5
+sub-S008	Southeast Asian	Indonesia	Indonesian	4	48	R	7.7	3	5
+sub-S009	Southeast Asian	Philippines	Tagalog	1	48	R	1.4	1	4
+sub-S010	Southeast Asian	Philippines	Tagalog	2	24	R	9.7	5	4
+sub-S011	Southeast Asian	Philippines	Tagalog	3	26	R	11.2	7	5
+sub-S012	East African	Kenya	Swahili	4	39	R	0.8	1	3
+sub-S013	East African	Kenya	Swahili	1	23	R	10.0	3	5
+sub-S014	East African	Kenya	Swahili	2	29	R	7.2	3	6
+sub-S015	East African	Kenya	Swahili	3	49	R	1.1	7	6
+sub-S016	East African	Uganda	Luganda	4	39	R	8.3	5	2
+sub-S017	East African	Kenya	Swahili	1	41	R	5.1	5	1
+sub-S018	East African	Uganda	Luganda	2	25	R	10.0	4	4
+sub-S019	East African	Ethiopia	Amharic	3	24	R	7.8	1	1
+sub-S020	East African	Kenya	Swahili	4	23	R	7.8	2	6
+sub-S021	East African	Kenya	Swahili	1	29	R	5.0	4	4
+sub-S022	East African	Kenya	Swahili	2	23	R	1.3	7	2
+sub-S023	South Asian	Nepal	Nepali	3	22	R	1.4	1	6
+sub-S024	South Asian	Nepal	Nepali	4	33	R	4.7	2	3
+sub-S025	South Asian	Bangladesh	Bengali	1	45	R	1.2	2	6
+sub-S026	South Asian	India	Hindi	2	23	R	9.8	7	1
+sub-S027	South Asian	Sri Lanka	Sinhala	3	33	R	4.7	4	4
+sub-S028	South Asian	Sri Lanka	Sinhala	4	34	R	8.0	3	5
+sub-S029	South Asian	Sri Lanka	Sinhala	1	36	R	11.7	6	4
+sub-S030	South Asian	Bangladesh	Bengali	2	34	R	11.6	1	4
+sub-S031	South Asian	Nepal	Nepali	3	29	R	6.8	4	7
+sub-S032	South Asian	Nepal	Nepali	4	42	R	10.5	3	3
+sub-S033	South Asian	Sri Lanka	Sinhala	1	23	R	2.2	6	2

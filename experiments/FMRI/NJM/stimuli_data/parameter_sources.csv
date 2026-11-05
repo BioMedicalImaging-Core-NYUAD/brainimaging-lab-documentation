@@ -1,0 +1,75 @@
+section,parameter,value_used,status,protocol_page,what_the_protocol_says,note
+study,title,Evaluating Competing Job Offers ... in the UAE,protocol,1,Title page,
+study,bids_task_name,njm,simulated,,Not specified,Short BIDS-safe task label derived from the folder name
+study,scanner,Siemens Prisma 3T,inferred,,"Protocol says 'high-field fMRI' only",From lab docs (2-mri-scanner-system/2-system-specification.rst)
+sample,behavioral_n_completed,105,protocol,1,N = 105 completed participants,
+sample,behavioral_trials,24,protocol,1;14,24 DCE choice tasks,
+sample,behavioral_catch_trials,3,resolved_conflict,8,2 to 3 embedded catch trials,Upper value used
+sample,fmri_n_usable_target,25-30,protocol,6,25 to 30 usable,Abstract (p.1) says n = 30 to 35 for the sub-sample
+sample,fmri_n_enrolled_target,32-35,protocol,7,15% buffer -> 32 to 35 enrolled,
+sample,fmri_per_cohort,10-12,protocol,6,10 to 12 per regional group,3 x 10-12 = 30-36 (does not match 25-30 usable)
+sample,cohorts,Southeast Asian / East African / South Asian,protocol,1;3,Three geographic cohorts,
+sample,cohort_countries,see JSON,protocol,3,Nepal India Bangladesh Sri Lanka / Philippines Indonesia / Kenya Uganda Ethiopia,
+session,n_runs,4,resolved_conflict,1;14,4 runs (p.1 and p.14),p.6 says 4 to 5 runs
+session,trials_per_run,12,protocol,14,12 trials per run,
+session,n_trials_total,48,resolved_conflict,14,48 paired choices,p.6 says 48 to 60
+session,catch_trials_per_run,1,protocol,14,1 dominant catch trial per run (4 total),p.8 says 4 to 6 catch trials per participant
+session,identical_terms_trials_per_run,1,simulated,4,"Aim 2: effect of origin 'even when pay and working conditions are identical'",Design choice to give a clean origin-only probe; PI to confirm
+session,n_design_versions,4,simulated,,Not specified,Version assigned per subject; re-generate with more if needed
+session,rest_between_runs_s,120-180,protocol,14,2-3 min in-scanner rest and comfort check,
+session,lead_in_fixation_s,10,simulated,14,Run time 'accounting for baseline scanner stabilization',Template uses 5 s; 10 s gives a baseline before trial 1
+session,lead_out_fixation_s,12,simulated,,Not specified,Lets the last trial's HRF return to baseline
+session,show_trial_counter,true,inferred,11,Mock screen header 'Trial 1 / 24 (or 48)',Confirm it is shown to participants
+session,estimated_total_scanner_time_min,45-60,protocol,14,45 to 60 min incl. prep and structurals,
+timing,phase1_employer_s,3.0,resolved_conflict,5;12;13,"p.5 and p.13 table: 2.5-3.0 s; p.12 text: 4.0 s",Fixed 3.0 s (a range cannot be 'fixed'); matches the 14 s average trial on p.14
+timing,phase2_offer_s,4.0,resolved_conflict,5;12;13,"p.5 and p.13 table: 4.0 s; p.12 text: 5.0 s",
+timing,phase3_decision_max_s,3.0,protocol,5;12;13,Up to 3.0 s,
+timing,phase3_ends_on_response,true,protocol,12,Decision screen terminates immediately on button press,
+timing,phase3_keep_schedule_after_response,true,simulated,12,Task advances to jittered fixation after response,Remaining window time is added to fixation so every run has a fixed length and volume count
+timing,selection_feedback_s,0.2,protocol,13,Highlighted border < 0.2 s,
+timing,isi1_values_s / isi2_values_s,1-3 s (6/4/2 per run; mean 1.67 s),simulated,12,"Text: 'inter-phase and inter-trial intervals' are jittered; table shows no inter-phase gap",Needed to separate Phase 1/2/3 BOLD; see design/design_efficiency.txt
+timing,iti_values_s,3-7 s,resolved_conflict,12;13,"p.12: 3.0-7.0 s; p.13 table: ITI 2.0-6.0 s and fixation 1.0-2.5 s (mean 3 s)",p.12 is the only fully specified distribution
+timing,iti_probabilities,.40/.25/.17/.11/.07,protocol,12,Exponential-like probabilities,These give a mean of 4.2 s not the stated 5.0 s
+timing,iti_counts_per_run,5/3/2/1/1,simulated,12,,Closest integer counts to the probabilities for 12 trials; fixed per run so all runs have equal length
+timing,tr_s,1.5,simulated,,Not specified,Lab docs mention 0.75 s and 1 s TRs for other studies; set with the physicist
+timing,run_duration_s,232 (computed),simulated,14,"3.5-4 min functional scan per run, 14-16 min total",10 s lead-in + 12 trials x 17.5 s + 12 s lead-out = 232 s (3.87 min); 4 runs = 15.5 min; TR 1.5 s -> 158 volumes incl. 3 spare
+attributes,employer_origin,4 levels,protocol,10,SEA/SA; Arab/Emirati; Black/African; White/Western,"Display text for the SEA/SA level is not given; p.11 example shows 'South Asian Family'"
+attributes,salary_aed,1800 / 2500 / 3200,protocol,10,Low / standard / high market rate,
+attributes,rest_days_per_week,0 / 0.5 / 1,protocol,10,None / 1 every two weeks / 1 every week,
+attributes,workload,light / moderate / heavy,protocol,10,1 child no cooking-cleaning / 2 children + general / 3+ children + extensive,
+attributes,icons,person / globe / money bag / calendar / broom,protocol,11,Visual icons reduce reading load and language barriers,PNG placeholders in icons/
+response,buttons,1-4 = index / middle / ring / pinky,protocol,11,4-key MRI response box,
+response,labels,Definitely A / Probably A / Probably B / Definitely B,protocol,10;11,Confidence-weighted forced choice,
+response,response_hand,right,inferred,7,Emergency squeeze ball is in the left hand,Confirm handedness inclusion criteria
+response,vpixx_colors,red / yellow / green / blue on right box,simulated,,Not specified,Verify physical finger-button layout with experiments/general/test-vpixx-utilities/test_getButtonColor.m
+response,keyboard_keys,1-4,simulated,,,Debug/laptop fallback
+faces,sex,female,protocol,11,Standardized female headshot photo,
+faces,identities_per_origin,6,simulated,,Not specified,Placeholder silhouettes in faces/; replace with matched photos
+faces,image_size_px,400 x 500,simulated,,,
+display,layout_deg,see JSON,simulated,11;13,A on left / B on right; Phase 3 shows photo + origin + 4 options,Positions and sizes in degrees; also drive eyetracking_aoi.csv
+display,background / text / highlight colours,see JSON,simulated,13,Highlighted border confirms the selection,
+catch,definition,same origin; dominant on all 3 terms,protocol,14,Option objectively superior on salary rest and workload for the same employer demographic,
+catch,dominant_side,2 x A and 2 x B,simulated,14,Example has A dominant,Always-A would be learnable
+catch,pass_rule,chose dominant side at either confidence,simulated,8,Not specified,
+exclusion,max_failed_catch_trials,1,protocol,8,Fail more than 1 catch trial (> 33%) -> exclude,With 4 fMRI catch trials >1 failure is 50% not 33%
+exclusion,max_timeout_fraction,0.15,protocol,8,Timeouts on more than 15% of trials,
+exclusion,head_motion,FD 0.5 mm / 20% volumes / 3 mm,simulated,7,Excessive head motion (no threshold),
+eyetracking,system,SR Research EyeLink,inferred,7,Eye tracking simultaneous with choices,Lab has an EyeLink (docs 2-system-specification.rst)
+eyetracking,sampling_rate_hz,1000,simulated,,Not specified,
+eyetracking,calibration_type,HV5,simulated,,Not specified,
+eyetracking,metrics,11 metrics,protocol,7,Gaze points ... average fixation duration,Needs full-rate EDF + phase messages + AOIs
+eyetracking,pupil,recorded,protocol,10,Pupil dilation indexes decision friction,Face photos must be luminance-matched
+physio,signals,ECG or pulse oximeter + respiratory belt,protocol,7,Continuous during all functional runs,
+physio,sampling_rate_hz,500,simulated,7,'High sampling rate',
+physio,event_markers,trial + phase onsets,protocol,8,Pulse trigger markers at the start of every trial and phase,Codes in physio_trigger_codes.csv are simulated
+physio,skin_conductance,optional,protocol,10,SCR listed as a decision-friction measure,Not in the procedures on p.7
+payout,eligible_responses,Definitely A / Definitely B,protocol,8,Probably / rejection / failed market draw -> fee only,May push participants toward 'Definitely'
+payout,salary_scale_divisor,64,protocol,8,~1:64 scaled-down bonus,
+payout,bonus_aed,28.13 / 39.06 / 50.00,protocol,8,"'rounded-down to nearest dirham' yet decimals shown",Rounded down would be 28 / 39 / 50
+payout,market_lottery_success_prob,0.5,simulated,8,Secondary market-matching lottery (probability not given),
+payout,completion_fee_aed,150,simulated,8;9,Guaranteed completion fee (amount not given),PLACEHOLDER only - take from IRB protocol
+payout,travel_allowance_aed,50,simulated,9,Travel allowance (amount not given),PLACEHOLDER only
+analysis,phase_regressors,P1 / P2 / P3,protocol,9,GLM with regressors for the 3 phases,
+analysis,parametric_modulators,subjective value; effort cost (P2); uncertainty (P3),protocol,9;10,,Probably-responses index friction (p.10)
+analysis,rois,vmPFC VS amygdala FFA anterior insula aMCC dlPFC dACC mPFC TPJ,protocol,5;9,,
+analysis,thresholds,FWE; cluster-defining p < 0.001,protocol,6;9,,

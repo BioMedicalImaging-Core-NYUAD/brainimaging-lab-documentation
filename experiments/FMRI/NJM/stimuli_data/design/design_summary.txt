@@ -1,0 +1,49 @@
+Run length 232.0 s (3.87 min); TR 1.5 s -> program 158 volumes per run (incl. 3 spare). 4 runs = 15.5 min of task scanning.
+
+=== design_v01.csv ===
+trials 48 (tradeoff 40, identical_terms 4, catch 4)
+D-error (effects-coded A-B differences, zero priors, non-catch trials) = 0.752
+origin appearances (A/B) non-catch: SEA_SA 11/11, ARAB 11/11, AFRICAN 11/11, WESTERN 11/11
+salary levels (A+B slots): {1800: 29, 2500: 28, 3200: 31}
+rest levels   (A+B slots): {0.0: 28, 0.5: 30, 1.0: 30}
+workload lvls (A+B slots): {1: 27, 2: 31, 3: 30}
+corr(diffs) salary-rest -0.13  salary-workload 0.20  rest-workload 0.20
+trials with a 0-rest-day option: 27
+catch positions: [3, 10, 9, 8]  dominant sides: ['B', 'A', 'B', 'A']
+run durations (s): [232.0]
+
+=== design_v02.csv ===
+trials 48 (tradeoff 40, identical_terms 4, catch 4)
+D-error (effects-coded A-B differences, zero priors, non-catch trials) = 0.751
+origin appearances (A/B) non-catch: SEA_SA 11/11, ARAB 11/11, AFRICAN 11/11, WESTERN 11/11
+salary levels (A+B slots): {1800: 32, 2500: 28, 3200: 28}
+rest levels   (A+B slots): {0.0: 29, 0.5: 31, 1.0: 28}
+workload lvls (A+B slots): {1: 26, 2: 27, 3: 35}
+corr(diffs) salary-rest -0.21  salary-workload 0.20  rest-workload 0.15
+trials with a 0-rest-day option: 28
+catch positions: [8, 11, 4, 9]  dominant sides: ['B', 'A', 'A', 'B']
+run durations (s): [232.0]
+
+=== design_v03.csv ===
+trials 48 (tradeoff 40, identical_terms 4, catch 4)
+D-error (effects-coded A-B differences, zero priors, non-catch trials) = 0.762
+origin appearances (A/B) non-catch: SEA_SA 11/11, ARAB 11/11, AFRICAN 11/11, WESTERN 11/11
+salary levels (A+B slots): {1800: 26, 2500: 33, 3200: 29}
+rest levels   (A+B slots): {0.0: 26, 0.5: 32, 1.0: 30}
+workload lvls (A+B slots): {1: 30, 2: 30, 3: 28}
+corr(diffs) salary-rest -0.18  salary-workload 0.27  rest-workload 0.22
+trials with a 0-rest-day option: 25
+catch positions: [8, 11, 3, 9]  dominant sides: ['A', 'B', 'B', 'A']
+run durations (s): [232.0]
+
+=== design_v04.csv ===
+trials 48 (tradeoff 40, identical_terms 4, catch 4)
+D-error (effects-coded A-B differences, zero priors, non-catch trials) = 0.741
+origin appearances (A/B) non-catch: SEA_SA 11/11, ARAB 11/11, AFRICAN 11/11, WESTERN 11/11
+salary levels (A+B slots): {1800: 28, 2500: 31, 3200: 29}
+rest levels   (A+B slots): {0.0: 31, 0.5: 29, 1.0: 28}
+workload lvls (A+B slots): {1: 31, 2: 29, 3: 28}
+corr(diffs) salary-rest -0.23  salary-workload 0.18  rest-workload 0.18
+trials with a 0-rest-day option: 29
+catch positions: [5, 11, 11, 5]  dominant sides: ['A', 'B', 'B', 'A']
+run durations (s): [232.0]
