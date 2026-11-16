@@ -1,0 +1,15 @@
+code,event,description,status,eyelink_message
+1,RUN_START,first scanner trigger received,SIMULATED - verify DOUT bit mapping with experiments/EEG-FMRI/general/bit_test.m,RUN_START
+2,RUN_END,end of lead-out fixation,SIMULATED - verify DOUT bit mapping with experiments/EEG-FMRI/general/bit_test.m,RUN_END
+10,PRETRIAL_FIXATION,fixation cross before phase 1,SIMULATED - verify DOUT bit mapping with experiments/EEG-FMRI/general/bit_test.m,PRETRIAL_FIXATION
+11,PHASE1_ONSET,employer photos + origin shown,SIMULATED - verify DOUT bit mapping with experiments/EEG-FMRI/general/bit_test.m,PHASE1_ONSET
+12,GAP1_ONSET,fixation between phase 1 and 2,SIMULATED - verify DOUT bit mapping with experiments/EEG-FMRI/general/bit_test.m,GAP1_ONSET
+21,PHASE2_ONSET,full offers shown,SIMULATED - verify DOUT bit mapping with experiments/EEG-FMRI/general/bit_test.m,PHASE2_ONSET
+22,GAP2_ONSET,fixation between phase 2 and 3,SIMULATED - verify DOUT bit mapping with experiments/EEG-FMRI/general/bit_test.m,GAP2_ONSET
+31,PHASE3_ONSET,decision screen shown,SIMULATED - verify DOUT bit mapping with experiments/EEG-FMRI/general/bit_test.m,PHASE3_ONSET
+41,RESPONSE_B1,Definitely Accept Offer A,SIMULATED - verify DOUT bit mapping with experiments/EEG-FMRI/general/bit_test.m,RESPONSE_B1
+42,RESPONSE_B2,Probably Accept Offer A,SIMULATED - verify DOUT bit mapping with experiments/EEG-FMRI/general/bit_test.m,RESPONSE_B2
+43,RESPONSE_B3,Probably Accept Offer B,SIMULATED - verify DOUT bit mapping with experiments/EEG-FMRI/general/bit_test.m,RESPONSE_B3
+44,RESPONSE_B4,Definitely Accept Offer B,SIMULATED - verify DOUT bit mapping with experiments/EEG-FMRI/general/bit_test.m,RESPONSE_B4
+49,RESPONSE_TIMEOUT,no response within phase 3 window,SIMULATED - verify DOUT bit mapping with experiments/EEG-FMRI/general/bit_test.m,RESPONSE_TIMEOUT
+51,ITI_ONSET,inter-trial fixation,SIMULATED - verify DOUT bit mapping with experiments/EEG-FMRI/general/bit_test.m,ITI_ONSET

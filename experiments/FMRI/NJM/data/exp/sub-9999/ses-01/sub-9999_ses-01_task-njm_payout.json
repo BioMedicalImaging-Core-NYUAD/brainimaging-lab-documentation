@@ -1,0 +1,36 @@
+{
+  "subject": "9999",
+  "session": "01",
+  "drawn_at": "2026-11-16 11:18:47",
+  "random_seed": 1.007052031E+9,
+  "market_success_probability": 0.5,
+  "scanner": {
+    "drawn": true,
+    "lottery": "scanner",
+    "n_trials": 48,
+    "picked_run": 3,
+    "picked_trial": 6,
+    "answer": "definitely",
+    "chosen_salary_aed": 3200,
+    "eligible": true,
+    "market_success": false,
+    "bonus_aed": 0,
+    "note": "no bonus: the job was not available in the market draw"
+  },
+  "online": {
+    "drawn": true,
+    "lottery": "online",
+    "n_trials": 24,
+    "picked_run": 0,
+    "picked_trial": 7,
+    "answer": "definitely",
+    "chosen_salary_aed": 2500,
+    "eligible": true,
+    "market_success": true,
+    "bonus_aed": 39,
+    "note": "bonus: AED 2500 / 64, rounded down"
+  },
+  "fmri_session_fee_aed": 80,
+  "travel_allowance_aed": 20,
+  "total_aed": 139
+}

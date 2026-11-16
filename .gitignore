@@ -58,3 +58,18 @@ pipeline/fmri_pipelines/projects/sixth-finger/RSAtoolbox/
 
 # Large saved MATLAB workspaces (regeneratable analysis outputs, not source)
 pipeline/fmri_pipelines/projects/sixth-finger/**/matlab_workspace.mat
+
+# MATLAB autosave files
+*.asv
+
+# NJM: local source material (unpublished protocol, raw sheets) - never commit
+experiments/FMRI/NJM/stimuli_data/_source/
+
+# NJM: never commit participant data; only the test participant (sub-9999, simulated) is kept as an example
+experiments/FMRI/NJM/data/exp/*
+!experiments/FMRI/NJM/data/exp/sub-9999/
+# the example .mat files hold local folder paths; the events/design/payout files are enough as an example
+experiments/FMRI/NJM/data/exp/sub-9999/**/*.mat
+
+# Experiment pages copied from experiments/**/README.rst by docs/source/conf.py at build time
+docs/source/5-mri-experiments-gallery/experiments/*/exp-*.rst

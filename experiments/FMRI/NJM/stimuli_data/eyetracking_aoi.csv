@@ -1,0 +1,24 @@
+phase,side,element,x_center_deg,y_center_deg,width_deg,height_deg,left_deg,right_deg,top_deg,bottom_deg,note
+phase1,A,photo,-6.0,-2.72,3.6,4.5,-7.8,-4.2,-4.970000000000001,-0.4700000000000002,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase1,A,employer_origin,-6.0,0.35,10.8,1.5,-11.4,-0.5999999999999996,-0.4,1.1,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase1,B,photo,6.0,-2.72,3.6,4.5,4.2,7.8,-4.970000000000001,-0.4700000000000002,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase1,B,employer_origin,6.0,0.35,10.8,1.5,0.5999999999999996,11.4,-0.4,1.1,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase2,A,photo,-6.0,-2.72,3.6,4.5,-7.8,-4.2,-4.970000000000001,-0.4700000000000002,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase2,A,employer_origin,-6.0,0.35,10.8,1.5,-11.4,-0.5999999999999996,-0.4,1.1,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase2,A,salary_aed,-6.0,2.0,10.8,1.5,-11.4,-0.5999999999999996,1.25,2.75,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase2,A,rest_days_per_week,-6.0,3.6,10.8,1.5,-11.4,-0.5999999999999996,2.85,4.35,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase2,A,workload,-6.0,5.2,10.8,1.5,-11.4,-0.5999999999999996,4.45,5.95,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase2,B,photo,6.0,-2.72,3.6,4.5,4.2,7.8,-4.970000000000001,-0.4700000000000002,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase2,B,employer_origin,6.0,0.35,10.8,1.5,0.5999999999999996,11.4,-0.4,1.1,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase2,B,salary_aed,6.0,2.0,10.8,1.5,0.5999999999999996,11.4,1.25,2.75,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase2,B,rest_days_per_week,6.0,3.6,10.8,1.5,0.5999999999999996,11.4,2.85,4.35,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase2,B,workload,6.0,5.2,10.8,1.5,0.5999999999999996,11.4,4.45,5.95,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase3,-,prompt,0.0,2.25,16.0,1.2,-8.0,8.0,1.65,2.85,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase3,A,photo,-6.0,-2.72,3.6,4.5,-7.8,-4.2,-4.970000000000001,-0.4700000000000002,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase3,A,employer_origin,-6.0,0.35,10.8,1.5,-11.4,-0.5999999999999996,-0.4,1.1,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase3,A,option_1,-8.55,4.6,4.9,2.6,-11.0,-6.1000000000000005,3.3,5.8999999999999995,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase3,A,option_2,-3.45,4.6,4.9,2.6,-5.9,-1.0,3.3,5.8999999999999995,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase3,B,photo,6.0,-2.72,3.6,4.5,4.2,7.8,-4.970000000000001,-0.4700000000000002,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase3,B,employer_origin,6.0,0.35,10.8,1.5,0.5999999999999996,11.4,-0.4,1.1,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase3,B,option_3,3.45,4.6,4.9,2.6,1.0,5.9,3.3,5.8999999999999995,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF
+phase3,B,option_4,8.55,4.6,4.9,2.6,6.1000000000000005,11.0,3.3,5.8999999999999995,from display.layout_deg in the JSON; +y is down; the task converts with VP.pixelsPerDegree and writes the pixel AOIs into the EDF

@@ -36,6 +36,82 @@ elif PDF_GENERATION_INDEX == 'EEG_FMRI_MANUAL':
     master_doc = 'index_eeg_fmri'
 
 
+# -- Experiment pages kept next to the experiment code -----------------------
+# An experiment is documented by a README.rst in its own folder, e.g.
+#   experiments/FMRI/NJM/README.rst
+# GitHub shows that file when the folder is browsed. For the website, the
+# function below copies every such file into the experiments gallery
+#   5-mri-experiments-gallery/experiments/<fmri|eeg-fmri>/exp-<name>.rst
+# each time the documentation is built (locally and on Read the Docs), so the
+# gallery's existing "experiments/fmri/*" glob picks it up. Nothing has to be
+# added under docs/ by hand, and the copies are ignored by git.
+#
+# In the README.rst, write paths of images and included files relative to the
+# experiment folder (".. figure:: screens/phase2_offer.png"). They are
+# rewritten in the copy so that they still point at the experiment folder.
+import re
+import pathlib
+
+EXPERIMENT_DOC_NAME = "README.rst"
+# Experiments whose page is still hand-written under docs/: listed here so they
+# do not appear twice. To move one over, delete its page under docs/ and its line here.
+EXPERIMENT_DOCS_SKIP = {
+    "EEG-FMRI/finger-tapping",
+}
+EXPERIMENT_DOC_PREFIX = "exp-"
+
+
+def collect_experiment_docs():
+    source_dir = pathlib.Path(__file__).resolve().parent
+    repo_dir = source_dir.parents[1]
+    experiments_dir = repo_dir / "experiments"
+    gallery_dir = source_dir / "5-mri-experiments-gallery" / "experiments"
+
+    # directives whose argument is a file, and the ":file:" option of csv-table / raw
+    directive = re.compile(r"^(\s*\.\.\s+(?:\|[^|]+\|\s+)?(?:image|figure|literalinclude|include)::\s*)(\S+)\s*$")
+    file_option = re.compile(r"^(\s*:file:\s*)(\S+)\s*$")
+
+    wanted = {}
+    for readme in sorted(experiments_dir.rglob(EXPERIMENT_DOC_NAME)):
+        parts = readme.parent.relative_to(experiments_dir).parts
+        if len(parts) < 2 or "/".join(parts) in EXPERIMENT_DOCS_SKIP:
+            continue
+        target_dir = gallery_dir / parts[0].lower()            # FMRI -> fmri, EEG-FMRI -> eeg-fmri
+        if not target_dir.is_dir():
+            print("experiment docs: no gallery folder for", readme)
+            continue
+
+        def repoint(match, folder=readme.parent):
+            path = match.group(2)
+            if path.startswith("/") or "://" in path:
+                return match.group(0)
+            # "/..." is read by Sphinx as relative to the source directory
+            return match.group(1) + "/" + pathlib.Path(os.path.relpath(folder / path, source_dir)).as_posix()
+
+        lines = []
+        for line in readme.read_text(encoding="utf-8").splitlines():
+            line = directive.sub(repoint, line)
+            line = file_option.sub(repoint, line)
+            lines.append(line)
+        origin = readme.relative_to(repo_dir).as_posix()
+        text = (".. GENERATED FILE - do not edit. Source: %s (copied by docs/source/conf.py)\n\n" % origin
+                + "\n".join(lines)
+                + "\n\nCode and files of this experiment: :github-file:`%s/`\n" % readme.parent.relative_to(repo_dir).as_posix())
+        wanted[target_dir / (EXPERIMENT_DOC_PREFIX + "-".join(parts[1:]) + ".rst")] = text    # exp-NJM.rst, exp-qc-bh.rst
+
+    # remove copies whose README.rst is gone, write the others only when they changed
+    for old in gallery_dir.glob("*/%s*.rst" % EXPERIMENT_DOC_PREFIX):
+        if old not in wanted:
+            old.unlink()
+    for path, text in wanted.items():
+        if not path.exists() or path.read_text(encoding="utf-8") != text:
+            path.write_text(text, encoding="utf-8")
+    print("experiment docs collected:", ", ".join(sorted(p.name for p in wanted)) or "none")
+
+
+collect_experiment_docs()
+
+
 # -- General configuration ---------------------------------------------------
 # -- General configuration
 

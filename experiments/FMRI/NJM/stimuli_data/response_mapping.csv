@@ -1,0 +1,5 @@
+button,finger,label,choice,confidence,hand,vpixx_box,vpixx_color_PLACEHOLDER,keyboard_key
+1,index,Definitely Accept Offer A,A,definitely,right,right box,red,1!
+2,middle,Probably Accept Offer A,A,probably,right,right box,yellow,2@
+3,ring,Probably Accept Offer B,B,probably,right,right box,green,3#
+4,pinky,Definitely Accept Offer B,B,definitely,right,right box,blue,4$
