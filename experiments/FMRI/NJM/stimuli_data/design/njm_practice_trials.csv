@@ -1,0 +1,7 @@
+trial_id,trial_kind,is_catch,dominant_profile,P1_origin,P1_salary_aed,P1_rest_days,P1_workload,P2_origin,P2_salary_aed,P2_rest_days,P2_workload
+1,tradeoff,0,,WESTERN,3200,0.0,3,ARAB,1800,0.5,3
+2,tradeoff,0,,WESTERN,1800,1.0,3,SEA_SA,3200,0.0,1
+3,tradeoff,0,,SEA_SA,1800,0.5,2,ARAB,3200,0.0,1
+4,catch,1,P1,AFRICAN,3200,0.5,2,AFRICAN,2500,0.0,3
+5,tradeoff,0,,ARAB,2500,0.0,1,WESTERN,2500,0.5,3
+6,tradeoff,0,,ARAB,3200,0.0,1,SEA_SA,2500,1.0,2

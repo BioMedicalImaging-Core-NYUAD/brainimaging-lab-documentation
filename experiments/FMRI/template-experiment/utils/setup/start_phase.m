@@ -6,7 +6,9 @@ function [pa, phaseEnd, onsetTime] = start_phase(VP, pa, experimentStartTime, du
 % so a late frame never pushes the following phases later (no drift).
 %
 % Call this right after drawing the first frame of the phase, then keep
-% redrawing/flipping while GetSecs < phaseEnd - 0.5 * VP.ifi.
+% redrawing/flipping while GetSecs < phaseEnd - 1.5 * VP.ifi (Flip returns
+% at a screen refresh; stopping at 0.5 frames would make every following
+% phase exactly one frame late).
 %
 % Inputs:
 %   VP                  - Viewing Parameters structure (window, ifi)

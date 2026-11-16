@@ -1,0 +1,13 @@
+The five icons in this folder are from Google's Noto Emoji project
+(https://github.com/googlefonts/noto-emoji, folder 2D/png/512), resized to 160 x 160 px.
+Noto Emoji image resources are licensed under the Apache License, Version 2.0
+(http://www.apache.org/licenses/LICENSE-2.0).
+
+  icon_employer.png    U+1F464  bust in silhouette   employer
+  icon_background.png  U+1F310  globe with meridians family background
+  icon_salary.png      U+1F4B0  money bag            monthly salary
+  icon_rest_days.png   U+1F4C5  calendar             rest days
+  icon_workload.png    U+1F9F9  broom                household workload
+
+They replace the emoji pictures embedded in the protocol document, which are Apple artwork and
+cannot be redistributed.

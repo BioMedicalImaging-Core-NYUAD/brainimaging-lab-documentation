@@ -42,7 +42,7 @@ drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixat
 % Discard presses made before the response screen appeared
 KbQueueFlush();
 
-while GetSecs < phaseEnd - 0.5 * VP.ifi
+while GetSecs < phaseEnd - 1.5 * VP.ifi   % stop one frame early so the next phase starts on time
     currentFixationAngle = pa.fixationSpeed * (GetSecs - experimentStartTime);
 
     drawCircleWithDot(VP.window, VP.windowCenter, pa.fixationRadiusPix, currentFixationAngle, ...

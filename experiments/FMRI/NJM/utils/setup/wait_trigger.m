@@ -1,4 +1,4 @@
-function triggerTime = wait_trigger(VP, manualTrigger)
+function triggerTime = wait_trigger(VP, manualTrigger, noWait)
 % WAIT_TRIGGER - Wait for scanner trigger or manual trigger
 %
 % Inputs:
@@ -9,9 +9,11 @@ function triggerTime = wait_trigger(VP, manualTrigger)
 %   triggerTime - GetSecs time at which the trigger was detected
 %                 (blocks until trigger received)
 %
+%   noWait - optional, true = do not wait at all (automated tests)
+%
 % Usage:
-%   wait_trigger(VP, true);   % Debug mode (press t)
-%   wait_trigger(VP, false);  % Scanner mode
+%   t0 = wait_trigger(VP, true);   % Debug mode (press t)
+%   t0 = wait_trigger(VP, false);  % Scanner mode
 
 % Input validation
 if nargin < 2
@@ -42,6 +44,12 @@ if manualTrigger
 end
 
 Screen('Flip', VP.window);
+
+if nargin >= 3 && noWait
+    triggerTime = GetSecs;
+    fprintf('TEST MODE: not waiting for a trigger\n');
+    return;
+end
 
 if manualTrigger
     % DEBUG MODE: Manual trigger via keyboard (5 or t)

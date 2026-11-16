@@ -1,0 +1,7 @@
+run,trial_in_run,trial_global,trial_id,trial_kind,is_catch,dominant_side,swapped,A_origin,A_face,A_salary_aed,A_rest_days,A_workload,B_origin,B_face,B_salary_aed,B_rest_days,B_workload,pretrial_fixation,gap1,gap2,iti,onset_fixation,onset_phase1,onset_gap1,onset_phase2,onset_gap2,onset_phase3,onset_iti,trial_end,run_duration,seed
+1,1,1,5,tradeoff,0,none,1,WESTERN,face_western_01.png,2500,0.5,3,ARAB,face_arab_01.png,2500,0,1,2,3,1,3,10,12,16,19,24,25,28,31,157.5,107002665
+1,2,2,4,catch,1,A,0,AFRICAN,face_african_01.png,3200,0.5,2,AFRICAN,face_african_02.png,2500,0,3,3,1,2,4,31,34,38,39,44,46,49,53,157.5,107002665
+1,3,3,1,tradeoff,0,none,1,ARAB,face_arab_02.png,1800,0.5,3,WESTERN,face_western_02.png,3200,0,3,4,1,1,6,53,57,61,62,67,68,71,77,157.5,107002665
+1,4,4,6,tradeoff,0,none,0,ARAB,face_arab_01.png,3200,0,1,SEA_SA,face_sea_sa_02.png,2500,1,2,3.5,1,1,4,77,80.5,84.5,85.5,90.5,91.5,94.5,98.5,157.5,107002665
+1,5,5,2,tradeoff,0,none,1,SEA_SA,face_sea_sa_01.png,3200,0,1,WESTERN,face_western_02.png,1800,1,3,1.5,1,2,3,98.5,100,104,105,110,112,115,118,157.5,107002665
+1,6,6,3,tradeoff,0,none,0,SEA_SA,face_sea_sa_01.png,1800,0.5,2,ARAB,face_arab_02.png,3200,0,1,4.5,3,3,5,118,122.5,126.5,129.5,134.5,137.5,140.5,145.5,157.5,107002665

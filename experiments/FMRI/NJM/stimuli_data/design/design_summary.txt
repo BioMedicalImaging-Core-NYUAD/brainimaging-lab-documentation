@@ -1,49 +1,30 @@
-Run length 232.0 s (3.87 min); TR 1.5 s -> program 158 volumes per run (incl. 3 spare). 4 runs = 15.5 min of task scanning.
+NJM fMRI trial set (design/njm_fmri_trials.csv) - search seed 20261118
 
-=== design_v01.csv ===
-trials 48 (tradeoff 40, identical_terms 4, catch 4)
-D-error (effects-coded A-B differences, zero priors, non-catch trials) = 0.752
-origin appearances (A/B) non-catch: SEA_SA 11/11, ARAB 11/11, AFRICAN 11/11, WESTERN 11/11
-salary levels (A+B slots): {1800: 29, 2500: 28, 3200: 31}
-rest levels   (A+B slots): {0.0: 28, 0.5: 30, 1.0: 30}
-workload lvls (A+B slots): {1: 27, 2: 31, 3: 30}
-corr(diffs) salary-rest -0.13  salary-workload 0.20  rest-workload 0.20
-trials with a 0-rest-day option: 27
-catch positions: [3, 10, 9, 8]  dominant sides: ['B', 'A', 'B', 'A']
-run durations (s): [232.0]
+Run length 292.0 s (4.87 min); TR 1.50 s (placeholder) -> program 198 volumes per run (incl. 3 spare).
+4 runs = 19.5 min of task scanning; with 120-180 s rests between runs: 25-28 min.
 
-=== design_v02.csv ===
-trials 48 (tradeoff 40, identical_terms 4, catch 4)
-D-error (effects-coded A-B differences, zero priors, non-catch trials) = 0.751
-origin appearances (A/B) non-catch: SEA_SA 11/11, ARAB 11/11, AFRICAN 11/11, WESTERN 11/11
-salary levels (A+B slots): {1800: 32, 2500: 28, 3200: 28}
-rest levels   (A+B slots): {0.0: 29, 0.5: 31, 1.0: 28}
-workload lvls (A+B slots): {1: 26, 2: 27, 3: 35}
-corr(diffs) salary-rest -0.21  salary-workload 0.20  rest-workload 0.15
-trials with a 0-rest-day option: 28
-catch positions: [8, 11, 4, 9]  dominant sides: ['B', 'A', 'A', 'B']
-run durations (s): [232.0]
+trials: 48  (tradeoff 40, identical_terms 4, catch 4)
+distinct job profiles: 96 of 108 (88.9 % of the full factorial)
+D-error, effects-coded differences, zero priors: 0.738 (44 non-catch trials), 0.693 (40 trade-off trials)
 
-=== design_v03.csv ===
-trials 48 (tradeoff 40, identical_terms 4, catch 4)
-D-error (effects-coded A-B differences, zero priors, non-catch trials) = 0.762
-origin appearances (A/B) non-catch: SEA_SA 11/11, ARAB 11/11, AFRICAN 11/11, WESTERN 11/11
-salary levels (A+B slots): {1800: 26, 2500: 33, 3200: 29}
-rest levels   (A+B slots): {0.0: 26, 0.5: 32, 1.0: 30}
-workload lvls (A+B slots): {1: 30, 2: 30, 3: 28}
-corr(diffs) salary-rest -0.18  salary-workload 0.27  rest-workload 0.22
-trials with a 0-rest-day option: 25
-catch positions: [8, 11, 3, 9]  dominant sides: ['A', 'B', 'B', 'A']
-run durations (s): [232.0]
+appearances per employer origin : {'SEA_SA': 24, 'ARAB': 24, 'AFRICAN': 24, 'WESTERN': 24}
+appearances per salary level    : {1800: 32, 2500: 32, 3200: 32}
+appearances per rest-day level  : {0.0: 32, 0.5: 32, 1.0: 32}
+appearances per workload level  : {1: 32, 2: 32, 3: 32}
+levels within each origin       : every salary / rest-day / workload level appears exactly 8 times per origin: True
 
-=== design_v04.csv ===
-trials 48 (tradeoff 40, identical_terms 4, catch 4)
-D-error (effects-coded A-B differences, zero priors, non-catch trials) = 0.741
-origin appearances (A/B) non-catch: SEA_SA 11/11, ARAB 11/11, AFRICAN 11/11, WESTERN 11/11
-salary levels (A+B slots): {1800: 28, 2500: 31, 3200: 29}
-rest levels   (A+B slots): {0.0: 31, 0.5: 29, 1.0: 28}
-workload lvls (A+B slots): {1: 31, 2: 29, 3: 28}
-corr(diffs) salary-rest -0.23  salary-workload 0.18  rest-workload 0.18
-trials with a 0-rest-day option: 29
-catch positions: [5, 11, 11, 5]  dominant sides: ['A', 'B', 'B', 'A']
-run durations (s): [232.0]
+origin pairs in the 44 non-catch trials:
+   AFRICAN / ARAB         8
+   AFRICAN / SEA_SA       7
+   AFRICAN / WESTERN      7
+   ARAB / SEA_SA          7
+   ARAB / WESTERN         7
+   SEA_SA / WESTERN       8
+
+correlation of attribute differences (non-catch): salary-rest -0.17, salary-workload +0.16, rest-workload +0.16
+non-catch trials with a 0-rest-day option: 28;  with 0 rest days on exactly one side: 28
+catch trials (origin, dominant profile): ARAB/P1, AFRICAN/P2, SEA_SA/P2, WESTERN/P2
+
+Not in this file (done per participant by MATLAB, seeded by subject ID): split into 4 runs (1 catch +
+1 identical-terms + 10 trade-off each), trial order, left/right side (half the trials swapped), which
+face shows each origin, and the jitter order.

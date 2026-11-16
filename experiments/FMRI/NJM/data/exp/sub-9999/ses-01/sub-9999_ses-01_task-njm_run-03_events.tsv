@@ -1,0 +1,47 @@
+onset	duration	trial_type	trial	trial_global	trial_id	trial_kind	is_catch	dominant_side	swapped	A_origin	B_origin	A_face	B_face	A_salary_aed	B_salary_aed	A_rest_days	B_rest_days	A_workload	B_workload	response_button	response_label	choice	confidence	response_time	timeout	catch_pass	chosen_origin	chosen_salary_aed	chosen_rest_days	chosen_workload
+10.9594	4.0000	phase1_employer	1	25	18	tradeoff	0	n/a	1	AFRICAN	SEA_SA	face_african_01.png	face_sea_sa_02.png	1800	3200	0	1	1	2	4	Definitely Accept Offer B	B	definitely	1.0864	0	n/a	SEA_SA	3200	1	2
+16.9612	5.0000	phase2_offer	1	25	18	tradeoff	0	n/a	1	AFRICAN	SEA_SA	face_african_01.png	face_sea_sa_02.png	1800	3200	0	1	1	2	4	Definitely Accept Offer B	B	definitely	1.0864	0	n/a	SEA_SA	3200	1	2
+22.9652	1.0864	phase3_decision	1	25	18	tradeoff	0	n/a	1	AFRICAN	SEA_SA	face_african_01.png	face_sea_sa_02.png	1800	3200	0	1	1	2	4	Definitely Accept Offer B	B	definitely	1.0864	0	n/a	SEA_SA	3200	1	2
+24.0516	0	response	1	25	18	tradeoff	0	n/a	1	AFRICAN	SEA_SA	face_african_01.png	face_sea_sa_02.png	1800	3200	0	1	1	2	4	Definitely Accept Offer B	B	definitely	1.0864	0	n/a	SEA_SA	3200	1	2
+31.9731	4.0000	phase1_employer	2	26	14	tradeoff	0	n/a	1	AFRICAN	ARAB	face_african_01.png	face_arab_01.png	3200	2500	0	0.5	3	2	4	Definitely Accept Offer B	B	definitely	1.1941	0	n/a	ARAB	2500	0.5	2
+36.9753	5.0000	phase2_offer	2	26	14	tradeoff	0	n/a	1	AFRICAN	ARAB	face_african_01.png	face_arab_01.png	3200	2500	0	0.5	3	2	4	Definitely Accept Offer B	B	definitely	1.1941	0	n/a	ARAB	2500	0.5	2
+43.9785	1.1941	phase3_decision	2	26	14	tradeoff	0	n/a	1	AFRICAN	ARAB	face_african_01.png	face_arab_01.png	3200	2500	0	0.5	3	2	4	Definitely Accept Offer B	B	definitely	1.1941	0	n/a	ARAB	2500	0.5	2
+45.1726	0	response	2	26	14	tradeoff	0	n/a	1	AFRICAN	ARAB	face_african_01.png	face_arab_01.png	3200	2500	0	0.5	3	2	4	Definitely Accept Offer B	B	definitely	1.1941	0	n/a	ARAB	2500	0.5	2
+54.4809	4.0000	phase1_employer	3	27	7	identical_terms	0	n/a	1	AFRICAN	SEA_SA	face_african_02.png	face_sea_sa_01.png	1800	1800	0.5	0.5	3	3	4	Definitely Accept Offer B	B	definitely	2.0828	0	n/a	SEA_SA	1800	0.5	3
+60.4824	5.0000	phase2_offer	3	27	7	identical_terms	0	n/a	1	AFRICAN	SEA_SA	face_african_02.png	face_sea_sa_01.png	1800	1800	0.5	0.5	3	3	4	Definitely Accept Offer B	B	definitely	2.0828	0	n/a	SEA_SA	1800	0.5	3
+67.4874	2.0828	phase3_decision	3	27	7	identical_terms	0	n/a	1	AFRICAN	SEA_SA	face_african_02.png	face_sea_sa_01.png	1800	1800	0.5	0.5	3	3	4	Definitely Accept Offer B	B	definitely	2.0828	0	n/a	SEA_SA	1800	0.5	3
+69.5702	0	response	3	27	7	identical_terms	0	n/a	1	AFRICAN	SEA_SA	face_african_02.png	face_sea_sa_01.png	1800	1800	0.5	0.5	3	3	4	Definitely Accept Offer B	B	definitely	2.0828	0	n/a	SEA_SA	1800	0.5	3
+76.9916	4.0000	phase1_employer	4	28	46	tradeoff	0	n/a	0	AFRICAN	ARAB	face_african_01.png	face_arab_01.png	3200	2500	0	0.5	1	3	2	Probably Accept Offer A	A	probably	1.4152	0	n/a	AFRICAN	3200	0	1
+83.9918	5.0000	phase2_offer	4	28	46	tradeoff	0	n/a	0	AFRICAN	ARAB	face_african_01.png	face_arab_01.png	3200	2500	0	0.5	1	3	2	Probably Accept Offer A	A	probably	1.4152	0	n/a	AFRICAN	3200	0	1
+90.9976	1.4152	phase3_decision	4	28	46	tradeoff	0	n/a	0	AFRICAN	ARAB	face_african_01.png	face_arab_01.png	3200	2500	0	0.5	1	3	2	Probably Accept Offer A	A	probably	1.4152	0	n/a	AFRICAN	3200	0	1
+92.4128	0	response	4	28	46	tradeoff	0	n/a	0	AFRICAN	ARAB	face_african_01.png	face_arab_01.png	3200	2500	0	0.5	1	3	2	Probably Accept Offer A	A	probably	1.4152	0	n/a	AFRICAN	3200	0	1
+104.0028	4.0000	phase1_employer	5	29	24	tradeoff	0	n/a	0	ARAB	WESTERN	face_arab_02.png	face_western_01.png	1800	2500	1	0	1	2	1	Definitely Accept Offer A	A	definitely	1.3437	0	n/a	ARAB	1800	1	1
+110.0095	5.0000	phase2_offer	5	29	24	tradeoff	0	n/a	0	ARAB	WESTERN	face_arab_02.png	face_western_01.png	1800	2500	1	0	1	2	1	Definitely Accept Offer A	A	definitely	1.3437	0	n/a	ARAB	1800	1	1
+116.0083	1.3437	phase3_decision	5	29	24	tradeoff	0	n/a	0	ARAB	WESTERN	face_arab_02.png	face_western_01.png	1800	2500	1	0	1	2	1	Definitely Accept Offer A	A	definitely	1.3437	0	n/a	ARAB	1800	1	1
+117.3520	0	response	5	29	24	tradeoff	0	n/a	0	ARAB	WESTERN	face_arab_02.png	face_western_01.png	1800	2500	1	0	1	2	1	Definitely Accept Offer A	A	definitely	1.3437	0	n/a	ARAB	1800	1	1
+124.5127	4.0000	phase1_employer	6	30	30	tradeoff	0	n/a	1	AFRICAN	ARAB	face_african_02.png	face_arab_01.png	3200	2500	0.5	1	1	3	1	Definitely Accept Offer A	A	definitely	1.1211	0	n/a	AFRICAN	3200	0.5	1
+129.5195	5.0000	phase2_offer	6	30	30	tradeoff	0	n/a	1	AFRICAN	ARAB	face_african_02.png	face_arab_01.png	3200	2500	0.5	1	1	3	1	Definitely Accept Offer A	A	definitely	1.1211	0	n/a	AFRICAN	3200	0.5	1
+137.5184	1.1211	phase3_decision	6	30	30	tradeoff	0	n/a	1	AFRICAN	ARAB	face_african_02.png	face_arab_01.png	3200	2500	0.5	1	1	3	1	Definitely Accept Offer A	A	definitely	1.1211	0	n/a	AFRICAN	3200	0.5	1
+138.6395	0	response	6	30	30	tradeoff	0	n/a	1	AFRICAN	ARAB	face_african_02.png	face_arab_01.png	3200	2500	0.5	1	1	3	1	Definitely Accept Offer A	A	definitely	1.1211	0	n/a	AFRICAN	3200	0.5	1
+150.0229	4.0000	phase1_employer	7	31	8	tradeoff	0	n/a	0	WESTERN	SEA_SA	face_western_02.png	face_sea_sa_02.png	2500	1800	0.5	1	2	3	2	Probably Accept Offer A	A	probably	1.4357	0	n/a	WESTERN	2500	0.5	2
+155.0258	5.0000	phase2_offer	7	31	8	tradeoff	0	n/a	0	WESTERN	SEA_SA	face_western_02.png	face_sea_sa_02.png	2500	1800	0.5	1	2	3	2	Probably Accept Offer A	A	probably	1.4357	0	n/a	WESTERN	2500	0.5	2
+161.0306	1.4357	phase3_decision	7	31	8	tradeoff	0	n/a	0	WESTERN	SEA_SA	face_western_02.png	face_sea_sa_02.png	2500	1800	0.5	1	2	3	2	Probably Accept Offer A	A	probably	1.4357	0	n/a	WESTERN	2500	0.5	2
+162.4663	0	response	7	31	8	tradeoff	0	n/a	0	WESTERN	SEA_SA	face_western_02.png	face_sea_sa_02.png	2500	1800	0.5	1	2	3	2	Probably Accept Offer A	A	probably	1.4357	0	n/a	WESTERN	2500	0.5	2
+172.5377	4.0000	phase1_employer	8	32	41	tradeoff	0	n/a	0	AFRICAN	SEA_SA	face_african_01.png	face_sea_sa_02.png	2500	1800	1	0	3	2	1	Definitely Accept Offer A	A	definitely	1.0388	0	n/a	AFRICAN	2500	1	3
+177.5400	5.0000	phase2_offer	8	32	41	tradeoff	0	n/a	0	AFRICAN	SEA_SA	face_african_01.png	face_sea_sa_02.png	2500	1800	1	0	3	2	1	Definitely Accept Offer A	A	definitely	1.0388	0	n/a	AFRICAN	2500	1	3
+183.5416	1.0388	phase3_decision	8	32	41	tradeoff	0	n/a	0	AFRICAN	SEA_SA	face_african_01.png	face_sea_sa_02.png	2500	1800	1	0	3	2	1	Definitely Accept Offer A	A	definitely	1.0388	0	n/a	AFRICAN	2500	1	3
+184.5804	0	response	8	32	41	tradeoff	0	n/a	0	AFRICAN	SEA_SA	face_african_01.png	face_sea_sa_02.png	2500	1800	1	0	3	2	1	Definitely Accept Offer A	A	definitely	1.0388	0	n/a	AFRICAN	2500	1	3
+193.5476	4.0000	phase1_employer	9	33	47	tradeoff	0	n/a	1	SEA_SA	WESTERN	face_sea_sa_01.png	face_western_01.png	3200	2500	0	1	2	1	n/a	n/a	n/a	n/a	n/a	1	n/a	n/a	n/a	n/a	n/a
+200.5472	5.0000	phase2_offer	9	33	47	tradeoff	0	n/a	1	SEA_SA	WESTERN	face_sea_sa_01.png	face_western_01.png	3200	2500	0	1	2	1	n/a	n/a	n/a	n/a	n/a	1	n/a	n/a	n/a	n/a	n/a
+207.5513	3.0000	phase3_decision	9	33	47	tradeoff	0	n/a	1	SEA_SA	WESTERN	face_sea_sa_01.png	face_western_01.png	3200	2500	0	1	2	1	n/a	n/a	n/a	n/a	n/a	1	n/a	n/a	n/a	n/a	n/a
+218.5602	4.0000	phase1_employer	10	34	11	tradeoff	0	n/a	0	ARAB	AFRICAN	face_arab_02.png	face_african_02.png	2500	1800	0	0.5	1	2	3	Probably Accept Offer B	B	probably	2.3262	0	n/a	AFRICAN	1800	0.5	2
+224.5628	5.0000	phase2_offer	10	34	11	tradeoff	0	n/a	0	ARAB	AFRICAN	face_arab_02.png	face_african_02.png	2500	1800	0	0.5	1	2	3	Probably Accept Offer B	B	probably	2.3262	0	n/a	AFRICAN	1800	0.5	2
+230.5647	2.3262	phase3_decision	10	34	11	tradeoff	0	n/a	0	ARAB	AFRICAN	face_arab_02.png	face_african_02.png	2500	1800	0	0.5	1	2	3	Probably Accept Offer B	B	probably	2.3262	0	n/a	AFRICAN	1800	0.5	2
+232.8908	0	response	10	34	11	tradeoff	0	n/a	0	ARAB	AFRICAN	face_arab_02.png	face_african_02.png	2500	1800	0	0.5	1	2	3	Probably Accept Offer B	B	probably	2.3262	0	n/a	AFRICAN	1800	0.5	2
+242.0695	4.0000	phase1_employer	11	35	16	catch	1	B	1	ARAB	ARAB	face_arab_01.png	face_arab_02.png	1800	3200	0	1	3	1	n/a	n/a	n/a	n/a	n/a	1	0	n/a	n/a	n/a	n/a
+247.0687	5.0000	phase2_offer	11	35	16	catch	1	B	1	ARAB	ARAB	face_arab_01.png	face_arab_02.png	1800	3200	0	1	3	1	n/a	n/a	n/a	n/a	n/a	1	0	n/a	n/a	n/a	n/a
+253.0737	3.0000	phase3_decision	11	35	16	catch	1	B	1	ARAB	ARAB	face_arab_01.png	face_arab_02.png	1800	3200	0	1	3	1	n/a	n/a	n/a	n/a	n/a	1	0	n/a	n/a	n/a	n/a
+261.0764	4.0000	phase1_employer	12	36	12	tradeoff	0	n/a	0	AFRICAN	WESTERN	face_african_01.png	face_western_02.png	3200	1800	1	0	2	1	1	Definitely Accept Offer A	A	definitely	1.1379	0	n/a	AFRICAN	3200	1	2
+266.0821	5.0000	phase2_offer	12	36	12	tradeoff	0	n/a	0	AFRICAN	WESTERN	face_african_01.png	face_western_02.png	3200	1800	1	0	2	1	1	Definitely Accept Offer A	A	definitely	1.1379	0	n/a	AFRICAN	3200	1	2
+273.9353	1.1379	phase3_decision	12	36	12	tradeoff	0	n/a	0	AFRICAN	WESTERN	face_african_01.png	face_western_02.png	3200	1800	1	0	2	1	1	Definitely Accept Offer A	A	definitely	1.1379	0	n/a	AFRICAN	3200	1	2
+275.0732	0	response	12	36	12	tradeoff	0	n/a	0	AFRICAN	WESTERN	face_african_01.png	face_western_02.png	3200	1800	1	0	2	1	1	Definitely Accept Offer A	A	definitely	1.1379	0	n/a	AFRICAN	3200	1	2

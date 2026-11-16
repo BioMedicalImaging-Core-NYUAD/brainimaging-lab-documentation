@@ -1,0 +1,102 @@
+{
+  "onset": {
+    "Description": "Measured onset of the event, from the first scanner trigger",
+    "Units": "s"
+  },
+  "duration": {
+    "Description": "phase1/phase2: planned display time; phase3: response time (full window if no response); response: 0",
+    "Units": "s"
+  },
+  "trial_type": {
+    "Description": "Event type",
+    "Levels": {
+      "phase1_employer": "Employer photos and family background of both offers",
+      "phase2_offer": "Full offers: background, salary, off days, workload",
+      "phase3_decision": "Decision screen with the four answer options",
+      "response": "Button press"
+    }
+  },
+  "trial": {
+    "Description": "Trial number within the run"
+  },
+  "trial_global": {
+    "Description": "Trial number within the session (1-48)"
+  },
+  "trial_id": {
+    "Description": "Row of stimuli_data/design/njm_fmri_trials.csv (the same pair of offers for every participant)"
+  },
+  "trial_kind": {
+    "Description": "Kind of choice",
+    "Levels": {
+      "tradeoff": "Offers differ in job terms; neither is better on everything",
+      "identical_terms": "Same job terms, different employer origin",
+      "catch": "Same employer origin, one offer better on salary, off days and workload"
+    }
+  },
+  "is_catch": {
+    "Description": "1 = catch trial (attention check)"
+  },
+  "dominant_side": {
+    "Description": "Catch trials: side of the better offer (A = left, B = right)"
+  },
+  "swapped": {
+    "Description": "1 = the two offers of this trial_id are shown in swapped left/right position for this participant"
+  },
+  "A_origin": {
+    "Description": "Employer origin of Offer A (left); B_origin for Offer B (right)",
+    "Levels": {
+      "SEA_SA": "Southeast / South Asian family",
+      "ARAB": "Arab / Emirati family",
+      "AFRICAN": "Black / African family",
+      "WESTERN": "White / Western family"
+    }
+  },
+  "A_face": {
+    "Description": "Photo file shown for the employer (stimuli_data/faces)"
+  },
+  "A_salary_aed": {
+    "Description": "Monthly salary",
+    "Units": "AED"
+  },
+  "A_rest_days": {
+    "Description": "Rest days per week (0, 0.5 = one day every two weeks, 1)"
+  },
+  "A_workload": {
+    "Description": "Household workload: 1 = light, 2 = moderate, 3 = heavy"
+  },
+  "response_button": {
+    "Description": "Button pressed: 1 index, 2 middle, 3 ring, 4 little finger of the right hand"
+  },
+  "response_label": {
+    "Description": "Meaning of the button"
+  },
+  "choice": {
+    "Description": "Chosen offer (A or B)"
+  },
+  "confidence": {
+    "Description": "definitely (buttons 1, 4) or probably (buttons 2, 3)"
+  },
+  "response_time": {
+    "Description": "Time from the onset of the decision screen to the button press",
+    "Units": "s"
+  },
+  "timeout": {
+    "Description": "1 = no response within the decision window"
+  },
+  "catch_pass": {
+    "Description": "Catch trials: 1 = chose the better offer, 0 = did not (or no response)"
+  },
+  "chosen_origin": {
+    "Description": "Attributes of the chosen offer (chosen_origin, chosen_salary_aed, chosen_rest_days, chosen_workload)"
+  },
+  "TaskName": "njmpractice",
+  "StimulusPresentation": {
+    "SoftwareName": "Psychtoolbox",
+    "Code": "brainimaging-lab-documentation/experiments/FMRI/NJM"
+  },
+  "TestRun": {
+    "Description": "NOT REAL DATA: produced by the task in test mode",
+    "TimeScale": 0.1,
+    "SimulatedParticipant": true
+  }
+}

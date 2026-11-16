@@ -1,5 +1,6 @@
 {
-  "_readme": "Single source of truth for the NJM fMRI task. Read in MATLAB with jsondecode(fileread(...)). Provenance of every value (protocol page vs SIMULATED placeholder) is in parameter_sources.csv. Keys starting with '_' are comments.",
+  "_readme": "Single source of truth for the NJM fMRI task. MATLAB reads it at run time (utils/setup/setup_param.m), Python reads it in generate_njm_design.py. Provenance of every value is in parameter_sources.csv. Keys starting with '_' are comments.",
+  "protocol_version": "Protocol Draft dated 11-12-26 (52 pages), which supersedes the 19-page fMRI draft",
   "study": {
     "title": "Evaluating Competing Job Offers: Behavioral and Neural Correlates of Employment Decision-Making Among Household Employees in the UAE",
     "short_name": "NJM",
@@ -9,48 +10,53 @@
     "scanner": "Siemens MAGNETOM Prisma 3T (NYUAD Brain Imaging Core)"
   },
   "sample": {
-    "behavioral_n_completed": 105,
+    "behavioral_n_recruited": 225,
+    "behavioral_n_completed": 203,
     "behavioral_trials": 24,
-    "behavioral_catch_trials": 3,
-    "fmri_n_usable_target": [25, 30],
-    "fmri_n_enrolled_target": [32, 35],
+    "behavioral_blocks": 2,
+    "behavioral_catch_trials": 2,
+    "fmri_n_usable_target": 35,
+    "fmri_n_enrolled_target": 41,
     "fmri_attrition_buffer": 0.15,
-    "fmri_per_cohort": [10, 12],
+    "fmri_per_cohort": [11, 12],
+    "days_between_behavioral_and_fmri": [1, 14],
     "cohorts": ["Southeast Asian", "East African", "South Asian"],
-    "cohort_countries": {
-      "Southeast Asian": ["Philippines", "Indonesia"],
-      "East African": ["Kenya", "Uganda", "Ethiopia"],
-      "South Asian": ["Nepal", "India", "Bangladesh", "Sri Lanka"]
-    }
+    "age_range": [21, 55],
+    "handedness": "right-handed (Edinburgh Handedness Inventory)",
+    "language": "English"
   },
   "session": {
     "n_runs": 4,
     "trials_per_run": 12,
     "n_trials_total": 48,
+    "n_profiles_used": 96,
+    "n_profiles_universe": 108,
     "catch_trials_per_run": 1,
     "identical_terms_trials_per_run": 1,
-    "n_design_versions": 4,
+    "practice_trials": 6,
     "rest_between_runs_s": [120, 180],
     "lead_in_fixation_s": 10.0,
     "lead_out_fixation_s": 12.0,
     "show_trial_counter": true,
-    "trial_counter_format": "Trial %d / %d",
+    "shuffle_order_per_participant": true,
+    "side_swap_probability": 0.5,
     "estimated_total_scanner_time_min": [45, 60]
   },
   "timing": {
-    "phase1_employer_s": 3.0,
-    "isi1_values_s": [1.0, 2.0, 3.0],
-    "isi1_counts_per_run": [6, 4, 2],
-    "phase2_offer_s": 4.0,
-    "isi2_values_s": [1.0, 2.0, 3.0],
-    "isi2_counts_per_run": [6, 4, 2],
+    "_note": "Every trial: pre-trial fixation -> Phase 1 -> gap 1 -> Phase 2 -> gap 2 -> Phase 3 window -> ITI. The jitter lists are per run of 12 trials: each value is used 'count' times, in random order. Phase 3 always takes its full window in the schedule (time left after the response is fixation), so every run has the same length.",
+    "pretrial_fixation_values_s": [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5],
+    "pretrial_fixation_counts":   [1,   1,   1,   1,   3,   2,   1,   2],
+    "phase1_employer_s": 4.0,
+    "gap1_values_s": [1.0, 2.0, 3.0],
+    "gap1_counts":   [6,   4,   2],
+    "phase2_offer_s": 5.0,
+    "gap2_values_s": [1.0, 2.0, 3.0],
+    "gap2_counts":   [6,   4,   2],
     "phase3_decision_max_s": 3.0,
-    "phase3_ends_on_response": true,
-    "phase3_keep_schedule_after_response": true,
     "selection_feedback_s": 0.2,
     "iti_values_s": [3.0, 4.0, 5.0, 6.0, 7.0],
-    "iti_probabilities": [0.40, 0.25, 0.17, 0.11, 0.07],
-    "iti_counts_per_run": [5, 3, 2, 1, 1],
+    "iti_counts":   [5,   3,   2,   1,   1],
+    "iti_probabilities_protocol": [0.40, 0.25, 0.17, 0.11, 0.07],
     "tr_s": 1.5,
     "extra_volumes_after_design": 3
   },
@@ -58,25 +64,29 @@
     "employer_origin": {
       "levels": ["SEA_SA", "ARAB", "AFRICAN", "WESTERN"],
       "labels": ["Southeast / South Asian (non-Arab) Family", "Arab / Emirati Family", "Black (non-Arab) / African Family", "White (non-Arab) / Western Family"],
-      "display": ["South / Southeast Asian Family", "Arab / Emirati Family", "African Family", "Western Family"],
+      "display": ["Southeast / South Asian Family", "Arab / Emirati Family", "Black / African Family", "White / Western Family"],
+      "detail": ["Family background", "Family background", "Family background", "Family background"],
       "icon": "icon_background.png"
     },
     "salary_aed": {
       "levels": [1800, 2500, 3200],
       "labels": ["Low Market Rate", "Standard Market Rate", "High Market Rate"],
       "display": ["AED 1,800 / month", "AED 2,500 / month", "AED 3,200 / month"],
+      "detail": ["Salary", "Salary", "Salary"],
       "icon": "icon_salary.png"
     },
     "rest_days_per_week": {
       "levels": [0.0, 0.5, 1.0],
       "labels": ["No rest days", "1 day every two weeks", "1 day every week"],
       "display": ["0 days / week", "1/2 day / week", "1 day / week"],
+      "detail": ["Off days: none", "Off days: 1 day every two weeks", "Off days: 1 day every week"],
       "icon": "icon_rest_days.png"
     },
     "workload": {
       "levels": [1, 2, 3],
       "labels": ["Light (1 child + no cooking or cleaning)", "Moderate (2 children + general cooking and cleaning)", "Heavy (3+ children + extensive cooking and cleaning)"],
-      "display": ["Light (1 kid, no cook/clean)", "Moderate (2 kids + cook/clean)", "Heavy (3+ kids + extensive cook/clean)"],
+      "display": ["Light workload", "Moderate workload", "Heavy workload"],
+      "detail": ["1 kid, no cook/clean", "2 kids + cook/clean", "3+ kids + extensive cook/clean"],
       "icon": "icon_workload.png"
     }
   },
@@ -86,6 +96,7 @@
     "buttons": [1, 2, 3, 4],
     "fingers": ["index", "middle", "ring", "pinky"],
     "labels": ["Definitely Accept Offer A", "Probably Accept Offer A", "Probably Accept Offer B", "Definitely Accept Offer B"],
+    "short_labels": ["Definitely A", "Probably A", "Probably B", "Definitely B"],
     "choice": ["A", "A", "B", "B"],
     "confidence": ["definitely", "probably", "probably", "definitely"],
     "response_hand": "right",
@@ -95,39 +106,45 @@
   },
   "faces": {
     "sex": "female",
-    "identities_per_origin": 6,
-    "image_size_px": [400, 500],
+    "source": "AI-generated headshots (protocol p.19)",
+    "target_per_origin": 50,
     "folder": "faces",
-    "_note": "Placeholder silhouettes only. Replace with standardized, luminance-matched headshots."
+    "inventory": "faces/face_inventory.csv",
+    "output_size_px": [360, 450],
+    "crop": "central facial features only (eyes, nose, mouth) inside a soft oval; hair, ears and neck removed",
+    "min_per_origin_for_task": 2
   },
   "display": {
     "background_rgb": [128, 128, 128],
+    "card_rgb": [96, 96, 96],
     "text_rgb": [255, 255, 255],
+    "detail_text_rgb": [215, 215, 215],
+    "fixation_rgb": [255, 255, 255],
     "highlight_rgb": [255, 215, 0],
-    "highlight_line_px": 6,
-    "text_size_px": 32,
+    "highlight_line_deg": 0.14,
     "font": "Arial",
-    "icon_size_deg": 1.0,
-    "fixation_half_size_deg": 0.5,
-    "column_center_x_deg": [-6.0, 6.0],
+    "text_size_deg": {"header": 0.60, "main": 0.58, "detail": 0.42, "prompt": 0.70, "option": 0.50, "counter": 0.40, "instructions": 0.62},
+    "icon_size_deg": 1.05,
+    "fixation_half_size_deg": 0.35,
+    "fixation_line_deg": 0.09,
     "layout_deg": {
-      "phase1": {
-        "photo":      {"y": -2.0, "w": 4.0,  "h": 5.0},
-        "background": {"y":  2.0, "w": 10.0, "h": 1.4}
-      },
-      "phase2": {
-        "photo":      {"y": -5.0, "w": 2.8,  "h": 3.5},
-        "background": {"y": -2.4, "w": 10.0, "h": 1.4},
-        "salary":     {"y": -0.8, "w": 10.0, "h": 1.4},
-        "rest_days":  {"y":  0.8, "w": 10.0, "h": 1.4},
-        "workload":   {"y":  2.4, "w": 10.0, "h": 1.4}
-      },
-      "phase3": {
-        "photo":      {"y": -5.0, "w": 2.8,  "h": 3.5},
-        "background": {"y": -2.4, "w": 10.0, "h": 1.4},
-        "prompt":     {"y":  1.5, "w": 16.0, "h": 1.4},
-        "options":    {"y":  4.5, "x": [-9.0, -3.0, 3.0, 9.0], "w": 5.4, "h": 2.0}
-      }
+      "_note": "Degrees of visual angle from screen centre, +x right, +y down. Offer A is always the left card.",
+      "card_center_x": [-6.0, 6.0],
+      "card_width": 10.8,
+      "card_top": -6.1,
+      "card_bottom_short": 1.2,
+      "card_bottom_full": 6.3,
+      "header_y": -5.62,
+      "photo": {"y": -2.72, "w": 3.6, "h": 4.5},
+      "row_height": 1.5,
+      "row_y": {"employer_origin": 0.35, "salary_aed": 2.0, "rest_days_per_week": 3.6, "workload": 5.2},
+      "divider_y": 1.17,
+      "prompt_y": 2.25,
+      "option_center_x": [-8.55, -3.45, 3.45, 8.55],
+      "option_y": 4.6,
+      "option_w": 4.9,
+      "option_h": 2.6,
+      "counter_y": -7.0
     }
   },
   "catch_trials": {
@@ -144,32 +161,47 @@
     "max_abs_translation_mm": 3.0
   },
   "eyetracking": {
-    "system": "SR Research EyeLink (MR-compatible)",
+    "system": "SR Research EyeLink (MR-compatible, head-coil mounted)",
     "sampling_rate_hz": 1000,
     "calibration_type": "HV5",
     "record_pupil": true,
-    "metrics": ["gaze points", "fixations", "heatmaps", "area of interest", "time to first fixation", "time spent", "ratios", "fixation sequences", "number of revisits", "first fixation duration", "average fixation duration"]
+    "metrics": ["gaze points", "fixations", "heatmaps", "area of interest", "time to first fixation", "time spent", "ratios", "fixation sequences", "number of revisits", "first fixation duration", "average fixation duration", "saccade count", "pupil diameter"]
   },
   "physio": {
-    "signals": ["ECG or peripheral pulse oximeter", "respiratory belt"],
-    "derived": ["heart rate", "heart rate variability", "respiration rate"],
+    "signals": ["ECG or peripheral pulse oximeter", "respiratory belt", "skin conductance (GSR/EDA finger electrodes, listed in outcome table)"],
+    "derived": ["heart rate", "heart / pulse rate variability (RMSSD)", "respiration rate", "tonic SCL and phasic SCR"],
     "sampling_rate_hz": 500,
     "noise_correction": "RETROICOR",
-    "event_markers": "trial and phase onsets (see physio_trigger_codes.csv)",
-    "optional_signals": ["skin conductance (mentioned on p.10, no hardware listed)"]
+    "event_markers": "trial and phase onsets (see physio_trigger_codes.csv)"
   },
   "payout": {
-    "trial_selection": "one random trial",
-    "eligible_responses": ["Definitely Accept Offer A", "Definitely Accept Offer B"],
-    "market_lottery_success_prob": 0.5,
+    "trial_selection": "one random trial from the 48 scanned choices",
+    "eligible_confidence": "definitely",
+    "market_lottery_success_prob_PLACEHOLDER": 0.5,
     "salary_scale_divisor": 64,
-    "bonus_aed_by_salary": {"1800": 28.13, "2500": 39.06, "3200": 50.00},
-    "completion_fee_aed_PLACEHOLDER": 150,
-    "travel_allowance_aed_PLACEHOLDER": 50
+    "salary_levels_aed": [1800, 2500, 3200],
+    "bonus_aed": [28, 39, 50],
+    "fmri_session_fee_aed": 80,
+    "behavioral_session_fee_aed": 50,
+    "travel_allowance_aed": 20,
+    "dual_lottery": "the locked online (behavioural) lottery is resolved together with the scanner lottery at the end of the campus visit"
+  },
+  "instructions": {
+    "_note": "DRAFT English wording - must match the IRB-approved text before data collection. One string per page; '\\n' is a line break.",
+    "task_pages": [
+      "Job offers\n\nYou will see job offers from families in the UAE\nwho are looking for a live-in domestic worker.\n\nEach time, there are two offers:\nOffer A on the left and Offer B on the right.\n\nPlease treat every offer as a real job offer.",
+      "Each round has three steps\n\n1. You see the two employers and their family background.\n\n2. You see the full offers:\nsalary, off days and workload.\n\n3. You choose the offer you would accept.",
+      "How to answer\n\nWhen you see the question, press one button with your right hand:\n\nIndex finger = Definitely accept Offer A\nMiddle finger = Probably accept Offer A\nRing finger = Probably accept Offer B\nLittle finger = Definitely accept Offer B\n\nYou have 3 seconds to answer.",
+      "Between screens you will see a cross: +\n\nPlease look at the cross and wait.\n\nKeep your head as still as you can during the whole scan."
+    ],
+    "run_reminder": "Run %d of %d\n\nIndex = Definitely A        Middle = Probably A\nRing = Probably B        Little finger = Definitely B\n\nAnswer within 3 seconds.\nPlease keep your head still.",
+    "practice_intro": "Practice\n\nThese first job offers are for practice only.\nThey do not count.",
+    "end_of_run": "End of this part.\n\nPlease stay still and rest.",
+    "end_of_session": "You have finished all the job offers.\n\nThank you! Please stay still until we come to you."
   },
   "hardware": {
     "display": "PROPixx projector + in-bore screen (VP display mode 1)",
-    "response_boxes": "VPixx left and right 5-button response boxes",
+    "response_boxes": "VPixx left and right 5-button response boxes (task uses the right box; left hand holds the squeeze ball)",
     "scanner_trigger": "VPixx DIN bit 14 (wait_trigger.m)",
     "event_output": "VPixx DOUT (Datapixx SetDoutValues), as in experiments/EEG-FMRI",
     "stimulus_computer": "macOS, Psychtoolbox 3.0.22"

@@ -57,7 +57,7 @@ switch(debugConfig.displayMode) % Select hardware profile
         if debugConfig.fullscreen == 1 % Fullscreen toggle
             VP.fullscreen = []; % Fullscreen
         else
-            VP.fullscreen = [0 0 800 500]; % Windowed rectangle
+            VP.fullscreen = [40 60 1320 780]; % Windowed rectangle (1280 x 720)
         end
         
 
@@ -102,20 +102,17 @@ end
 PsychDefaultSetup(1);
 ListenChar(0); % Listen for keyboard input
 
-if debugConfig.skipSyncTests == 1
-    Screen('Preference', 'SkipSyncTests', 1);
-else
-    Screen('Preference', 'SkipSyncTests', 0);
-end
-
-% Initialize PsychSound
-InitializePsychSound(1); % 1 = request low-latency mode
-PsychPortAudio('Open');
+% 0 = run sync tests, 1 = shortened tests, 2 = no tests at all (automated tests in a window)
+Screen('Preference', 'SkipSyncTests', double(debugConfig.skipSyncTests));
+Screen('Preference', 'VisualDebugLevel', 1); % No Psychtoolbox welcome screen in front of the participant
 
 % CRITICAL FIX: Use plain Screen('OpenWindow') instead of PsychImaging
 % PsychImaging pipeline interferes with EyeLink calibration callbacks in fullscreen on Apple Silicon
 VP.backGroundColor = [128 128 128]; % Mid-gray background (0-255 range)
 [VP.window, VP.Rect] = Screen('OpenWindow', VP.screenID, VP.backGroundColor, VP.fullscreen);
+if isempty(VP.fullscreen)
+    HideCursor(VP.window); % Fullscreen: no mouse pointer on the participant's screen
+end
 
 [VP.windowCenter(1), VP.windowCenter(2)] = RectCenter(VP.Rect); % Compute window center
 VP.windowWidthPix = VP.Rect(3) - VP.Rect(1); % Window width in pixels

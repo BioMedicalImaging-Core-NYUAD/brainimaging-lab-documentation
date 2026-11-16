@@ -1,31 +1,36 @@
-function main()
-% MAIN - Button-pressing experiment with circular path and traveling dot
+function main(mode, opts)
+% MAIN - Navigating the Job Market (NJM) fMRI task: one functional run per call
 %
-% Participants view a circular path with a continuously traveling dot. During
-% stimulus presentation, the circular path changes to a target color (white,
-% red, yellow, green, or blue). Participants press the corresponding button
-% for the color they see.
+%   main                 one scanner run (a dialog asks for subject, session and run 1-4)
+%   main('practice')     practice trials (mock scanner / before run 1); not part of the 48 trials
+%   main(mode, opts)     no dialog and/or other settings, e.g. for testing:
+%                        opts.subjectID, opts.sessionID, opts.runID, opts.overwrite,
+%                        opts.debug = struct with any debugConfig field
 %
-% What do you see:
-% - Circular path: Black during non-stimulus phases, changes to target color during stimulus
-% - Traveling dot: Continuously moves along path; changes color for feedback
+% The task: on every trial the participant sees two job offers from two
+% employer families (Offer A left, Offer B right) in three steps:
+%   Phase 1 - employer photos + family background
+%   Phase 2 - full offers: salary, off days, workload
+%   Phase 3 - "Which job offer do you choose?" with four buttons
+%             (1 Definitely A, 2 Probably A, 3 Probably B, 4 Definitely B)
+% with a fixation cross between the steps and between trials.
+%
+% A session is 4 runs of 12 trials. Trial order, left/right position, faces
+% and jitter are randomised per participant (utils/setup/make_subject_design.m)
+% and saved in the participant's data folder, so the 4 runs belong together.
+%
+% Every setting of the task (timing, texts, layout, response mapping) is in
+% stimuli_data/njm_fmri_parameters.json. Related scripts in this folder:
+%   practice.m, njm_payout.m, njm_playback.m, njm_preview_screens.m, njm_check_design.m
 
-%
-% Trial structure:
-% 1. Stimulus: Circular path displays target color
-% 2. Response: Participant responds while path returns to black
-% 3. Feedback: Traveling dot changes color to  indicate correctness
-% 4. Inter-trial interval: Brief pause before next trial
-%
-% All timing and visual parameters are configurable in setup_param.m
+if nargin < 1 || isempty(mode), mode = 'task'; end
+if nargin < 2 || isempty(opts), opts = struct(); end
 
-% Clear workspace and close any open windows
-clear all; close all; sca;
+close all; sca;
 
 % Add the shared VPixx utilities (getButtonColor) to the path.
 % Search upwards from this file for experiments/general/vpixx-utilities so the
-% experiment keeps working wherever its folder sits in the repo (a fixed
-% '..' depth broke when the template moved from tests/ to experiments/FMRI/).
+% experiment keeps working wherever its folder sits in the repo.
 scriptDir = fileparts(mfilename('fullpath'));
 vpixxPath = '';
 searchDir = scriptDir;
@@ -54,19 +59,35 @@ addpath(genpath(fullfile(scriptDir, 'utils')));
 debugConfig = struct();
 debugConfig.enabled = 1;              % 1 = debug mode, 0 = production mode
 debugConfig.useVPixx = 1;             % 1 = use VPixx hardware, 0 = use keyboard
-debugConfig.fullscreen = 1;            % 1 = fullscreen, 0 = windowed mode
-debugConfig.skipSyncTests = 1;       % 1 = skip sync tests, 0 = run sync tests
+debugConfig.fullscreen = 1;           % 1 = fullscreen, 0 = windowed mode
+debugConfig.skipSyncTests = 1;        % 1 = skip sync tests, 0 = run sync tests
 debugConfig.displayMode = 1;          % 1 = NYUAD lab, 2 = laptop/development
 debugConfig.manualTrigger = 1;        % 1 = manual trigger (5 or t), 0 = scanner trigger
-debugConfig.buttonbox = 1;        % 1 = button box, 0 = keyboard
-debugConfig.eyetracking = 0;       % 1 = enable Eyelink, 0 = disable
+debugConfig.buttonbox = 1;            % 1 = button box (right VPixx box), 0 = keyboard keys 1-4
+debugConfig.eyetracking = 0;          % 1 = enable Eyelink, 0 = disable
+debugConfig.sendMarkers = 0;          % 1 = send event codes on the VPixx digital output (physiology recorder)
+debugConfig.doutMapping = 'direct';   % 'direct' or 'spread' (see utils/setup/send_event.m)
+debugConfig.showInstructions = 1;     % 1 = instruction screens before the trigger, 0 = none
+debugConfig.autoRespond = 0;          % TEST ONLY: 1 = simulated participant, no trigger wait
+debugConfig.timeScale = 1;            % TEST ONLY: < 1 runs the task faster (0.1 = ten times faster)
+
+% For the scanner session set:  manualTrigger = 0, and eyetracking / sendMarkers as needed.
+% For a laptop set:             useVPixx = 0, displayMode = 2, buttonbox = 0 (fullscreen = 0 for a window).
+
+% Settings passed in opts.debug win over the ones above
+if isfield(opts, 'debug') && isstruct(opts.debug)
+    names = fieldnames(opts.debug);
+    for i = 1:numel(names)
+        debugConfig.(names{i}) = opts.debug.(names{i});
+    end
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % GET BIDS INFORMATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 experimentDir = scriptDir;
 try
-    debugConfig.bidsInfo = get_info(experimentDir, 'circularpath');
+    debugConfig.bidsInfo = get_info(experimentDir, mode, opts);
 catch ME
     if contains(ME.message, 'cancelled') || contains(ME.message, 'not to overwrite')
         fprintf('Exiting.\n');
@@ -81,164 +102,150 @@ end
 % Setup display with debug configuration
 [VP, debugConfig] = setup_display(debugConfig);
 
-% Setup experiment parameters
-[VP, pa] = setup_param(VP, debugConfig);
+try
+    % Setup experiment parameters (JSON, this participant's design, stimuli)
+    [VP, pa] = setup_param(VP, debugConfig);
+catch ME
+    sca;
+    rethrow(ME);
+end
 
 % Setup keyboard mappings
-kb = setup_keyboard();
+kb = setup_keyboard(pa);
 
-% Initialize eyetracking (following reference pattern exactly)
+% Initialize eyetracking
 if debugConfig.eyetracking
     pa.EL = initEyetracking(VP, pa);
     if isempty(pa.EL)
-        pa.eyeTrackingEnabled = 0;
+        pa.eyeTrackingEnabled = false;
     else
-        pa.eyeTrackingEnabled = 1;
+        pa.eyeTrackingEnabled = true;
+        try
+            Eyelink('Command', 'sample_rate = %d', pa.P.eyetracking.sampling_rate_hz);
+            Eyelink('Message', 'DISPLAY_COORDS %d %d %d %d', 0, 0, VP.Rect(3) - 1, VP.Rect(4) - 1);
+        catch
+        end
     end
 else
     pa.EL = [];
-    pa.eyeTrackingEnabled = 0;
+    pa.eyeTrackingEnabled = false;
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % START EXPERIMENT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+exitFlag = false;
 try
-    % Calibration (following reference pattern - called before experiment starts)
+    % Calibration (before the run starts)
     if pa.eyeTrackingEnabled
-        [~, exitFlag] = initEyelinkStates('calibrate', VP.window, pa.EL);
-        if exitFlag
+        [~, calFailed] = initEyelinkStates('calibrate', VP.window, pa.EL);
+        if calFailed
             fprintf('\nCalibration failed or was cancelled. Disabling eye tracking.\n');
             pa.EL = [];
-            pa.eyeTrackingEnabled = 0;
+            pa.eyeTrackingEnabled = false;
         end
     end
 
-    % Wait for scanner trigger or manual trigger (displays message on screen).
-    % The trigger time is time zero: every phase is scheduled from it
-    % (see start_phase), and all logged onsets are relative to it.
-    experimentStartTime = wait_trigger(VP, debugConfig.manualTrigger);
-    if pa.eyeTrackingEnabled
-        err = Eyelink('CheckRecording');
-        if err ~= 0
-            initEyelinkStates('startrecording', VP.window, pa.EL);
-            fprintf('Eyelink now recording ..\n');
-        end
-    end
-
-    % Initialize gaze sample timing (subtract interval so first sample is recorded immediately)
-    pa.lastGazeSampleTime = experimentStartTime - pa.gazeSampleInterval;
-    fprintf('\n=== %s ===\n', pa.experimentName);
-
-    % Initialize fixation angle (starts at 0 radians)
-    currentFixationAngle = 0;
-
-    % Setup KbQueue once for efficient button detection throughout experiment
-    KbQueueCreate();
-    KbQueueStart();
-
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % START EXPERIMENT (moving dot only, before first trial)
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    [pa, exitFlag, currentFixationAngle] = s1_startExp(VP, pa, kb, experimentStartTime, currentFixationAngle);
-    % ESC during the start period: skip the trials but still reach cleanup below
-    % (a 'return' here used to skip cleanup: window left open, data not saved)
-    nTrialsToRun = pa.nTrials;
-    if exitFlag, nTrialsToRun = 0; end
-
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % MAIN EXPERIMENT LOOP
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    % Main trial-based loop - run exactly pa.nTrials trials
-    for trialIdx = 1:nTrialsToRun
-        pa.trialCounter = pa.trialCounter + 1;
-
-        % Check for ESC key to abort experiment using KbQueue
-        [pressed, firstPress] = KbQueueCheck();
-        if pressed && firstPress(kb.escKey)
-            fprintf('\n*** Experiment terminated by user (ESC pressed) ***\n');
-            break;
-        end
-
-        % Get target color from predefined sequence
-        targetColor = pa.colorSequence{trialIdx};
-
-        % Store trial data (use direct indexing with pre-allocated arrays)
-        pa.data.trialNumber(pa.trialCounter) = pa.trialCounter;
-        pa.data.targetColor{pa.trialCounter} = targetColor;
-        % trialStartTime / cumulativeTime are set in s2_stimulus from the actual
-        % onset of the stimulus frame (seconds from the trigger)
-        pa.data.fixationAngle(pa.trialCounter) = currentFixationAngle;
-
-        fprintf('Trial %d/%d: Target = %s\n', pa.trialCounter, pa.nTrials, targetColor);
-
-        % Phase 1: Stimulus
-        targetIdx = find(strcmp(targetColor, pa.colors));
-        [pa, exitFlag, currentFixationAngle] = s2_stimulus(VP, pa, kb, experimentStartTime, currentFixationAngle, targetColor, targetIdx);
-        if exitFlag, break; end
-
-        % Phase 2: Response
-        [pa, exitFlag, currentFixationAngle, responseReceived, responseButton, responseTime] = s3_response(VP, pa, kb, experimentStartTime, currentFixationAngle, debugConfig);
-        if exitFlag, break; end
-
-        % Record response data
-        if responseReceived
-            pa.data.response{pa.trialCounter} = responseButton;
-            pa.data.reactionTime(pa.trialCounter) = responseTime;
-            pa.data.correct(pa.trialCounter) = strcmp(responseButton, targetColor);
+    % Instructions (the experimenter turns the pages: SPACE = next, B = back)
+    if debugConfig.showInstructions && ~debugConfig.autoRespond
+        I = pa.P.instructions;
+        runNumber = pa.bidsInfo.runNumber;
+        if strcmp(pa.mode, 'practice')
+            pages = [I.task_pages(:)', {I.practice_intro}];
+        elseif runNumber == 1
+            pages = [I.task_pages(:)', {sprintf(I.run_reminder, runNumber, pa.nRuns)}];
         else
-            pa.data.response{pa.trialCounter} = 'no_response';
-            pa.data.reactionTime(pa.trialCounter) = NaN;
-            pa.data.correct(pa.trialCounter) = 0;
+            pages = {sprintf(I.run_reminder, runNumber, pa.nRuns)};
         end
-
-        % Phase 3: Feedback
-        [pa, exitFlag, currentFixationAngle] = s4_feedback(VP, pa, kb, experimentStartTime, currentFixationAngle, responseReceived, pa.data.correct(pa.trialCounter));
-        if exitFlag, break; end
-
-        % Phase 4: ITI
-        [pa, exitFlag, currentFixationAngle] = s5_iti(VP, pa, kb, experimentStartTime, currentFixationAngle);
-        if exitFlag, break; end
-
-        % Print trial result
-        if responseReceived
-            fprintf('  Response: %s, RT: %.3fs, Correct: %d\n', ...
-                responseButton, responseTime, pa.data.correct(pa.trialCounter));
-        else
-            fprintf('  No response received\n');
-        end
+        exitFlag = show_text_screen(VP, pa, kb, pages, 'key');
     end
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % END EXPERIMENT
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    % End screen (skipped after ESC)
     if ~exitFlag
-        [pa, ~, ~] = s6_endScreen(VP, pa, kb, experimentStartTime, currentFixationAngle);
+        % Wait for scanner trigger or manual trigger (displays message on screen).
+        % The trigger time is time zero: every screen is scheduled from it
+        % (see present_screen), and all logged onsets are relative to it.
+        experimentStartTime = wait_trigger(VP, debugConfig.manualTrigger, debugConfig.autoRespond);
+        pa.t0 = experimentStartTime;
+
+        if pa.eyeTrackingEnabled
+            err = Eyelink('CheckRecording');
+            if err ~= 0
+                initEyelinkStates('startrecording', VP.window, pa.EL);
+                fprintf('Eyelink now recording ..\n');
+            end
+        end
+        pa = send_event(pa, 'RUN_START', experimentStartTime, 0);
+
+        % Setup KbQueue once for button detection throughout the run
+        KbQueueCreate();
+        KbQueueStart();
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % LEAD-IN FIXATION (the first trial's screens are prepared meanwhile)
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        [pa, o] = present_screen(VP, pa, kb, [], NaN, pa.sched(1).phase1, ...
+            struct('event', 'PRETRIAL_FIXATION', 'prepTrial', 1));
+        exitFlag = o.esc;
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % MAIN EXPERIMENT LOOP
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        for k = 1:pa.nTrials
+            if exitFlag, break; end
+            [pa, exitFlag] = run_trial(VP, pa, kb, k);
+
+            if pa.data.timeout(k)
+                fprintf('Trial %2d/%d  %-15s  no response\n', k, pa.nTrials, pa.trials(k).kind);
+            elseif pa.data.completed(k)
+                fprintf('Trial %2d/%d  %-15s  %-26s RT %.2f s\n', k, pa.nTrials, pa.trials(k).kind, ...
+                    pa.data.response_label{k}, pa.data.reaction_time(k));
+            end
+        end
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % END OF RUN
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        if exitFlag
+            fprintf('\n*** Run stopped by the experimenter (ESC) ***\n');
+            pa.aborted = true;
+        else
+            pa.currentTrial = 0;
+            pa.measuredRunDuration = (GetSecs - pa.t0) / pa.timeScale;
+            pa = send_event(pa, 'RUN_END', GetSecs, pa.runEnd);
+            if strcmp(pa.mode, 'task') && pa.bidsInfo.runNumber == pa.nRuns
+                endText = pa.P.instructions.end_of_session;
+            else
+                endText = pa.P.instructions.end_of_run;
+            end
+            if debugConfig.autoRespond
+                show_text_screen(VP, pa, kb, endText, 0.5);
+            else
+                show_text_screen(VP, pa, kb, endText, 5);
+            end
+        end
+    else
+        pa.aborted = true;
     end
 
 catch ME
     % Error occurred - display detailed message
+    pa.aborted = true;
     fprintf('\n!!! ERROR OCCURRED !!!\n');
     fprintf('Error message: %s\n', ME.message);
     if ~isempty(ME.stack)
         fprintf('Error in: %s (line %d)\n', ME.stack(1).name, ME.stack(1).line);
-        % Print full stack trace
         fprintf('\nStack trace:\n');
         for i = 1:length(ME.stack)
             fprintf('  %d. %s (line %d)\n', i, ME.stack(i).name, ME.stack(i).line);
         end
     end
+    pa.errorMessage = ME.message;
 end
 
-% Cleanup and finalize experiment (always executed)
-% Check if experimentStartTime was defined before calling cleanup
+% Cleanup and save (always executed)
 if exist('experimentStartTime', 'var')
     cleanup_experiment(VP, pa, kb, experimentStartTime);
 else
-    % If experiment never started, use current time as fallback
     cleanup_experiment(VP, pa, kb, GetSecs);
 end
 

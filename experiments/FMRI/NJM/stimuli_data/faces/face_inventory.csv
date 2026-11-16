@@ -1,25 +1,9 @@
-face_id,employer_origin,file,sex,source,mean_luminance_target
-SEA_SA_01,SEA_SA,face_sea_sa_01.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-SEA_SA_02,SEA_SA,face_sea_sa_02.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-SEA_SA_03,SEA_SA,face_sea_sa_03.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-SEA_SA_04,SEA_SA,face_sea_sa_04.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-SEA_SA_05,SEA_SA,face_sea_sa_05.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-SEA_SA_06,SEA_SA,face_sea_sa_06.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-ARAB_01,ARAB,face_arab_01.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-ARAB_02,ARAB,face_arab_02.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-ARAB_03,ARAB,face_arab_03.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-ARAB_04,ARAB,face_arab_04.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-ARAB_05,ARAB,face_arab_05.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-ARAB_06,ARAB,face_arab_06.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-AFRICAN_01,AFRICAN,face_african_01.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-AFRICAN_02,AFRICAN,face_african_02.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-AFRICAN_03,AFRICAN,face_african_03.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-AFRICAN_04,AFRICAN,face_african_04.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-AFRICAN_05,AFRICAN,face_african_05.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-AFRICAN_06,AFRICAN,face_african_06.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-WESTERN_01,WESTERN,face_western_01.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-WESTERN_02,WESTERN,face_western_02.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-WESTERN_03,WESTERN,face_western_03.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-WESTERN_04,WESTERN,face_western_04.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-WESTERN_05,WESTERN,face_western_05.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
-WESTERN_06,WESTERN,face_western_06.png,female,PLACEHOLDER - replace with standardized headshot,match across all faces (pupil measure)
+face_id,employer_origin,file,set,sex,source_file,ipd_source_px,upscale_factor,roll_corrected_deg,lightness_before,contrast_before,lightness_after,contrast_after,luminance_matching,low_resolution,pretest_status
+SEA_SA_01,SEA_SA,face_sea_sa_01.png,fmri,female,faces_raw/SEA_SA/protocol_sample_r1c1.png,56.1,3.68,-1.46,46.8,14.6,47.9,14.6,within,1,NOT PRE-TESTED
+SEA_SA_02,SEA_SA,face_sea_sa_02.png,fmri,female,faces_raw/SEA_SA/protocol_sample_r2c4.png,54.1,3.81,-0.44,49.3,14.5,47.8,14.5,within,1,NOT PRE-TESTED
+ARAB_01,ARAB,face_arab_01.png,fmri,female,faces_raw/ARAB/protocol_sample_r1c2.png,54.2,3.81,-0.78,58.7,16.0,58.7,14.4,within,1,NOT PRE-TESTED
+ARAB_02,ARAB,face_arab_02.png,fmri,female,faces_raw/ARAB/protocol_sample_r2c3.png,55.4,3.72,-1.3,59.2,12.8,58.7,14.4,within,1,NOT PRE-TESTED
+AFRICAN_01,AFRICAN,face_african_01.png,fmri,female,faces_raw/AFRICAN/protocol_sample_r1c4.png,54.5,3.78,-1.25,34.8,11.9,34.4,11.9,within,1,NOT PRE-TESTED
+AFRICAN_02,AFRICAN,face_african_02.png,fmri,female,faces_raw/AFRICAN/protocol_sample_r2c2.png,52.7,3.92,1.89,34.3,11.8,34.3,11.8,within,1,NOT PRE-TESTED
+WESTERN_01,WESTERN,face_western_01.png,fmri,female,faces_raw/WESTERN/protocol_sample_r1c3.png,54.6,3.78,-0.78,67.9,12.3,67.0,12.5,within,1,NOT PRE-TESTED
+WESTERN_02,WESTERN,face_western_02.png,fmri,female,faces_raw/WESTERN/protocol_sample_r2c1.png,55.8,3.7,-1.55,66.5,12.7,67.0,12.5,within,1,NOT PRE-TESTED

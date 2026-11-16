@@ -1,14 +1,14 @@
-attribute,level_index,level,label,display_text,icon
-employer_origin,1,SEA_SA,Southeast / South Asian (non-Arab) Family,South / Southeast Asian Family,icon_background.png
-employer_origin,2,ARAB,Arab / Emirati Family,Arab / Emirati Family,icon_background.png
-employer_origin,3,AFRICAN,Black (non-Arab) / African Family,African Family,icon_background.png
-employer_origin,4,WESTERN,White (non-Arab) / Western Family,Western Family,icon_background.png
-salary_aed,1,1800,Low Market Rate,"AED 1,800 / month",icon_salary.png
-salary_aed,2,2500,Standard Market Rate,"AED 2,500 / month",icon_salary.png
-salary_aed,3,3200,High Market Rate,"AED 3,200 / month",icon_salary.png
-rest_days_per_week,1,0.0,No rest days,0 days / week,icon_rest_days.png
-rest_days_per_week,2,0.5,1 day every two weeks,1/2 day / week,icon_rest_days.png
-rest_days_per_week,3,1.0,1 day every week,1 day / week,icon_rest_days.png
-workload,1,1,Light (1 child + no cooking or cleaning),"Light (1 kid, no cook/clean)",icon_workload.png
-workload,2,2,Moderate (2 children + general cooking and cleaning),Moderate (2 kids + cook/clean),icon_workload.png
-workload,3,3,Heavy (3+ children + extensive cooking and cleaning),Heavy (3+ kids + extensive cook/clean),icon_workload.png
+attribute,level_index,level,label,display_text,detail_text,icon
+employer_origin,1,SEA_SA,Southeast / South Asian (non-Arab) Family,Southeast / South Asian Family,Family background,icon_background.png
+employer_origin,2,ARAB,Arab / Emirati Family,Arab / Emirati Family,Family background,icon_background.png
+employer_origin,3,AFRICAN,Black (non-Arab) / African Family,Black / African Family,Family background,icon_background.png
+employer_origin,4,WESTERN,White (non-Arab) / Western Family,White / Western Family,Family background,icon_background.png
+salary_aed,1,1800,Low Market Rate,"AED 1,800 / month",Salary,icon_salary.png
+salary_aed,2,2500,Standard Market Rate,"AED 2,500 / month",Salary,icon_salary.png
+salary_aed,3,3200,High Market Rate,"AED 3,200 / month",Salary,icon_salary.png
+rest_days_per_week,1,0.0,No rest days,0 days / week,Off days: none,icon_rest_days.png
+rest_days_per_week,2,0.5,1 day every two weeks,1/2 day / week,Off days: 1 day every two weeks,icon_rest_days.png
+rest_days_per_week,3,1.0,1 day every week,1 day / week,Off days: 1 day every week,icon_rest_days.png
+workload,1,1,Light (1 child + no cooking or cleaning),Light workload,"1 kid, no cook/clean",icon_workload.png
+workload,2,2,Moderate (2 children + general cooking and cleaning),Moderate workload,2 kids + cook/clean,icon_workload.png
+workload,3,3,Heavy (3+ children + extensive cooking and cleaning),Heavy workload,3+ kids + extensive cook/clean,icon_workload.png
